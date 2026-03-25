@@ -1,7 +1,7 @@
 # The MolTrust Protocol
 ## A Verification Standard for Autonomous Software Agents
 
-**Version 0.4 — Draft for Review**
+**Version 0.5 — Draft for Review**
 **MolTrust / CryptoKRI GmbH, Zurich**
 **March 2026**
 
@@ -15,7 +15,9 @@ This paper describes a minimal, open verification standard for software agents �
 
 The standard is built on existing open specifications (W3C DID, W3C Verifiable Credentials), requires no permission to implement, and is designed to function independently of any single platform, jurisdiction, or operator.
 
-*Technical specifications, data models, and conformance requirements are defined in the companion document: The MolTrust Protocol: Technical Specification (v0.2.1).*
+The Protocol aligns with the Singapore IMDA Model AI Governance Framework for Agentic AI (January 2026) and is designed to remain compatible with the EU AI Act (August 2026 enforcement) and emerging APAC regulatory frameworks.
+
+*Technical specifications, data models, and conformance requirements are defined in the companion document: The MolTrust Protocol: Technical Specification (v0.3).*
 
 ---
 
@@ -42,6 +44,8 @@ Three questions arise in any agent-to-agent or human-to-agent interaction that c
 **Behavioral history.** Has this agent acted consistently with its declared parameters in the past? Reputation systems exist within platforms. They do not transfer. An agent with a long, clean history on one system is indistinguishable from a newly registered agent on any other.
 
 These three gaps compound each other. Without portable identity, behavioral history cannot be attributed reliably. Without verifiable authorization, identity alone is insufficient. The absence of any one element undermines the value of the others.
+
+Unlike approaches that bind trust to a central authority or developer account, the MolTrust Protocol implements trust as portable, cryptographically verifiable proof — a property we call verifier independence.
 
 ---
 
@@ -95,6 +99,122 @@ Portability here means interoperability of evidence formats, not identity of sco
 
 Portability answers the question: *can this agent's claims be verified regardless of where it was registered?*
 
+**4.5 The Five-Party Trust Chain**
+
+Trust in the autonomous economy does not begin with an agent — it begins with the humans and organizations that deploy them. The MolTrust Protocol formalizes a five-party accountability chain:
+
+**Developer → Owner → Agent → Instructor → Counterparty**
+
+Each link is cryptographically verifiable:
+
+- **Developer**: entity that wrote or deployed the agent code. Optional Trust Tier 0 KYC-backed DID.
+- **Owner**: organization or individual operating the agent. May differ from Developer. Ownership transfers are recorded immutably.
+- **Agent**: autonomous system acting on behalf of Owner. Holds W3C DID + VCs. Cannot shed identity through redeployment.
+- **Instructor**: entity providing runtime instructions (human, agent, or workflow). Interaction Proofs bind instructions to outcomes.
+- **Counterparty**: system or agent the agent interacts with. Can verify credentials independently without calling the MolTrust API.
+
+Key property: Agent DIDs are independent from Developer DIDs. If a developer is compromised, their agents are not automatically compromised — each agent's credential chain is evaluated independently.
+
+**4.6 Agent Authorization Envelope**
+
+Every MolTrust VC carries a machine-readable authorization object — the Agent Authorization Envelope (AAE) — organized in three blocks:
+
+**MANDATE** — What is the agent permitted to do? Purpose, allowed and denied actions, resources, and delegation rules.
+
+**CONSTRAINTS** — Under what conditions? Time bounds, financial thresholds, jurisdictions, counterparty requirements, and obligations.
+
+**VALIDITY** — Is this credential still trustworthy? Issuer, holder binding, timestamps, revocation, and audit anchor.
+
+```json
+{
+  "authorization": {
+    "mandate": {
+      "purpose": "Execute procurement transactions",
+      "actions_allowed": ["quote.request", "order.place", "payment.initiate"],
+      "actions_denied": ["payment.approve_above_threshold", "contract.sign"],
+      "resources": ["supplier-catalog:*", "budget:procurement-2026-Q1"],
+      "delegation": {
+        "permitted": true,
+        "max_depth": 1,
+        "delegate_constraints": "inherit"
+      }
+    },
+    "constraints": {
+      "time_bound": {
+        "not_before": "2026-01-01T00:00:00Z",
+        "not_after": "2026-06-30T23:59:59Z"
+      },
+      "financial": {
+        "max_single_transaction": "10000.00 USD",
+        "max_cumulative_daily": "50000.00 USD",
+        "approval_threshold": "5000.00 USD"
+      },
+      "jurisdictions": ["CH", "EU", "US"],
+      "counterparty_requirements": {
+        "min_trust_score": 60,
+        "required_credentials": ["VerifiedAgentCredential"]
+      },
+      "obligations": {
+        "log_all_transactions": true,
+        "human_approval_above": "5000.00 USD"
+      }
+    },
+    "validity": {
+      "issuer": "did:moltrust:org:cryptokri",
+      "holder": "did:moltrust:agent:procurement-bot-7a",
+      "issuer": "did:moltrust:issuer001",
+      "holderBinding": "did:moltrust:agent042",
+      "issuedAt": "2026-03-25T00:00:00Z",
+      "expiresAt": "2026-04-25T00:00:00Z",
+      "revocationEndpoint": "https://api.moltrust.ch/revocation",
+      "onChainAnchor": {
+        "chain": "base-mainnet",
+        "block": 43825232,
+        "txHash": "0xcc425d150228c959565c4059eb07b0261afefc407156dc80f3c544216d3382da"
+      }
+    }
+  }
+}
+```
+
+AAE boundaries are immutably anchored at issuance. An agent cannot modify its own envelope — any attempt to exceed declared permissions is detectable by any verifier inspecting the credential. This is a fundamental separation: the agent executes within its envelope; the envelope itself is controlled by the issuing authority.
+
+A Runtime Control Plane handles revocation events separately from issuance. Revocation follows CAEP-compatible (Continuous Access Evaluation Protocol) event semantics, allowing credential status changes to propagate in near-real-time without requiring reissuance of the entire credential.
+
+The AAE design draws on NIST SP 800-162 (Guide to Attribute Based Access Control), W3C Verifiable Credentials Data Model 2.0, and OAuth 2.0 Rich Authorization Requests (RFC 9396).
+
+**4.7 Regulatory Alignment — Singapore IMDA Model AI Governance Framework**
+
+The Singapore Infocomm Media Development Authority (IMDA) published the Model AI Governance Framework for Agentic AI in January 2026 — the first comprehensive regulatory guidance addressing autonomous AI agent systems. The MolTrust Protocol maps to each of the four MGF dimensions:
+
+**Dimension 1 — Risk Bounding.** The MGF requires that agent systems implement mechanisms to bound the risks of autonomous action. MolTrust addresses this through the AAE mandate and constraints blocks, which define explicit boundaries on permitted actions, financial thresholds, jurisdictions, and delegation depth. Risk bounding is cryptographically enforced at the credential level — not as a policy overlay, but as a structural property of the authorization envelope. **Status: Fully Addressed.**
+
+**Dimension 2 — Human Accountability.** The MGF requires traceable accountability chains linking autonomous actions to responsible humans. MolTrust addresses this through the five-party trust chain (Section 4.5), which establishes cryptographically verifiable links from Developer through Owner to Agent. The AAE constraints block supports approval thresholds that require human sign-off above defined limits. A dedicated human-in-the-loop (HITL) interface for real-time approval workflows is on the roadmap for Q2 2026. **Status: Partially Addressed.**
+
+**Dimension 3 — Technical Controls.** The MGF requires robust technical safeguards for agent lifecycle management, including identity, monitoring, and revocation. MolTrust addresses this through the full DID+VC lifecycle — issuance, verification, time-to-live enforcement, and CAEP-compatible revocation. Interaction Proofs provide a continuous, tamper-evident audit trail. **Status: Strongly Addressed.**
+
+**Dimension 4 — End-User Responsibility.** The MGF requires that end users understand the capabilities and limitations of agents they interact with. MolTrust currently provides machine-readable AAE metadata and verifiable credentials. Human-readable Agent Cards and explainability interfaces — enabling non-technical users to understand an agent's authorization scope — are on the roadmap for Q2 2026. **Status: Roadmap Q2 2026.**
+
+The protocol is additionally designed for compatibility with the EU AI Act (August 2026 enforcement deadline), which imposes transparency and risk classification requirements on AI systems including autonomous agents; the South Korea AI Basic Act, which establishes accountability frameworks for AI operators; and the Taiwan AI Basic Act, which defines governance principles for AI deployment in regulated sectors.
+
+**4.8 Trust Tier 0 — Optional Human Identity Anchoring**
+
+The MolTrust Protocol is agent-centric. Anonymous deployment is permitted. No human identity disclosure is required to register an agent, issue credentials, or participate in the trust network. This is by design: many legitimate agent deployments — research prototypes, open-source tools, privacy-preserving services — have no reason to disclose the identity of their operators.
+
+For enterprise and regulated deployments, the protocol defines an optional Trust Tier 0, in which the Developer or Owner identity is KYC-verified by an accredited third-party identity provider. Verification produces a KYC-backed Developer Credential — a W3C Verifiable Credential attesting that the named entity has been identity-verified to a defined assurance level.
+
+Agents linked to a Trust Tier 0 Developer or Owner receive a score boost in the reference reputation model, reflecting the additional accountability signal. This boost is informative, not deterministic — verifiers may weight it as they choose.
+
+Critically, Trust Tier 0 does not affect agent DID independence. A verified developer's agents still hold their own DIDs, their own credential chains, and their own behavioral records. If the developer credential is revoked, agent credentials are not automatically invalidated — each agent's standing is evaluated on its own merits.
+
+**What Trust Tier 0 is not:**
+
+- It is not mandatory. Agents without Trust Tier 0 are full participants in the protocol.
+- It is not gatekeeping. No capability is restricted to Trust Tier 0 agents.
+- It does not make MolTrust a regulated identity provider. MolTrust does not perform KYC — it accepts and verifies credentials issued by accredited third parties.
+
+Trust Tier 0 is an opt-in accountability layer, expressible via the AAE CONSTRAINTS block, that bridges the protocol's agent-centric design with the human accountability requirements of regulated industries and emerging governance frameworks.
+
 ---
 
 ## 5. Speed and Permanence
@@ -103,7 +223,7 @@ The protocol separates two operations that have fundamentally different requirem
 
 Verification — checking identity, validating credentials, querying behavioral history — must be fast. These operations are performed off-chain using standard cryptographic primitives. A verification request completes in under 100 milliseconds under normal conditions. No consensus mechanism is involved. No network fee is incurred.
 
-Accountability — anchoring agent registration and recording confirmed violations — benefits from tamper-evident, distributed storage. These operations are performed on-chain and occur infrequently: once at registration, and when a violation is confirmed. The on-chain layer is used specifically where permanence and public verifiability matter — not as a general transaction layer.
+Accountability — anchoring agent registration and recording confirmed violations — benefits from tamper-evident, distributed storage. These operations are immutably anchored and occur infrequently: once at registration, and when a violation is confirmed. The immutable anchor layer is used specifically where permanence and public verifiability matter — not as a general transaction layer.
 
 **Verification happens at the speed of a signature — milliseconds, off-chain. Accountability is anchored at the speed of a blockchain — infrequent, permanent, and tamper-evident.**
 
@@ -126,6 +246,8 @@ Any reputation system operates under the assumption that participants may attemp
 **Compromised agents** — agents whose private keys have been obtained by unauthorized parties — can be detected through behavioral discontinuities and mitigated through credential revocation. Revocation propagates rapidly across the network. Verifiers with strict requirements should perform real-time verification rather than relying on cached results.
 
 The protocol does not guarantee that manipulation is impossible. Its objective is to ensure that the cost of manipulation increases proportionally with the scale of the attempt — making cooperative behavior more rational than defection in the overwhelming majority of cases.
+
+Reputation systems record what an agent has done — after the fact. The MolTrust Protocol verifies what an agent is authorized to do — before every transaction. Pre-transaction trust verification is not a replacement for reputation; it is its necessary precondition.
 
 ---
 
@@ -153,7 +275,7 @@ The protocol is organized in three layers, described in detail in the Technical 
 
 The **protocol standard** (Layer A) is the normative core: data formats, signing rules, verification flows, and lifecycle semantics. Any independent implementation conforming to Layer A can interoperate with any other conformant implementation at the evidence level.
 
-The **reference registry** (Layer B) is the MolTrust-operated service layer: identity resolution, credential revocation, trust score queries, and on-chain anchoring. Other operators may run conformant registries using their own infrastructure.
+The **reference registry** (Layer B) is the MolTrust-operated service layer: identity resolution, credential revocation, trust score queries, and immutably anchored records. Other operators may run conformant registries using their own infrastructure.
 
 The **reference reputation model** (Layer C) is an informative scoring model used by the MolTrust reference registry. Other implementations may use different scoring models, provided they consume Layer A evidence formats.
 
@@ -207,16 +329,20 @@ The agent economy does not have geographical boundaries. Its verification infras
 
 The MolTrust Protocol defines a minimal, open standard for agent verification based on four primitives — identity, authorization, behavioral record, and portability — implemented using existing W3C open standards.
 
+The protocol formalizes a five-party trust chain (Developer, Owner, Agent, Instructor, Counterparty) in which each link is cryptographically verifiable, and introduces the Agent Authorization Envelope (AAE) — a machine-readable structure defining mandate, constraints, and validity for every issued credential. The AAE enables pre-transaction trust verification: any counterparty can inspect an agent's authorized scope before committing to an interaction.
+
+The protocol aligns with the Singapore IMDA Model AI Governance Framework for Agentic AI across its four dimensions — risk bounding, human accountability, technical controls, and end-user responsibility — and is designed for compatibility with the EU AI Act and emerging APAC regulatory frameworks. An optional Trust Tier 0 provides KYC-backed human identity anchoring for enterprise and regulated deployments without compromising the protocol's agent-centric, permissionless design.
+
 The protocol is designed to:
 
 - Enable any party to verify an agent's identity, authorization, and behavioral history without access to a central registry
-- Operate at interaction speed for routine verification, with permanent on-chain anchoring reserved for registration and confirmed violations
+- Operate at interaction speed for routine verification, with permanent immutably anchored records reserved for registration and confirmed violations
 - Function across jurisdictions, platforms, and economic systems without modification
 - Remain separable from any single operator, including MolTrust
 
 The protocol does not govern agent behavior, evaluate agent output, or substitute for legal accountability. It provides the verifiable factual substrate on which those functions can be built.
 
-A reference implementation is available at **api.moltrust.ch**. Protocol specification, credential schemas, and integration packages are published as open source at **github.com/MoltyCel**. The companion Technical Specification (v0.2.1) provides complete data models, verification flows, and conformance requirements.
+A reference implementation is available at **api.moltrust.ch**. Protocol specification, credential schemas, and integration packages are published as open source at **github.com/MoltyCel**. The companion Technical Specification (v0.3) provides complete data models, verification flows, and conformance requirements.
 
 ---
 
@@ -227,16 +353,3 @@ A reference implementation is available at **api.moltrust.ch**. Protocol specifi
 
 *This document is released under Creative Commons Attribution 4.0 International (CC BY 4.0).*
 *The protocol is open. The reference implementation is operated by MolTrust.*
-
----
-
-**Document Integrity**
-
-| Field | Value |
-|---|---|
-| SHA-256 | `70597a2c5e510bcdeaaeffe037a7c79b2c781865893a0ca738c95aa18db3e20f` |
-| On-chain anchor | Base L2 (mainnet), Block 43691641 |
-| Transaction | `0x886cbc086fc4200b96771a67be0b62cd0971442d8f7e099ae27b056516acf0b2` |
-| Timestamp | 2026-03-22T09:43:49 UTC |
-
-*Verify: hash this document with SHA-256 and compare against the on-chain calldata at basescan.org.*

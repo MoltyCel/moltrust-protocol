@@ -1,11 +1,11 @@
 # The MolTrust Protocol: Technical Specification
-## Version 0.2.2 — Draft for Review
+## Version 0.3 — Draft for Review
 
 **MolTrust / CryptoKRI GmbH, Zurich**
 **March 2026**
 **Status: Informational Draft**
 
-This document is a companion to *The MolTrust Protocol: A Verification Standard for Autonomous Software Agents* (Whitepaper v0.4). It provides the technical definitions, data models, verification flows, and conformance requirements referenced in that document.
+This document is a companion to *The MolTrust Protocol: A Verification Standard for Autonomous Software Agents* (Whitepaper v0.5). It provides the technical definitions, data models, verification flows, and conformance requirements referenced in that document.
 
 ---
 
@@ -30,7 +30,23 @@ This distinction resolves the central design tension in any open-standard-plus-c
 
 1. Scope and Terminology
 2. Data Model (Layer A)
+   - 2.1 Signed Payload Boundary
+   - 2.2 Agent DID Document
+   - 2.3 Authorization Credential
+   - 2.4 Interaction Proof
+   - 2.5 Vertical Identifiers
+   - 2.6 Endorsement
+   - 2.7 Violation Record
+   - 2.8 Agent Authorization Envelope (AAE) — Formal Schema
+   - 2.9 Trust Tier 0 Credential Schema
+   - 2.10 Sybil Resistance Mechanisms
+   - 2.11 Credential TTL and Revocation Protocol
 3. Verification Flow (Layer A)
+   - 3.1 Identity Verification
+   - 3.2 Pre-Transaction Verification Flow
+   - 3.3 Authorization Verification
+   - 3.4 Behavioral History Verification
+   - 3.5 Interaction Proof Verification
 4. Reference Reputation Model (Layer C — Informative)
 5. Reference Registry (Layer B)
 6. On-Chain Anchoring (Layer B)
@@ -99,11 +115,19 @@ The key words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** in
 
 **Registry** — a service that resolves DIDs, maintains revocation lists, computes trust scores, and records interaction proofs. The MolTrust reference registry is one such service.
 
-**Violation Record** — a signed artifact attesting to a confirmed protocol violation by an identified agent (see Section 2.6).
+**Violation Record** — a signed artifact attesting to a confirmed protocol violation by an identified agent (see Section 2.7).
 
 **Protocol conformance** — conformance to Layer A requirements.
 
 **Registry conformance** — conformance to Layer B requirements.
+
+**AAE (Agent Authorization Envelope)** — a structured policy object embedded in or accompanying a Verifiable Credential that defines an agent's permitted actions, operational constraints, and validity parameters. Formally specified in Section 2.8.
+
+**Trust Tier 0** — the highest identity assurance level in MolTrust, backed by KYC verification from an accredited provider. See Section 2.9.
+
+**CAEP (Continuous Access Evaluation Protocol)** — a framework for real-time revocation signaling between issuers and verifiers, referenced in Section 2.11.
+
+**Runtime Control Plane** — the logical component responsible for evaluating AAE constraints at transaction time, including action matching, limit enforcement, and jurisdiction checks. See Section 3.2.
 
 ### 1.3 Notation
 
@@ -215,7 +239,7 @@ Implementations MAY define additional action types using the namespace conventio
 
 **Delegation chains:** An agent MAY issue an AuthorizationCredential to a sub-agent. The sub-agent's `permittedActions` MUST be a subset of the delegating agent's own authorized actions. Verifiers MUST traverse the full chain from subject to root principal. Maximum delegation depth: 8 hops. Verifiers MUST reject chains exceeding this depth.
 
-**Constraints:** The `constraints` field is a free-form JSON object for policy-specific restrictions (e.g. `{"maxTransactionValue": 5000}`). Constraint semantics are application-defined and not normatively specified in this document.
+**Constraints:** The `constraints` field is a free-form JSON object for policy-specific restrictions (e.g. `{"maxTransactionValue": 5000}`). Constraint semantics are application-defined and not normatively specified in this document. For a formal, machine-evaluable constraint model, see the Agent Authorization Envelope (Section 2.8).
 
 ### 2.4 Interaction Proof
 
@@ -290,7 +314,7 @@ The `summary` field MAY contain a human-readable description of the outcome. Raw
 
 **One-sided proofs:** If the responder is unavailable or refuses to sign within a reasonable timeout (application-defined, SHOULD be at least 300 seconds), the initiator MAY submit the proof with `"singleSig": true` and `proofResponder` absent. One-sided proofs are valid Layer A artifacts but carry reduced weight in Layer C scoring.
 
-**Multi-agent interactions:** Interactions involving more than two agents SHOULD be modeled as multiple bilateral proofs sharing the same `session` identifier. There is no native multi-party proof format in v0.2.
+**Multi-agent interactions:** Interactions involving more than two agents SHOULD be modeled as multiple bilateral proofs sharing the same `session` identifier. There is no native multi-party proof format in v0.3.
 
 ### 2.5 Vertical Identifiers
 
@@ -424,6 +448,389 @@ A ViolationReversal object MUST contain the following fields:
 
 The `registrySignature` is computed over the RFC 8785 canonical serialization of the object excluding the `registrySignature` field, using the same registry operator key as ViolationRecord. Registries MUST make ViolationReversal objects queryable by `reversedRecordId`.
 
+### 2.8 Agent Authorization Envelope (AAE) — Formal Schema
+
+The Agent Authorization Envelope (AAE) is a machine-evaluable policy object that replaces or extends the free-form `constraints` field in an AuthorizationCredential (Section 2.3). An AAE provides a deterministic, auditable authorization boundary for autonomous agent actions.
+
+An AAE MAY be embedded directly in an AuthorizationCredential's `credentialSubject` as the `authorizationEnvelope` field, or MAY be issued as a standalone Verifiable Credential of type `AgentAuthorizationEnvelope`.
+
+The AAE consists of three top-level objects: `mandate`, `constraints`, and `validity`.
+
+#### 2.8.1 Mandate
+
+The `mandate` object defines WHAT the agent is permitted to do.
+
+```json
+{
+  "mandate": {
+    "purpose": ["commerce", "data_read"],
+    "allowedActions": [
+      "https://moltrust.ch/actions/transact",
+      "https://moltrust.ch/actions/query/*"
+    ],
+    "deniedActions": [
+      "https://moltrust.ch/actions/query/admin/*"
+    ],
+    "resources": [
+      "https://api.example.com/bookings/*",
+      "https://api.example.com/inventory/read"
+    ],
+    "delegation": {
+      "allowed": false,
+      "maxSubAgents": 0,
+      "maxDepth": 0,
+      "attenuationOnly": true
+    }
+  }
+}
+```
+
+**Field definitions:**
+
+| Field | Type | Description |
+|---|---|---|
+| `purpose` | string[] | REQUIRED. Enumerated values: `commerce`, `data_read`, `data_write`, `communication`, `delegation`, `administration`. At least one value MUST be present. |
+| `allowedActions` | string[] | REQUIRED. URI patterns defining permitted actions. Supports wildcard `*` for path segments. Default-deny: any action not matching an `allowedActions` pattern is denied. |
+| `deniedActions` | string[] | OPTIONAL. URI patterns explicitly denied. Takes precedence over `allowedActions`. If an action matches both `allowedActions` and `deniedActions`, it is DENIED. |
+| `resources` | string[] | OPTIONAL. URI patterns defining the ABAC object layer — which resources the agent may act upon. When present, both action AND resource must match for authorization. |
+| `delegation` | object | OPTIONAL. Controls whether the agent may delegate authority to sub-agents. |
+
+**Delegation sub-fields:**
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `allowed` | boolean | `false` | Whether delegation is permitted at all. |
+| `maxSubAgents` | integer | `0` | Maximum number of sub-agents this agent may authorize. |
+| `maxDepth` | integer | `0` | Maximum further delegation depth from this agent. MUST NOT exceed 8. |
+| `attenuationOnly` | boolean | `true` | If `true`, delegated AAEs MUST be strictly equal to or more restrictive than the parent AAE. Sub-agents MUST NOT gain permissions the parent does not hold. |
+
+#### 2.8.2 Constraints
+
+The `constraints` object defines the operational boundaries WITHIN which permitted actions may be executed.
+
+```json
+{
+  "constraints": {
+    "duration": {
+      "ttl": 86400,
+      "maxSessionDuration": 3600,
+      "allowedDays": [1, 2, 3, 4, 5],
+      "allowedHours": {
+        "start": 8,
+        "end": 18
+      },
+      "timezone": "Europe/Zurich"
+    },
+    "limits": {
+      "autonomousThreshold": 500.00,
+      "stepUpThreshold": 2000.00,
+      "approvalThreshold": 10000.00,
+      "maxTransactionsPerHour": 20,
+      "currency": "USDC"
+    },
+    "scope": {
+      "jurisdictions": ["CH", "DE", "AT", "FR"],
+      "counterpartyMinScore": 40
+    },
+    "obligations": {
+      "requireHumanApprovalAbove": 5000.00,
+      "toolAllowlist": [
+        "https://moltrust.ch/tools/mt_shopping_verify",
+        "https://moltrust.ch/tools/mt_travel_verify"
+      ]
+    }
+  }
+}
+```
+
+**Duration sub-fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `ttl` | integer | Time-to-live in seconds from `validity.issuedAt`. Maximum: 86400 (24 hours) for autonomous agents, 604800 (7 days) for supervised agents. |
+| `maxSessionDuration` | integer | Maximum duration of a single session in seconds. |
+| `allowedDays` | integer[] | Days of the week when the agent may operate. 1 = Monday through 7 = Sunday (ISO 8601 weekday numbering). |
+| `allowedHours` | object | Time window within allowed days. `start` and `end` are integers 0–23 representing hours in the specified timezone. |
+| `timezone` | string | IANA timezone identifier (e.g. `"Europe/Zurich"`, `"America/New_York"`). REQUIRED when `allowedDays` or `allowedHours` is present. |
+
+**Limits sub-fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `autonomousThreshold` | number | Maximum transaction amount the agent may execute without any additional checks. |
+| `stepUpThreshold` | number | Transaction amount above which additional verification is required (e.g. re-authentication, additional credential presentation). |
+| `approvalThreshold` | number | Transaction amount above which explicit human approval is required. |
+| `maxTransactionsPerHour` | integer | Rate limit on transactions per rolling hour. |
+| `currency` | enum | Currency for threshold values. One of: `USDC`, `EUR`, `CHF`, `USD`. |
+
+**Scope sub-fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `jurisdictions` | string[] | ISO 3166-1 alpha-2 country codes where the agent may operate. Empty array means unrestricted. |
+| `counterpartyMinScore` | integer | Minimum trust score (0–100) required for any counterparty the agent interacts with. |
+
+**Obligations sub-fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `requireHumanApprovalAbove` | number | Transaction value above which human-in-the-loop approval is mandatory, regardless of other thresholds. |
+| `toolAllowlist` | string[] | URI patterns of tools/APIs the agent is permitted to invoke. When present, tool invocations not matching any pattern MUST be denied. |
+
+#### 2.8.3 Validity
+
+The `validity` object defines WHO issued the envelope, to WHOM it is bound, and WHEN it is active.
+
+```json
+{
+  "validity": {
+    "issuer": "did:moltrust:<principal-id>",
+    "holderBinding": "did:moltrust:<agent-id>",
+    "issuedAt": "2026-03-25T00:00:00Z",
+    "expiresAt": "2026-03-26T00:00:00Z",
+    "revocationEndpoint": "https://api.moltrust.ch/revocation/aae/<envelope-id>",
+    "onChainAnchor": {
+      "chain": "base-mainnet",
+      "block": 43800000,
+      "txHash": "0xabc123..."
+    }
+  }
+}
+```
+
+**Field definitions:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `issuer` | DID string | REQUIRED | The DID of the principal or parent agent issuing this envelope. |
+| `holderBinding` | DID string | REQUIRED | The DID of the agent to which this envelope is bound. The envelope MUST NOT be used by any other agent. |
+| `issuedAt` | ISO 8601 datetime | REQUIRED | Timestamp of envelope creation. |
+| `expiresAt` | ISO 8601 datetime | REQUIRED | Expiration timestamp. No open-ended credentials are permitted. |
+| `revocationEndpoint` | URL | REQUIRED | HTTPS endpoint where verifiers can check if this envelope has been revoked. |
+| `onChainAnchor` | object | OPTIONAL | On-chain reference for the envelope hash, providing tamper evidence. |
+
+**On-chain anchor sub-fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `chain` | string | Chain identifier (e.g. `"base-mainnet"`, `"ethereum-mainnet"`). |
+| `block` | integer | Block number containing the anchor transaction. |
+| `txHash` | string | Transaction hash of the anchor. |
+
+#### 2.8.4 Validation Rules
+
+The following rules MUST be enforced by any conformant AAE evaluator:
+
+1. **Default-deny:** Any action not explicitly matched by an `allowedActions` pattern MUST be denied.
+2. **Deny precedence:** If an action matches both `allowedActions` and `deniedActions`, the action MUST be denied. `deniedActions` always takes precedence.
+3. **Delegation depth cap:** `delegation.maxDepth` MUST NOT exceed 8. AAEs specifying a value greater than 8 MUST be rejected.
+4. **Mandatory expiry:** `validity.expiresAt` MUST be present and MUST be a future timestamp at evaluation time. AAEs without `expiresAt` MUST be rejected unconditionally.
+5. **Holder binding:** The presenting agent's DID MUST match `validity.holderBinding`. Mismatched presentations MUST be rejected.
+6. **Attenuation enforcement:** When `delegation.attenuationOnly` is `true`, any delegated AAE MUST have `allowedActions` that are a subset of the parent's effective allowed actions (after deny exclusion), `limits` that are equal to or more restrictive than the parent's, and `scope.jurisdictions` that are a subset of the parent's.
+7. **TTL ceiling:** `constraints.duration.ttl` MUST NOT exceed 86400 seconds for autonomous agents or 604800 seconds for supervised agents. Evaluators MUST reject AAEs exceeding these ceilings.
+
+### 2.9 Trust Tier 0 Credential Schema
+
+Trust Tier 0 represents the highest identity assurance level in MolTrust: a developer or operator identity backed by KYC verification from an accredited provider. Tier 0 credentials bridge the pseudonymous DID layer to a verified real-world identity without exposing personal data on-chain.
+
+**JSON-LD Schema:**
+
+```json
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://moltrust.ch/ns/tier0/v1"
+  ],
+  "type": ["VerifiableCredential", "DeveloperIdentityCredential"],
+  "id": "<uuid-v4>",
+  "issuer": "<accredited-kyc-provider-did>",
+  "issuanceDate": "<iso-8601>",
+  "expirationDate": "<iso-8601>",
+  "credentialSubject": {
+    "id": "<developer-did>",
+    "verificationLevel": "tier0_kyc",
+    "kycProvider": "<provider-name>",
+    "verifiedAt": "<iso-8601>",
+    "validUntil": "<iso-8601>",
+    "jurisdiction": "<ISO-3166-1>"
+  },
+  "credentialStatus": {
+    "id": "https://api.moltrust.ch/revocation/<credential-id>",
+    "type": "BitstringStatusListEntry",
+    "statusListIndex": "<integer>",
+    "statusListCredential": "https://api.moltrust.ch/revocation/status-list/tier0"
+  },
+  "proof": {
+    "type": "Ed25519Signature2020",
+    "created": "<iso-8601>",
+    "verificationMethod": "<kyc-provider-did>#keys-1",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "<base58btc-signature>"
+  }
+}
+```
+
+**Field semantics:**
+
+| Field | Description |
+|---|---|
+| `issuer` | The DID of the accredited KYC provider. MUST be a provider recognized by the registry operator. |
+| `verificationLevel` | Fixed value `"tier0_kyc"`. Indicates full KYC verification has been completed. |
+| `kycProvider` | Human-readable name of the KYC provider (e.g. `"Sumsub"`, `"Onfido"`, `"IDnow"`). |
+| `verifiedAt` | ISO 8601 timestamp of when the KYC verification was completed. |
+| `validUntil` | ISO 8601 timestamp of when the KYC verification expires. MUST NOT exceed 365 days from `verifiedAt`. |
+| `jurisdiction` | ISO 3166-1 alpha-2 code of the jurisdiction where the identity was verified. |
+
+**Issuance rules:**
+
+- The KYC provider MUST be accredited by the registry operator. The list of accredited providers is published at `https://<registry-domain>/.well-known/kyc-providers.json`.
+- The credential MUST NOT contain any personal data (name, address, date of birth, document numbers). The `credentialSubject` attests that verification occurred, not what was verified.
+- Maximum validity: 365 days. Renewal requires re-verification.
+- The credential MUST include a `credentialStatus` field referencing the revocation registry (see Section 2.11).
+
+**Trust Tier hierarchy:**
+
+| Tier | Assurance Level | Backing |
+|---|---|---|
+| Tier 0 | Highest | KYC-verified real-world identity |
+| Tier 1 | High | Organizational credential (e.g. domain-verified, ERC-8004) |
+| Tier 2 | Medium | Behavioral reputation only (interaction proofs, endorsements) |
+| Tier 3 | Low | Self-declared, no external verification |
+
+Verifiers MAY use trust tier as a gating criterion. For example, a financial services vertical MAY require Tier 0 for agents transacting above a defined threshold.
+
+### 2.10 Sybil Resistance Mechanisms
+
+Sybil attacks — where a single adversary creates multiple fake identities to manipulate trust scores, endorsement graphs, or governance — represent a fundamental threat to any decentralized reputation system. MolTrust employs a layered defense combining cryptographic proofs, economic costs, permanent records, and graph analysis.
+
+#### 2.10.1 Dual-Signature Interaction Proofs
+
+Every bilateral interaction proof (Section 2.4) requires sequential signatures from both the initiator and the responder. The responder's signature covers the initiator's signature, creating a non-repudiable chain of commitment. This means:
+
+- A single adversary cannot fabricate bilateral proofs without controlling two distinct signing keys.
+- One-sided proofs (where the responder does not sign) are valid but carry reduced weight in scoring (Section 4.2), limiting their value for sybil manipulation.
+- The sequential signing procedure prevents parallel forgery — the initiator's commitment is locked before the responder signs.
+
+#### 2.10.2 Economic Stake via x402
+
+The x402 payment protocol introduces a measurable economic cost for interactions with trusted endpoints. When agents must pay (in USDC on Base L2) to access scored endpoints, credential issuance, or premium verification services, the cost of creating and maintaining fake identities scales linearly:
+
+- Each sybil identity must independently fund x402 payments.
+- Credential issuance fees (e.g. $5.00 per VC) make mass sybil creation economically unfavorable.
+- The payment record on Base L2 provides an independent audit trail of agent activity.
+
+#### 2.10.3 Violation Records
+
+Violation Records (Section 2.7) serve as permanent, portable negative attestations:
+
+- Confirmed sybil participation results in a `sybil` violation type, permanently associated with both the agent DID and the principal DID.
+- Violation records are anchored on-chain (Section 6.1), making them tamper-proof and publicly auditable.
+- Principal DID continuity (Section 8.5) ensures that re-registration under a new agent DID does not escape a principal's violation history.
+
+#### 2.10.4 Endorsement Decay (v0.3 Roadmap)
+
+Endorsements that are not renewed through continued interaction lose their contribution to trust scores over time. The time decay function `d_i = exp(-0.005 * age_in_days)` (Section 4.2) ensures that:
+
+- Inactive sybil clusters degrade naturally as endorsements age without renewal.
+- Maintaining a high trust score requires ongoing, genuine interactions.
+- An adversary must continuously invest resources to sustain sybil identities, rather than front-loading endorsements and abandoning the identity.
+
+Future versions MAY introduce explicit endorsement expiry notifications and mandatory renewal windows.
+
+#### 2.10.5 Graph Anomaly Detection (v0.3 Roadmap)
+
+Jaccard Cluster Detection identifies groups of agents with suspiciously overlapping endorser sets:
+
+- For any two agents A and B, compute Jaccard similarity: `J(A,B) = |endorsers_A ∩ endorsers_B| / |endorsers_A ∪ endorsers_B|`
+- Threshold: `J > 0.8` triggers a sybil investigation flag.
+- Flagged clusters are subject to manual review by the registry operator.
+- Vertical diversity is a secondary signal: agents operating in fewer than 3 distinct verticals while exhibiting high Jaccard similarity receive a penalty of 10.0 points in the scoring model.
+
+Graph anomaly detection is a heuristic. It does not catch sophisticated adversaries who deliberately diversify endorser sets across identities. Registry operators running large networks SHOULD supplement Jaccard detection with spectral clustering, community detection (e.g. Louvain algorithm), or temporal pattern analysis.
+
+### 2.11 Credential TTL and Revocation Protocol
+
+All credentials issued under the MolTrust protocol MUST carry an explicit expiration timestamp. Open-ended credentials are not permitted.
+
+#### 2.11.1 Maximum TTL by Credential Type
+
+| Credential Type | Maximum TTL | Notes |
+|---|---|---|
+| AuthorizationCredential | 365 days | Renewable; renewal generates new credential ID |
+| SkillEndorsementCredential | 90 days | Default SHOULD be 90 days; maximum 365 days |
+| InteractionProof | 72 hours | Validity window for submission to registry; the record is permanent once accepted |
+| ViolationRecord | Permanent | No expiration. May be marked `reversed` but never deleted. |
+| DeveloperIdentityCredential (Tier 0) | 365 days | Requires re-verification for renewal |
+| AgentAuthorizationEnvelope | 86400 seconds (autonomous) / 604800 seconds (supervised) | See Section 2.8 |
+
+#### 2.11.2 Revocation Registry Endpoint
+
+Every credential with a revocation requirement MUST reference a revocation endpoint in its `credentialStatus` field or in the AAE's `validity.revocationEndpoint`.
+
+**Endpoint specification:**
+
+```
+GET /revocation/{credential-id}
+```
+
+**Response format:**
+
+```json
+{
+  "credentialId": "<credential-id>",
+  "revoked": false,
+  "revokedAt": null,
+  "reason": null,
+  "checkedAt": "2026-03-25T10:00:00Z"
+}
+```
+
+When revoked:
+
+```json
+{
+  "credentialId": "<credential-id>",
+  "revoked": true,
+  "revokedAt": "2026-03-25T09:30:00Z",
+  "reason": "key_compromise",
+  "checkedAt": "2026-03-25T10:00:00Z"
+}
+```
+
+**Revocation reason values:**
+
+| Value | Meaning |
+|---|---|
+| `key_compromise` | The signing key has been compromised |
+| `issuer_revocation` | The issuer has explicitly revoked the credential |
+| `subject_request` | The credential subject requested revocation |
+| `policy_violation` | The credential was revoked due to a policy violation |
+| `superseded` | The credential has been replaced by a newer version |
+| `expiry_acceleration` | The credential is being expired ahead of its natural TTL |
+
+#### 2.11.3 Bitstring Status List Compatibility
+
+The MolTrust revocation registry is compatible with the W3C Bitstring Status List v1.0 specification. Each credential type maintains a separate status list credential:
+
+```
+GET /revocation/status-list/{credential-type}
+```
+
+The status list is a compressed bitstring where each bit position corresponds to a `statusListIndex` assigned at credential issuance. A bit value of `1` indicates the credential at that index has been revoked. This allows verifiers to check revocation status with a single HTTP request for the entire status list, rather than individual queries per credential.
+
+Status lists MUST be signed by the registry operator key and MUST include a `validUntil` timestamp (maximum 300 seconds from issuance) to prevent stale caching.
+
+#### 2.11.4 Verifier Behavior
+
+Verifiers MUST implement the following revocation checking logic:
+
+1. **Expired credential:** If `expirationDate` (or `expiresAt` for AAEs) is in the past at verification time (UTC), the credential MUST be denied. There is no grace period.
+2. **Revoked credential:** If the revocation endpoint returns `"revoked": true`, the credential MUST be denied.
+3. **Unreachable revocation endpoint:** If the revocation endpoint is unreachable (network error, timeout, HTTP 5xx), the verifier SHOULD deny the credential (fail-closed). Verifiers with explicit risk tolerance policies MAY accept credentials with unreachable revocation endpoints, but MUST log the event and re-check within 60 seconds.
+4. **Cache policy:** Verifiers MAY cache revocation responses for up to 300 seconds. Cached responses beyond this window MUST trigger a fresh check.
+
+This fail-closed default is deliberate. In an autonomous agent economy, the cost of accepting a revoked credential (unauthorized action, financial loss) typically exceeds the cost of rejecting a valid credential (temporary service disruption, retry).
+
 ---
 
 ## 3. Verification Flow (Layer A)
@@ -439,7 +846,76 @@ The `registrySignature` is computed over the RFC 8785 canonical serialization of
 
 Steps 1–6 SHOULD complete within 200 milliseconds for cached DID Documents.
 
-### 3.2 Authorization Verification
+### 3.2 Pre-Transaction Verification Flow
+
+This section defines the complete verification sequence that a counterparty (verifier) executes before authorizing an agent's requested action. All steps are designed to be executable WITHOUT calling the MolTrust API — this is verifier independence in practice. The verifier needs only the presented credential, a DID resolver, and access to the revocation endpoint.
+
+This flow implements Attribute-Based Access Control (ABAC) as described in NIST SP 800-162 and aligns with the authorization detail structures defined in RFC 9396 (Rich Authorization Requests).
+
+**Sequence:**
+
+```
+Agent                  Counterparty          W3C Resolver       Revocation Registry    AAE Engine         Trust Score
+  |                        |                      |                     |                    |                  |
+  |--- present VC -------->|                      |                     |                    |                  |
+  |    (AAE embedded)      |                      |                     |                    |                  |
+  |                        |--- resolve DID ----->|                     |                    |                  |
+  |                        |<-- DID Document -----|                     |                    |                  |
+  |                        |                      |                     |                    |                  |
+  |                        |--- check revocation ---------------------->|                    |                  |
+  |                        |<-- {revoked: false} ----------------------|                    |                  |
+  |                        |                      |                     |                    |                  |
+  |                        |--- check mandate.allowedActions ---------->|--- vs requested -->|                  |
+  |                        |                      |                     |    action           |                  |
+  |                        |--- check mandate.deniedActions ----------->|--- deny override? ->|                  |
+  |                        |                      |                     |                    |                  |
+  |                        |--- check constraints.limits -------------->|--- vs tx amount -->|                  |
+  |                        |                      |                     |                    |                  |
+  |                        |--- check constraints.scope.jurisdictions ->|--- vs context ---->|                  |
+  |                        |                      |                     |                    |                  |
+  |                        |--- check constraints.scope -------------------------------------------------->|
+  |                        |    .counterpartyMinScore                   |                    |     vs own score |
+  |                        |<------------------------------------------|--------------------|----- result ----|
+  |                        |                      |                     |                    |                  |
+  |<-- ALLOW or DENY ------|                      |                     |                    |                  |
+  |    (with reason code)  |                      |                     |                    |                  |
+```
+
+**Verification steps in detail:**
+
+1. **Credential presentation:** The agent presents a Verifiable Credential with an embedded AAE (or a standalone AAE credential) to the counterparty.
+
+2. **DID resolution:** The counterparty resolves the agent's DID to its DID Document using a W3C-conformant DID resolver. The counterparty verifies the credential signature against the public key in the DID Document.
+
+3. **Revocation check:** The counterparty queries the `validity.revocationEndpoint` specified in the AAE. If the credential is revoked or the endpoint is unreachable, the request is denied (fail-closed per Section 2.11.4).
+
+4. **Action authorization:** The AAE Engine evaluates `mandate.allowedActions` against the requested action URI. If no pattern matches, the action is denied (default-deny). If a matching `deniedActions` pattern exists, the action is denied regardless of `allowedActions`.
+
+5. **Transaction limits:** The AAE Engine evaluates `constraints.limits` against the transaction parameters. If the amount exceeds `autonomousThreshold`, step-up verification is triggered. If it exceeds `approvalThreshold`, human approval is required.
+
+6. **Jurisdiction check:** The AAE Engine verifies that the transaction context matches `constraints.scope.jurisdictions`. If the counterparty's jurisdiction is not in the allowed list, the action is denied.
+
+7. **Counterparty trust check:** The counterparty evaluates whether the agent meets its own minimum score requirements, AND the agent's AAE evaluates whether the counterparty meets `constraints.scope.counterpartyMinScore`. This is a mutual check.
+
+8. **Decision:** The counterparty returns ALLOW or DENY with a machine-readable reason code.
+
+**Reason codes:**
+
+| Code | Meaning |
+|---|---|
+| `allowed` | All checks passed; action is authorized |
+| `denied:credential_expired` | The credential or AAE has expired |
+| `denied:credential_revoked` | The credential or AAE has been revoked |
+| `denied:revocation_unreachable` | The revocation endpoint could not be reached |
+| `denied:action_not_permitted` | The requested action is not in `allowedActions` |
+| `denied:action_explicitly_denied` | The requested action matches a `deniedActions` pattern |
+| `denied:limit_exceeded` | The transaction amount exceeds the applicable threshold |
+| `denied:jurisdiction_mismatch` | The transaction context does not match allowed jurisdictions |
+| `denied:counterparty_score_insufficient` | The counterparty's trust score is below the required minimum |
+| `denied:holder_binding_mismatch` | The presenting agent's DID does not match `holderBinding` |
+| `denied:signature_invalid` | The credential signature could not be verified |
+
+### 3.3 Authorization Verification
 
 1. **Request** the agent's AuthorizationCredential for the relevant vertical and action
 2. **Verify** the credential signature against the issuer's DID Document
@@ -451,7 +927,7 @@ Steps 1–6 SHOULD complete within 200 milliseconds for cached DID Documents.
 
 Verifiers SHOULD cache verified credential chains with a TTL not exceeding 300 seconds.
 
-### 3.3 Behavioral History Verification
+### 3.4 Behavioral History Verification
 
 1. **Query** the agent's trust score from a registry endpoint
 2. **Verify** the response signature against the registry's published DID
@@ -460,7 +936,7 @@ Verifiers SHOULD cache verified credential chains with a TTL not exceeding 300 s
 
 Verifiers MUST NOT treat trust scores as authoritative verdicts. A trust score is one input into a local trust decision. The weight given to the score is application-defined.
 
-### 3.4 Interaction Proof Verification
+### 3.5 Interaction Proof Verification
 
 To verify a submitted interaction proof:
 
@@ -494,9 +970,9 @@ Scores are withheld (`null`) until the minimum endorser threshold is reached (Se
 
 ```
 score = clamp(
-  0.6 × direct_score
-  + 0.3 × propagated_score
-  + 0.1 × cross_vertical_bonus
+  0.6 * direct_score
+  + 0.3 * propagated_score
+  + 0.1 * cross_vertical_bonus
   + interaction_bonus
   - sybil_penalty,
   0, 100
@@ -506,14 +982,14 @@ score = clamp(
 **`direct_score`**
 
 ```
-direct_score = (Σ w_i × e_i × d_i) / (Σ w_i) × 100
+direct_score = (sum(w_i * e_i * d_i) / sum(w_i)) * 100
 ```
 
 Note: weighted mean, not simple mean over n endorsements. This gives higher-trust endorsers proportionally more influence.
 
 - `w_i` = endorser trust score / 100
 - `e_i` = endorsement weight declared in credential (0.0–1.0)
-- `d_i` = time decay: `exp(-0.005 × age_in_days)`
+- `d_i` = time decay: `exp(-0.005 * age_in_days)`
 
 **`propagated_score`**
 
@@ -526,7 +1002,7 @@ Single-hop only. This rewards being endorsed by high-trust agents.
 **`cross_vertical_bonus`**
 
 ```
-cross_vertical_bonus = min(n_distinct_verticals × 5, 20)
+cross_vertical_bonus = min(n_distinct_verticals * 5, 20)
 ```
 
 Distinct verticals are counted at the `<namespace>/<identifier>` level.
@@ -535,7 +1011,7 @@ Distinct verticals are counted at the `<namespace>/<identifier>` level.
 
 ```
 interaction_bonus = min(
-  n_bilateral × 0.5 + n_single_sig × 0.2,
+  n_bilateral * 0.5 + n_single_sig * 0.2,
   10
 )
 ```
@@ -543,7 +1019,7 @@ interaction_bonus = min(
 **`sybil_penalty`**
 
 ```
-sybil_penalty = 20 × max(0, jaccard(endorsers_A, endorsers_B) - 0.7)
+sybil_penalty = 20 * max(0, jaccard(endorsers_A, endorsers_B) - 0.7)
 ```
 
 Where `endorsers_A` and `endorsers_B` are the endorser DID sets of the scored agent and its most similar peer. Jaccard threshold 0.7 is a heuristic; implementations SHOULD tune this value based on observed network topology. This is not a robust sybil detection system; it is a lightweight signal.
@@ -559,7 +1035,7 @@ Registry operators MAY register agents with a `bootstrap_weight` — an initial 
 ```
 effective_score = computed_score + bootstrap_contribution
 
-bootstrap_contribution = bootstrap_weight × decay_factor
+bootstrap_contribution = bootstrap_weight * decay_factor
 
 decay_factor = max(0,
   1 - (days_since_registration / bootstrap_period_days)
@@ -581,7 +1057,7 @@ Supplementary to the score; SHOULD be exposed alongside it in API responses.
 consistency = 1 - (std_deviation(outcome_values) / 100)
 ```
 
-Where `outcome_values`: `completed → 100`, `partial → 50`, `disputed → 10`, `failed → 0`.
+Where `outcome_values`: `completed -> 100`, `partial -> 50`, `disputed -> 10`, `failed -> 0`.
 
 An anomaly is flagged when consistency drops more than 0.3 within any rolling 30-day window relative to the prior 90-day baseline. This is a heuristic signal, not a definitive fraud indicator.
 
@@ -610,6 +1086,8 @@ The reference registry MUST expose the following endpoints:
 | `/interaction/proofs/{did}` | GET | List proofs for agent |
 | `/violation/record` | POST | Submit violation record (operator only) |
 | `/violation/{id}` | GET | Retrieve violation record |
+| `/revocation/{credential-id}` | GET | Check credential revocation status |
+| `/revocation/status-list/{credential-type}` | GET | Bitstring status list for credential type |
 | `/swarm/stats` | GET | Network-level statistics |
 | `/health` | GET | Registry health status |
 
@@ -629,7 +1107,7 @@ The reference registry MUST expose the following endpoints:
     "interaction_bonus": 3.5,
     "sybil_penalty": 0.0,
     "bootstrap_contribution": 0.0,
-    "computation_method": "moltrust-v0.2"
+    "computation_method": "moltrust-v0.3"
   },
   "consistency": 0.91,
   "anomaly_flag": false,
@@ -643,7 +1121,7 @@ The reference registry MUST expose the following endpoints:
 }
 ```
 
-All trust score responses MUST be signed by the registry operator key to allow verifiers to confirm the response has not been tampered with in transit. The `computation_method` field identifies the scoring model version used; `moltrust-v0.2` refers to the reference model defined in Section 4 of this specification.
+All trust score responses MUST be signed by the registry operator key to allow verifiers to confirm the response has not been tampered with in transit. The `computation_method` field identifies the scoring model version used; `moltrust-v0.3` refers to the reference model defined in Section 4 of this specification.
 
 ### 5.3 Revocation
 
@@ -773,8 +1251,8 @@ This section covers known attack vectors. It is not exhaustive. New attack class
 
 | Attack | Mitigations | Residual Risk |
 |---|---|---|
-| Sybil clusters | Cross-vertical requirement, Jaccard detection, stake cost | Well-funded patient attacker can still construct convincing clusters |
-| Slow-burn trust accumulation | Consistency signal, stake forfeiture | Patient attacker with low-detectable violation may not trigger signal |
+| Sybil clusters | Cross-vertical requirement, Jaccard detection, stake cost, x402 economic barriers (Section 2.10) | Well-funded patient attacker can still construct convincing clusters |
+| Slow-burn trust accumulation | Consistency signal, stake forfeiture, endorsement decay (Section 2.10.4) | Patient attacker with low-detectable violation may not trigger signal |
 | Key theft / impersonation | Key rotation, revocation propagation, consistency discontinuity | Stale-cache verifiers may not detect revocation in time |
 | Collusion / bribed endorsements | Endorser weight propagation, Jaccard detection | High-trust collusion is harder to detect |
 | Reputation laundering | Principal DID continuity, on-chain violation permanence | Principal with new identity cannot be auto-linked without external evidence |
@@ -783,6 +1261,7 @@ This section covers known attack vectors. It is not exhaustive. New attack class
 | Hash preimage inference | Outcome hash includes low-entropy fields only | For predictable outcomes, hash may be correlatable |
 | Endorsement farming | Basis field, evidence hash requirement, one-per-vertical rule | Subjective endorsements without interaction proof basis are harder to detect |
 | Adjudicator compromise | ViolationReversal mechanism, operator-signed records | Corrupted external adjudicator could produce false violations |
+| AAE bypass / privilege escalation | Default-deny, deny precedence, holder binding, attenuation-only delegation (Section 2.8) | Implementation bugs in AAE evaluation logic |
 
 ### 9.3 Notes on Jaccard Sybil Detection
 
@@ -814,6 +1293,8 @@ The Jaccard similarity threshold (0.7) is a lightweight heuristic suitable for s
 | Endorsement | Registry (off-chain) | Public |
 | Stake balance | Blockchain | Public |
 | Violation Record | Registry (off-chain) + on-chain hash | Public |
+| Tier 0 credential | Agent + Registry | Verifiers on request |
+| AAE | Agent + Counterparty | Presented per transaction |
 
 ### 10.3 Hash Preimage Risks
 
@@ -831,15 +1312,17 @@ The Jaccard similarity threshold (0.7) is a lightweight heuristic suitable for s
 
 **Data Processing Agreements:** Organizations using the MolTrust reference API to process data relating to natural persons MUST establish a Data Processing Agreement with MolTrust / CryptoKRI GmbH.
 
+**Tier 0 privacy:** DeveloperIdentityCredential (Section 2.9) does NOT contain personal data. The credential attests that KYC verification occurred; the personal data used during verification is held exclusively by the KYC provider under a separate data processing relationship.
+
 ### 10.5 Future: Zero-Knowledge Extensions
 
-ZK-proof techniques (e.g. zk-SNARKs) could allow agents to prove behavioral properties without revealing underlying interaction proofs. This is not specified in v0.2 and is deferred to a future extension.
+ZK-proof techniques (e.g. zk-SNARKs) could allow agents to prove behavioral properties without revealing underlying interaction proofs. This is not specified in v0.3 and is deferred to a future extension.
 
 ---
 
 ## 11. Worked Example
 
-**Scenario:** A travel booking agent (Agent A) wants to book a hotel through Agent B. Agent B requires trust score ≥ 60.
+**Scenario:** A travel booking agent (Agent A) wants to book a hotel through Agent B. Agent B requires trust score >= 60.
 
 ### Step 1 — Identity Verification
 
@@ -854,7 +1337,7 @@ Agent A signs the nonce with its Ed25519 key and returns:
 }
 ```
 
-Agent B resolves the DID, retrieves the public key, verifies the signature. ✓
+Agent B resolves the DID, retrieves the public key, verifies the signature.
 
 ### Step 2 — Authorization Verification
 
@@ -872,7 +1355,7 @@ Agent A presents its AuthorizationCredential:
 }
 ```
 
-Agent B verifies: signature valid, not expired, `transact` in `permittedActions`, vertical matches. ✓
+Agent B verifies: signature valid, not expired, `transact` in `permittedActions`, vertical matches.
 
 ### Step 3 — Behavioral History
 
@@ -881,7 +1364,7 @@ Agent B queries:
 GET https://api.moltrust.ch/skill/trust-score/did:moltrust:traveler-agent-001
 ```
 
-Response: `trust_score: 72.4`, `grade: B`, `withheld: false`, signed by registry. Score ≥ 60. ✓
+Response: `trust_score: 72.4`, `grade: B`, `withheld: false`, signed by registry. Score >= 60.
 
 ### Step 4 — Interaction
 
@@ -904,7 +1387,7 @@ Agent A constructs and signs:
 }
 ```
 
-Agent B adds `proofResponder` and submits to registry. Both agents' behavioral records are updated at the next scoring cycle. ✓
+Agent B adds `proofResponder` and submits to registry. Both agents' behavioral records are updated at the next scoring cycle.
 
 ---
 
@@ -925,6 +1408,8 @@ A Layer A conformant implementation MUST:
 9. Express verticals using the `<namespace>/<identifier>` format defined in Section 2.5
 10. Produce endorsements conforming to Section 2.6
 11. Produce violation records conforming to Section 2.7 when recording violations
+12. Enforce AAE validation rules defined in Section 2.8.4 when processing Agent Authorization Envelopes
+13. Implement credential TTL enforcement and revocation checking per Section 2.11
 
 ### 12.2 Layer B — Registry Conformance
 
@@ -937,6 +1422,7 @@ A Layer B conformant registry MUST:
 5. Publish the operator DID Document at `/.well-known/did.json`
 6. Associate ViolationRecords with both agent DID and principal DID
 7. Record confirmed violations on-chain per Section 6
+8. Expose revocation endpoints per Section 2.11.2 and Bitstring Status Lists per Section 2.11.3
 
 ### 12.3 Layer C — Reputation Model Conformance
 
@@ -953,7 +1439,7 @@ A conformant implementation is NOT required to:
 
 ### 12.5 Version Compatibility
 
-Version 0.2 is a draft. Breaking changes to Layer A data formats will carry a minimum 12-month deprecation period in future versions. Layer B API changes follow semantic versioning. Layer C changes are non-breaking by definition.
+Version 0.3 is a draft. Breaking changes to Layer A data formats will carry a minimum 12-month deprecation period in future versions. Layer B API changes follow semantic versioning. Layer C changes are non-breaking by definition.
 
 ---
 
@@ -961,10 +1447,13 @@ Version 0.2 is a draft. Breaking changes to Layer A data formats will carry a mi
 
 - W3C DID Core v1.0: https://www.w3.org/TR/did-core/
 - W3C VC Data Model 2.0: https://www.w3.org/TR/vc-data-model-2.0/
+- W3C Bitstring Status List v1.0: https://www.w3.org/TR/vc-bitstring-status-list/
 - Ed25519Signature2020: https://w3c-ccg.github.io/di-eddsa-2020/
 - RFC 8785 (JSON Canonicalization): https://www.rfc-editor.org/rfc/rfc8785
 - RFC 2119 (Key Words): https://www.rfc-editor.org/rfc/rfc2119
 - RFC 4122 (UUID): https://www.rfc-editor.org/rfc/rfc4122
+- RFC 9396 (Rich Authorization Requests): https://www.rfc-editor.org/rfc/rfc9396
+- NIST SP 800-162 (Guide to ABAC): https://csrc.nist.gov/pubs/sp/800/162/final
 - ERC-8004: https://eips.ethereum.org/EIPS/eip-8004
 - Trusted Agentic Mesh (TAM): https://www.ijfmr.com/papers/2026/1/66724.pdf
 - AgentHub — Agent Registry and Provenance: https://arxiv.org/abs/2510.03495
@@ -982,16 +1471,3 @@ Version 0.2 is a draft. Breaking changes to Layer A data formats will carry a mi
 
 *This document is released under Creative Commons Attribution 4.0 International (CC BY 4.0).*
 *The protocol is open. The reference implementation is operated by MolTrust.*
-
----
-
-**Document Integrity**
-
-| Field | Value |
-|---|---|
-| SHA-256 | `d2ca9b372d9190bd5661ac1bb4c911881cfe0ef197aa43396cdc8fd27116a554` |
-| On-chain anchor | Base L2 (mainnet), Block 43691643 |
-| Transaction | `0xc79a233fb19401b06ed870f27c9571b6a9e780ab6ba4fdb1d5e8a1bfdb17c972` |
-| Timestamp | 2026-03-22T09:43:53 UTC |
-
-*Verify: hash this document with SHA-256 and compare against the on-chain calldata at basescan.org.*
