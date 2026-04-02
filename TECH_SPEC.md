@@ -1,9 +1,11 @@
 # The MolTrust Protocol: Technical Specification
-## Version 0.3 — Draft for Review
+## Version 0.7 — Draft for Review
 
 **MolTrust / CryptoKRI GmbH, Zurich**
-**March 2026**
+**April 2026**
 **Status: Informational Draft**
+
+*v0.7 additions: Cross-Protocol Interoperability (qntm/APS), Infrastructure-Layer Enforcement (Falco), Governance Layer, Outcome Verification.*
 
 This document is a companion to *The MolTrust Protocol: A Verification Standard for Autonomous Software Agents* (Whitepaper v0.5). It provides the technical definitions, data models, verification flows, and conformance requirements referenced in that document.
 
@@ -41,6 +43,9 @@ This distinction resolves the central design tension in any open-standard-plus-c
    - 2.9 Trust Tier 0 Credential Schema
    - 2.10 Sybil Resistance Mechanisms
    - 2.11 Credential TTL and Revocation Protocol
+   - 2.12 Multi-Chain Wallet Binding
+   - 2.13 External DID Bridging
+   - 2.14 Cross-Ecosystem Trust Score Import
 3. Verification Flow (Layer A)
    - 3.1 Identity Verification
    - 3.2 Pre-Transaction Verification Flow
@@ -51,11 +56,27 @@ This distinction resolves the central design tension in any open-standard-plus-c
 5. Reference Registry (Layer B)
 6. On-Chain Anchoring (Layer B)
 7. Credential Lifecycle (Layer A)
-8. Agent Lifecycle (Layer A)
-9. Threat Model
-10. Privacy Model
-11. Worked Example
-12. Conformance
+8. Cross-Protocol Interoperability
+   - 8.1 AAE ↔ qntm Authority Constraints Mapping
+   - 8.2 AAE ↔ APS Delegation Mapping
+   - 8.3 decision-equivalence Layer
+9. Infrastructure-Layer Enforcement
+   - 9.1 Architecture
+   - 9.2 Webhook Payload Schema
+   - 9.3 Falco Rule Design
+10. Governance Layer
+   - 10.1 Layer Classification
+   - 10.2 aps.txt Security Analysis
+11. Outcome Verification
+   - 11.1 FlagRecord Schema
+   - 11.2 OutcomeRecord Schema
+   - 11.3 FlagScore Formula
+   - 11.4 Settlement Watcher
+12. Agent Lifecycle (Layer A)
+13. Threat Model
+14. Privacy Model
+15. Worked Example
+16. Conformance
 
 ---
 
@@ -105,13 +126,19 @@ The key words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** in
 
 **Vertical** — a domain of agent activity, expressed as a namespaced string of the form `<namespace>/<identifier>` (see Section 2.5).
 
-**Seed Agent** — an agent registered with a bootstrap weight by a registry operator, used to initialize the endorsement graph. Bootstrap weights are time-limited (see Section 8.2).
+**Seed Agent** — an agent registered with a bootstrap weight by a registry operator, used to initialize the endorsement graph. Bootstrap weights are time-limited (see Section 12.2).
 
 **Verifier** — any party that checks a DID, credential, interaction proof, or trust score.
 
 **Issuer** — any party that signs and issues a Verifiable Credential.
 
 **On-chain anchor** — a transaction on a distributed ledger that permanently records a hash of a protocol artifact.
+
+**Wallet Binding** — a cryptographic proof that an agent controls a specific blockchain wallet, linking the wallet address to the agent's DID.
+
+**DID Bridge** — a verified link between an external DID (from another ecosystem) and a `did:moltrust` identity, enabling cross-ecosystem trust portability.
+
+**External Score Import** — a mechanism for importing reputation scores from external systems into the MolTrust trust score, with reduced weight and accelerated decay.
 
 **Registry** — a service that resolves DIDs, maintains revocation lists, computes trust scores, and records interaction proofs. The MolTrust reference registry is one such service.
 
@@ -725,7 +752,7 @@ Violation Records (Section 2.7) serve as permanent, portable negative attestatio
 
 - Confirmed sybil participation results in a `sybil` violation type, permanently associated with both the agent DID and the principal DID.
 - Violation records are anchored on-chain (Section 6.1), making them tamper-proof and publicly auditable.
-- Principal DID continuity (Section 8.5) ensures that re-registration under a new agent DID does not escape a principal's violation history.
+- Principal DID continuity (Section 12.5) ensures that re-registration under a new agent DID does not escape a principal's violation history.
 
 #### 2.10.4 Endorsement Decay (v0.3 Roadmap)
 
@@ -830,6 +857,167 @@ Verifiers MUST implement the following revocation checking logic:
 4. **Cache policy:** Verifiers MAY cache revocation responses for up to 300 seconds. Cached responses beyond this window MUST trigger a fresh check.
 
 This fail-closed default is deliberate. In an autonomous agent economy, the cost of accepting a revoked credential (unauthorized action, financial loss) typically exceeds the cost of rejecting a valid credential (temporary service disruption, retry).
+
+---
+
+### 2.12 Multi-Chain Wallet Binding
+
+MolTrust supports wallet binding across multiple blockchain ecosystems. The `chain` parameter in `/identity/nonce` and `/identity/bind` determines the signature scheme used for verification.
+
+**Supported chains:**
+
+| Chain | Signature Scheme | Address Format |
+|---|---|---|
+| `ethereum` (default) | EIP-191 secp256k1 | `0x` hex (20 bytes) |
+| `base` | EIP-191 secp256k1 | `0x` hex (20 bytes) |
+| `solana` | Ed25519 via PyNaCl | Base58 public key |
+
+**Nonce request (extended):**
+
+```json
+GET /identity/nonce?did={did}&chain=solana
+
+{
+  "nonce": "<random-hex>",
+  "chain": "solana",
+  "message": "MolTrust wallet binding\nDID: {did}\nNonce: <nonce>",
+  "instructions": "Sign this message with your Solana wallet (ed25519)"
+}
+```
+
+**Bind request (Solana):**
+
+```json
+POST /identity/bind
+{
+  "did": "did:moltrust:<id>",
+  "wallet_address": "<base58-pubkey>",
+  "signature": "<base58-ed25519-signature>",
+  "chain": "solana"
+}
+
+Response:
+{
+  "success": true,
+  "did": "did:moltrust:<id>",
+  "wallet": "<base58-pubkey>",
+  "chain": "solana",
+  "payment_ready": true
+}
+```
+
+**DID Document update:** Upon successful binding, the agent's DID Document is extended with a chain-specific payment service:
+
+```json
+{
+  "service": [{
+    "id": "did:moltrust:<id>#payment",
+    "type": "SolanaPaymentService",
+    "serviceEndpoint": "<base58-pubkey>"
+  }]
+}
+```
+
+For Ethereum/Base bindings, the service type is `EthereumPaymentService` with a `0x`-prefixed address.
+
+**Verification rules:**
+- Each DID MAY have at most one wallet binding per chain.
+- Binding a new wallet on the same chain replaces the previous binding.
+- The nonce MUST be used within 300 seconds.
+- Signature verification uses the chain-native algorithm — there is no cross-chain signature compatibility.
+
+---
+
+### 2.13 External DID Bridging
+
+MolTrust supports linking external DID methods to `did:moltrust` identities. This allows agents from other ecosystems to use MolTrust trust infrastructure without abandoning their existing identity.
+
+**Supported external DID methods:** Any DID method that supports Ed25519 or secp256k1 signing.
+
+**Bridge request:**
+
+```json
+POST /identity/bridge
+{
+  "external_did": "did:<method>:<id>",
+  "moltrust_did": "did:moltrust:<id>",
+  "proof": "<signature-base58>",
+  "chain": "solana" | "ethereum",
+  "wallet_address": "<pubkey>"
+}
+
+Response:
+{
+  "success": true,
+  "external_did": "did:<method>:<id>",
+  "moltrust_did": "did:moltrust:<id>",
+  "chain": "solana"
+}
+```
+
+**Prerequisite:** The `wallet_address` MUST already be bound to `moltrust_did` via `/identity/bind`. The proof is a signature over the string `"DID Bridge: {external_did} -> {moltrust_did}"` using the bound wallet's private key.
+
+**Resolution:**
+
+```json
+GET /identity/resolve-external/{external_did}
+
+{
+  "external_did": "did:<method>:<id>",
+  "moltrust_did": "did:moltrust:<id>",
+  "document": { ... MolTrust DID Document ... }
+}
+```
+
+**Constraints:**
+- Each external DID MAY be bridged to at most one `did:moltrust` identity.
+- Bridging is not transitive: if A bridges to B and B bridges to C, resolving A does not return C.
+- Bridge records are stored in the registry and are publicly queryable.
+- Revoking a wallet binding implicitly invalidates all bridges that depend on that wallet.
+
+---
+
+### 2.14 Cross-Ecosystem Trust Score Import
+
+Agents with verified reputation scores in external systems may import those scores as a basis for their MolTrust trust score.
+
+**Import request:**
+
+```json
+POST /identity/import-score
+{
+  "moltrust_did": "did:moltrust:<id>",
+  "external_did": "did:<method>:<id>",
+  "external_score": 0.83,
+  "external_system": "peer_attestation",
+  "proof": "<signature>"
+}
+
+Response:
+{
+  "moltrust_did": "did:moltrust:<id>",
+  "external_score": 0.83,
+  "mapped_score": 91.5,
+  "source": "peer_attestation"
+}
+```
+
+**Score mapping:** External scores (normalized to 0.0–1.0) are mapped to the MolTrust trust score range (0–100) using logarithmic scaling. External endorsements carry a reduced weight of 0.3 relative to native MolTrust endorsements (weight 1.0).
+
+**Mapping formula:**
+
+```
+mapped_score = min(100, external_score * 100 * external_weight)
+external_weight = 0.3  (default for imported scores)
+```
+
+**Authentication:** The `proof` field MUST be a signature over `"Score Import: {external_did} -> {moltrust_did} score={external_score}"` from the wallet bound to the external DID via `/identity/bridge`.
+
+**Constraints:**
+- Score imports require an active DID bridge (Section 2.13).
+- Each external system may contribute at most one score per `moltrust_did`.
+- Imported scores decay at 2x the normal rate (half-life of 45 days vs. 90 days for native scores).
+- The `external_system` field is a free-form string for the importing party to self-declare; the registry does not validate external system claims.
 
 ---
 
@@ -1090,6 +1278,11 @@ The reference registry MUST expose the following endpoints:
 | `/revocation/status-list/{credential-type}` | GET | Bitstring status list for credential type |
 | `/swarm/stats` | GET | Network-level statistics |
 | `/health` | GET | Registry health status |
+| `/identity/nonce` | GET | Request nonce for wallet binding (supports `chain` param) |
+| `/identity/bind` | POST | Bind wallet to DID (Ethereum, Base, Solana) |
+| `/identity/bridge` | POST | Bridge external DID to MolTrust DID |
+| `/identity/resolve-external/{did}` | GET | Resolve external DID to MolTrust identity |
+| `/identity/import-score` | POST | Import external trust score (requires bridge) |
 
 ### 5.2 Trust Score Response Format
 
@@ -1107,7 +1300,7 @@ The reference registry MUST expose the following endpoints:
     "interaction_bonus": 3.5,
     "sybil_penalty": 0.0,
     "bootstrap_contribution": 0.0,
-    "computation_method": "moltrust-v0.3"
+    "computation_method": "moltrust-v0.7"
   },
   "consistency": 0.91,
   "anomaly_flag": false,
@@ -1121,7 +1314,7 @@ The reference registry MUST expose the following endpoints:
 }
 ```
 
-All trust score responses MUST be signed by the registry operator key to allow verifiers to confirm the response has not been tampered with in transit. The `computation_method` field identifies the scoring model version used; `moltrust-v0.3` refers to the reference model defined in Section 4 of this specification.
+All trust score responses MUST be signed by the registry operator key to allow verifiers to confirm the response has not been tampered with in transit. The `computation_method` field identifies the scoring model version used; `moltrust-v0.7` refers to the reference model defined in Section 4 of this specification.
 
 ### 5.3 Revocation
 
@@ -1153,7 +1346,6 @@ The operator DID is used to sign trust score responses and violation records. Ve
 | High-value credential issuance | MAY | SHA-256 of VC |
 | Trust score snapshot | MAY | Score + timestamp hash |
 | Confirmed violation | MUST | SHA-256 of ViolationRecord |
-| Document integrity | SHOULD | SHA-256 of spec or whitepaper |
 
 ### 6.2 Anchor Format
 
@@ -1165,7 +1357,6 @@ Examples:
 ```
 MolTrust/AgentRegistration/1 SHA256:ffbc2b04...
 MolTrust/Violation/1 SHA256:3a8f91c2...
-MolTrust/DocumentIntegrity/1 SHA256:ffbc2b04...
 ```
 
 ### 6.3 Verification
@@ -1207,47 +1398,243 @@ Verifiers MUST reject credentials where `expirationDate` is in the past at verif
 
 ---
 
-## 8. Agent Lifecycle (Layer A)
+## 8. Cross-Protocol Interoperability
 
-### 8.1 Registration
+### 8.1 AAE ↔ qntm Authority Constraints Mapping
+
+MolTrust AAE fields map directly to the qntm ConstraintEvaluation facets. This mapping was verified through 5 test vectors (TV-001 through TV-005, corpollc/qntm PR #10), independently confirmed by two external implementations.
+
+| AAE Field | qntm Facet | Mapping |
+|---|---|---|
+| mandate.purpose + allowedActions | scope | Direct: action URI patterns map to qntm scope constraints |
+| constraints.limits.autonomousThreshold | spend | Direct: USDC threshold maps to qntm spend limit |
+| constraints.duration.ttl | time | Direct: seconds TTL maps to qntm time constraint |
+| constraints.scope.counterpartyMinScore | reputation | Direct: 0-100 score maps to qntm reputation threshold |
+| mandate.delegation.allowed | reversibility | Inverse: delegation=false implies non-reversible commitment |
+
+Shared canonicalization: JCS RFC 8785. Shared signing: Ed25519. This means a single signing operation can produce artifacts verifiable by both MolTrust and qntm conformant implementations.
+
+Test vectors TV-001 through TV-005 cover AAE delegation narrowing — ensuring sub-agent AAEs are strict subsets of parent AAEs. All 5 vectors verified by external conformance runners.
+
+### 8.2 AAE ↔ APS Delegation Mapping
+
+The Agent Provider Service (APS) protocol uses a provider attestation model. MolTrust AAE maps to APS as follows:
+
+- `importProviderAttestation()` accepts MolTrust VCs as attestation input
+- AAE trust score (0-100) maps to APS Grade (0-3): Grade 0 = score < 25, Grade 1 = 25-50, Grade 2 = 50-75, Grade 3 = 75-100
+- Provider Registry integration is in progress
+
+### 8.3 decision-equivalence Layer
+
+Cross-system interoperability requires a shared model for comparing agent decisions across protocol boundaries. The decision-equivalence model defines three levels:
+
+1. **Correlation** — `action_ref`: A temporal binding that links an action in one system to an action in another. Implemented as a shared UUID or hash reference.
+2. **Equivalence** — Canonical outcome hash via JCS: A semantic binding that proves two systems reached the same conclusion about an interaction outcome. *Planned for TechSpec v0.8.*
+3. **Explanation** — System-specific evidence: Each system provides its own proof format (MolTrust: IPR, qntm: ConstraintEvaluation, APS: ProviderAttestation).
+
+MolTrust currently implements Level 1 (via IPR `session` field) and Level 3 (via IPR evidence). Level 2 (canonical outcome hash) is identified as a gap and planned for TechSpec v0.8.
+
+---
+
+## 9. Infrastructure-Layer Enforcement
+
+### 9.1 Architecture
+
+MolTrust defines three enforcement layers for AAE constraints:
+
+```
+Layer 1 — Cryptographic
+  Ed25519 signatures, JCS RFC 8785 canonicalization
+  AAE boundaries are tamper-proof by construction
+  Verifiable by any party without infrastructure dependency
+
+Layer 2 — API
+  MolTrust Trust Score degradation on violation
+  IPR (Interaction Proof Record) submission
+  Verifiable Credential revocation
+
+Layer 3 — Kernel (in progress)
+  Falco eBPF/syscall detection
+  Linux kernel-level constraint monitoring
+  Not bypassable by the agent process itself
+```
+
+Layer 3 is a qualitative difference: Layers 1 and 2 rely on the agent's runtime environment to report violations. Layer 3 operates below the agent's process boundary — the agent cannot suppress or modify the detection signal.
+
+Status: Layer 3 integration is in progress (April 2026). The architecture is validated; the Falco bridge pod is being deployed.
+
+### 9.2 Webhook Payload Schema
+
+When Falco detects a constraint violation, it sends a webhook to the MolTrust IPR endpoint:
+
+```json
+{
+  "output_hash": "sha256:<hash-of-evidence>",
+  "agent_did": "did:moltrust:<id>",
+  "output_type": "generic",
+  "source_refs": ["falco:<rule_name>"],
+  "confidence": 1.0,
+  "confidence_basis": "declared",
+  "produced_at": "<ISO-8601>",
+  "metadata": {
+    "source": "falco",
+    "action": "<denied_action_from_aae>",
+    "result": "VIOLATION",
+    "rule": "<falco_rule_name>",
+    "syscall": "<syscall>",
+    "file_path": "<path>",
+    "container_id": "<k8s-pod-id>"
+  }
+}
+```
+
+The `agent_did` is resolved from the Kubernetes pod annotation `moltrust.ch/agent-did`.
+
+### 9.3 Falco Rule Design
+
+Falco rules are derived from AAE `mandate.deniedActions` entries. For each denied action pattern in the AAE, a corresponding Falco rule monitors the relevant syscalls.
+
+Example: If an AAE contains `"deniedActions": ["/etc/*"]`, the Falco rule monitors `open`, `openat`, and `write` syscalls targeting `/etc/` paths for the annotated pod.
+
+DID binding is established via Kubernetes pod annotations:
+```yaml
+metadata:
+  annotations:
+    moltrust.ch/agent-did: "did:moltrust:<id>"
+    moltrust.ch/aae-id: "urn:uuid:<aae-id>"
+```
+
+Status: Test setup live with test DID `did:moltrust:662a7181e0154998`. Falco Bridge Pod deployment in progress.
+
+---
+
+## 10. Governance Layer
+
+### 10.1 Layer Classification
+
+The MolTrust protocol stack extends to four layers:
+
+| Layer | Name | Function | Status |
+|---|---|---|---|
+| 1 | Identity | W3C DID, Ed25519 | Live |
+| 2 | Authorization | AAE (Mandate/Constraints/Validity) | Live |
+| 3 | Governance | Policy blocks, compliance rules | Planned Q3 2026 |
+| 4 | Execution | Runtime enforcement (API + Kernel) | API live, Kernel in progress |
+
+Layer 3 (Governance) sits between Authorization and Execution. It defines organizational and regulatory policies that constrain how AAEs are issued, what constraints are mandatory, and how violations are escalated.
+
+The `VerifiedGovernanceCredential` VC type is planned for Q3 2026. It will encode organizational governance policies as machine-readable, signed artifacts.
+
+### 10.2 aps.txt Security Analysis
+
+The Agent Provider Service (APS) protocol uses `aps.txt` files for provider discovery. A security analysis identified 5 attack vectors:
+
+| ID | Vector | Risk | Mitigation |
+|---|---|---|---|
+| AV-1 | DNS Spoofing | aps.txt served from wrong domain | DNSSEC + HTTPS enforcement |
+| AV-2 | Content Manipulation | aps.txt modified in transit | TLS + signed aps.txt (proposed) |
+| AV-3 | Replay | Old aps.txt served after policy change | Timestamp + TTL in signed version |
+| AV-4 | DoS | aps.txt endpoint overwhelmed | CDN + rate limiting |
+| AV-5 | Confusion | Multiple aps.txt files with conflicting policies | Canonical resolution order |
+
+The strongest gap: `aps.txt` is currently unsigned. MolTrust has proposed signed `aps.txt` via DID-linked signatures as a Working Group contribution (Q2 2026). The bootstrapping rule for unknown authors is warn-not-block.
+
+---
+
+## 11. Outcome Verification
+
+### 11.1 FlagRecord Schema
+
+```json
+{
+  "type": "FlagRecord",
+  "marketId": "<market-id>",
+  "flaggedAt": "<ISO-8601>",
+  "anomalyScore": 55,
+  "signals": ["volumeSpike", "priceVolumeDiv"],
+  "assessment": "MEDIUM RISK",
+  "source": "moltguard",
+  "anchorBlock": 44098421
+}
+```
+
+### 11.2 OutcomeRecord Schema
+
+```json
+{
+  "type": "OutcomeRecord",
+  "marketId": "<market-id>",
+  "resolvedAt": "<ISO-8601>",
+  "outcome": "CONFIRMED | PARTIAL | INCONCLUSIVE | FALSE_POSITIVE",
+  "flagRecordId": "<flag-record-id>",
+  "settlementSource": "polymarket-gamma-api",
+  "evidence": "<hash-of-settlement-data>"
+}
+```
+
+### 11.3 FlagScore Formula
+
+```
+FlagScore = (CONFIRMED + 0.5 * PARTIAL + 0.25 * INCONCLUSIVE) / total_flags
+```
+
+FlagScore measures the accuracy of anomaly detection over time. A FlagScore of 1.0 means every flagged anomaly was subsequently confirmed. The score is computed per rolling quarter and anchored on-chain.
+
+Note: The term "anomaly" is used deliberately rather than "manipulation" — flagged patterns indicate unusual activity that warrants investigation, not proven wrongdoing.
+
+### 11.4 Settlement Watcher
+
+The Settlement Watcher monitors the Polymarket Gamma API for market resolutions. When a previously flagged market resolves, it:
+
+1. Creates an OutcomeRecord linking the flag to the resolution
+2. Updates the running FlagScore
+3. Triggers a Herald follow-up post if the outcome is CONFIRMED or PARTIAL
+
+Status: Implementation ready, deployment in progress.
+
+---
+
+## 12. Agent Lifecycle (Layer A)
+
+### 12.1 Registration
 
 Registration requires: a conformant DID Document, a principal DID (for non-root agents), an initial AuthorizationCredential. Optional: stake deposit, bootstrap weight (operator-assigned only).
 
-### 8.2 Bootstrap Period
+### 12.2 Bootstrap Period
 
 If a bootstrap weight is assigned at registration, it decays as defined in Section 4.4. After the bootstrap period ends, the agent's score is entirely organic. The registry MUST expose `bootstrap_contribution` in the trust score breakdown so verifiers can distinguish organic from bootstrapped scores.
 
-### 8.3 Sub-Agents
+### 12.3 Sub-Agents
 
 Sub-agents MUST have their own distinct DID. They MUST hold an AuthorizationCredential from the parent agent. They do NOT inherit the parent's behavioral history. Maximum delegation depth: 8 hops from root principal.
 
-### 8.4 Cloning and Redeployment
+### 12.4 Cloning and Redeployment
 
 **Clone** (same code, new deployment, new operator context): MUST register a new DID. Does NOT inherit history. Representing a clone as the original is a `clone-impersonation` violation.
 
 **Redeployment** (same logical identity, same principal, new infrastructure): SHOULD use the same DID with key rotation rather than re-registration. Key rotation preserves identity continuity.
 
-### 8.5 Principal Continuity
+### 12.5 Principal Continuity
 
 Violation Records are associated with both the agent DID and the principal DID. Re-registration of a new agent DID for a principal with confirmed, unresolved violations MUST be flagged by the registry. This association depends on the principal DID being stable; principals SHOULD NOT rotate their DID.
 
-### 8.6 Deregistration
+### 12.6 Deregistration
 
-On deregistration: DID marked inactive, credentials remain valid until their own expiry, behavioral record retained per Section 10.4, stake returned if no unresolved violations.
+On deregistration: DID marked inactive, credentials remain valid until their own expiry, behavioral record retained per Section 14.4, stake returned if no unresolved violations.
 
-### 8.7 Optional Stake
+### 12.7 Optional Stake
 
 Agents MAY deposit USDC stake in a registry smart contract at registration. Stake is returned on clean deregistration and forfeited on confirmed violation. Minimum stake for the signal to be meaningful: 10 USDC (reference value; operator-defined). Stake forfeiture requires a ViolationRecord (Section 2.7); unilateral accusation does not trigger forfeiture.
 
 ---
 
-## 9. Threat Model
+## 13. Threat Model
 
-### 9.1 Scope
+### 13.1 Scope
 
 This section covers known attack vectors. It is not exhaustive. New attack classes will emerge as the agent economy develops.
 
-### 9.2 Attack Summary
+### 13.2 Attack Summary
 
 | Attack | Mitigations | Residual Risk |
 |---|---|---|
@@ -1263,15 +1650,15 @@ This section covers known attack vectors. It is not exhaustive. New attack class
 | Adjudicator compromise | ViolationReversal mechanism, operator-signed records | Corrupted external adjudicator could produce false violations |
 | AAE bypass / privilege escalation | Default-deny, deny precedence, holder binding, attenuation-only delegation (Section 2.8) | Implementation bugs in AAE evaluation logic |
 
-### 9.3 Notes on Jaccard Sybil Detection
+### 13.3 Notes on Jaccard Sybil Detection
 
 The Jaccard similarity threshold (0.7) is a lightweight heuristic suitable for small-to-medium networks. It does not catch sophisticated sybil clusters that deliberately diversify their endorser sets. Operators running large networks SHOULD supplement Jaccard detection with graph-theoretic clustering algorithms. This is outside the scope of this specification.
 
 ---
 
-## 10. Privacy Model
+## 14. Privacy Model
 
-### 10.1 Principles
+### 14.1 Principles
 
 **Data minimization:** Only hashes and structural metadata are submitted to shared infrastructure. Raw transaction content, counterparty details, and outcome specifics are retained locally by the parties.
 
@@ -1279,7 +1666,7 @@ The Jaccard similarity threshold (0.7) is a lightweight heuristic suitable for s
 
 **Separation of on-chain and off-chain data:** On-chain anchors contain only hashes. An observer of on-chain data learns that an event occurred — not what it contained.
 
-### 10.2 What Is Stored Where
+### 14.2 What Is Stored Where
 
 | Data element | Storage | Accessible to |
 |---|---|---|
@@ -1296,11 +1683,11 @@ The Jaccard similarity threshold (0.7) is a lightweight heuristic suitable for s
 | Tier 0 credential | Agent + Registry | Verifiers on request |
 | AAE | Agent + Counterparty | Presented per transaction |
 
-### 10.3 Hash Preimage Risks
+### 14.3 Hash Preimage Risks
 
 `outcomeHash` is a SHA-256 hash of a structured payload. For interactions with low-entropy or predictable outcomes (e.g. a binary success/failure), the hash may be correlatable by an attacker who can enumerate possible outcomes. Parties handling sensitive interactions SHOULD include a random salt in the outcome payload before hashing to prevent preimage correlation.
 
-### 10.4 GDPR and Swiss DSG Considerations
+### 14.4 GDPR and Swiss DSG Considerations
 
 *This analysis is informational and does not constitute legal advice.*
 
@@ -1314,13 +1701,13 @@ The Jaccard similarity threshold (0.7) is a lightweight heuristic suitable for s
 
 **Tier 0 privacy:** DeveloperIdentityCredential (Section 2.9) does NOT contain personal data. The credential attests that KYC verification occurred; the personal data used during verification is held exclusively by the KYC provider under a separate data processing relationship.
 
-### 10.5 Future: Zero-Knowledge Extensions
+### 14.5 Future: Zero-Knowledge Extensions
 
 ZK-proof techniques (e.g. zk-SNARKs) could allow agents to prove behavioral properties without revealing underlying interaction proofs. This is not specified in v0.3 and is deferred to a future extension.
 
 ---
 
-## 11. Worked Example
+## 15. Worked Example
 
 **Scenario:** A travel booking agent (Agent A) wants to book a hotel through Agent B. Agent B requires trust score >= 60.
 
@@ -1391,9 +1778,9 @@ Agent B adds `proofResponder` and submits to registry. Both agents' behavioral r
 
 ---
 
-## 12. Conformance
+## 16. Conformance
 
-### 12.1 Layer A — Protocol Conformance
+### 16.1 Layer A — Protocol Conformance
 
 A Layer A conformant implementation MUST:
 
@@ -1411,7 +1798,7 @@ A Layer A conformant implementation MUST:
 12. Enforce AAE validation rules defined in Section 2.8.4 when processing Agent Authorization Envelopes
 13. Implement credential TTL enforcement and revocation checking per Section 2.11
 
-### 12.2 Layer B — Registry Conformance
+### 16.2 Layer B — Registry Conformance
 
 A Layer B conformant registry MUST:
 
@@ -1424,11 +1811,11 @@ A Layer B conformant registry MUST:
 7. Record confirmed violations on-chain per Section 6
 8. Expose revocation endpoints per Section 2.11.2 and Bitstring Status Lists per Section 2.11.3
 
-### 12.3 Layer C — Reputation Model Conformance
+### 16.3 Layer C — Reputation Model Conformance
 
 There is no mandatory conformance requirement for Layer C. Implementations MAY use any scoring model that consumes Layer A evidence. Implementations that use the reference model SHOULD implement all components defined in Section 4.
 
-### 12.4 Non-Goals
+### 16.4 Non-Goals
 
 A conformant implementation is NOT required to:
 
@@ -1437,7 +1824,7 @@ A conformant implementation is NOT required to:
 - Enforce legal compliance
 - Interoperate with non-conformant implementations
 
-### 12.5 Version Compatibility
+### 16.5 Version Compatibility
 
 Version 0.3 is a draft. Breaking changes to Layer A data formats will carry a minimum 12-month deprecation period in future versions. Layer B API changes follow semantic versioning. Layer C changes are non-breaking by definition.
 

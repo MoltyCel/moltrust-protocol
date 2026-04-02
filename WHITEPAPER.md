@@ -1,7 +1,7 @@
 # The MolTrust Protocol
 ## A Verification Standard for Autonomous Software Agents
 
-**Version 0.5 — Draft for Review**
+**Version 0.7 — Draft for Review**
 **MolTrust / CryptoKRI GmbH, Zurich**
 **March 2026**
 
@@ -15,9 +15,11 @@ This paper describes a minimal, open verification standard for software agents �
 
 The standard is built on existing open specifications (W3C DID, W3C Verifiable Credentials), requires no permission to implement, and is designed to function independently of any single platform, jurisdiction, or operator.
 
-The Protocol aligns with the Singapore IMDA Model AI Governance Framework for Agentic AI (January 2026) and is designed to remain compatible with the EU AI Act (August 2026 enforcement) and emerging APAC regulatory frameworks.
+The Protocol supports multi-chain wallet binding (Ethereum, Base L2, Solana), external DID bridging for cross-ecosystem interoperability, and cross-ecosystem trust score import. It aligns with the Singapore IMDA Model AI Governance Framework for Agentic AI (January 2026) and is designed to remain compatible with the EU AI Act (August 2026 enforcement) and emerging APAC regulatory frameworks.
 
-*Technical specifications, data models, and conformance requirements are defined in the companion document: The MolTrust Protocol: Technical Specification (v0.3).*
+MolTrust is the first agent trust framework with kernel-level constraint enforcement — AAE constraints are not only cryptographically tamper-proof but also enforced at the Linux kernel level via Falco eBPF integration (in progress, April 2026).
+
+*Technical specifications, data models, and conformance requirements are defined in the companion document: The MolTrust Protocol: Technical Specification (v0.7).*
 
 ---
 
@@ -74,6 +76,8 @@ The MolTrust Protocol defines four primitives that together satisfy the requirem
 Every agent in the protocol is assigned a Decentralized Identifier (DID) — a globally unique, cryptographically verifiable identifier that the agent controls. DIDs are specified by the W3C and require no central registry to create or verify. Ownership is proven by possession of the corresponding private key.
 
 A DID provides a stable, portable reference to an agent across platforms and over time. It survives redeployment, migration, and platform changes. It answers the question: *is this the same entity I interacted with before?*
+
+VCOne (`did:moltrust:vcone`) is MolTrust's first verified autonomous agent deployed under this model. It operates with its own Ed25519 signing key, its own GitHub account, and a Telegram interface for human-in-the-loop control. Every action it takes is cryptographically signed and provable through Interaction Proof Records. VCOne demonstrates the MolTrust Protocol through its existence — not as marketing, but as live proof that the system works as specified.
 
 **4.2 Authorization**
 
@@ -183,7 +187,45 @@ A Runtime Control Plane handles revocation events separately from issuance. Revo
 
 The AAE design draws on NIST SP 800-162 (Guide to Attribute Based Access Control), W3C Verifiable Credentials Data Model 2.0, and OAuth 2.0 Rich Authorization Requests (RFC 9396).
 
-**4.7 Regulatory Alignment — Singapore IMDA Model AI Governance Framework**
+**4.7 Multi-Layer Enforcement**
+
+The Agent Authorization Envelope defines what an agent may do. But definition alone is insufficient — constraints must be enforced at every level of the stack. MolTrust implements a three-layer enforcement model:
+
+**Layer 1 — Cryptographic.** Ed25519 signatures and JCS RFC 8785 canonicalization make AAE boundaries tamper-proof by construction. Any counterparty can verify that the AAE has not been modified since issuance — without infrastructure dependency.
+
+**Layer 2 — API.** The MolTrust registry enforces constraints at the application level: trust score degradation on violation, Interaction Proof Record (IPR) submission for audit trails, and credential revocation for compromised agents.
+
+**Layer 3 — Kernel (in progress).** Falco eBPF integration monitors agent behavior at the Linux syscall level. If an AAE declares that an agent may not write to `/etc/`, Falco detects the syscall and submits a violation proof to MolTrust — regardless of whether the agent's own runtime reports it. This is enforcement below the agent's process boundary. The agent cannot suppress or modify the detection signal.
+
+Layer 3 is a qualitative difference from Layers 1 and 2. Cryptographic and API enforcement rely on the agent's environment to report violations. Kernel enforcement operates independently of the agent — it is the infrastructure itself that enforces the constraint.
+
+Status: Layer 3 architecture is validated. Falco bridge deployment is in progress (April 2026).
+
+**4.8 Cross-Protocol Composability**
+
+The MolTrust Protocol is designed to compose with other agent trust frameworks rather than replace them. Three integration paths are currently active:
+
+**qntm Authority Constraints Working Group.** MolTrust AAE fields map directly to qntm ConstraintEvaluation facets (5 of 5 dimensions verified via test vectors TV-001 through TV-005). JCS RFC 8785 and Ed25519 are shared primitives — a single signing operation produces artifacts verifiable by both systems.
+
+**Agent Provider Service (APS).** MolTrust AAE trust scores map to APS Grade levels. Provider attestation import is in progress.
+
+**decision-equivalence.** A three-level model for comparing agent decisions across protocol boundaries: correlation (temporal binding), equivalence (semantic binding via canonical outcome hash), and explanation (system-specific evidence). MolTrust implements Levels 1 and 3; Level 2 is planned for a future specification version.
+
+The common thread: MolTrust does not require other protocols to adopt its formats. It provides mapping specifications that allow each system to verify MolTrust credentials using its own native verification logic. This is composability through shared primitives, not through format convergence.
+
+**4.9 Outcome Verification**
+
+Trust scores describe an agent's history. Outcome verification measures whether that history was accurate.
+
+In prediction markets, MolTrust flags anomalous trading patterns before market resolution. After resolution, the Settlement Watcher compares flagged predictions against actual outcomes. The FlagScore — computed as (CONFIRMED + 0.5 × PARTIAL + 0.25 × INCONCLUSIVE) / total_flags — measures detection accuracy over time.
+
+This creates a verifiable track record for the detection system itself: not just "we flagged this market" but "we flagged this market and were right 78% of the time." The FlagScore is anchored on-chain quarterly.
+
+The term "anomaly" is used deliberately rather than "manipulation" — flagged patterns indicate unusual activity warranting investigation, not proven wrongdoing.
+
+Status: Implementation ready, deployment in progress.
+
+**4.10 Regulatory Alignment — Singapore IMDA Model AI Governance Framework**
 
 The Singapore Infocomm Media Development Authority (IMDA) published the Model AI Governance Framework for Agentic AI in January 2026 — the first comprehensive regulatory guidance addressing autonomous AI agent systems. The MolTrust Protocol maps to each of the four MGF dimensions:
 
@@ -197,7 +239,7 @@ The Singapore Infocomm Media Development Authority (IMDA) published the Model AI
 
 The protocol is additionally designed for compatibility with the EU AI Act (August 2026 enforcement deadline), which imposes transparency and risk classification requirements on AI systems including autonomous agents; the South Korea AI Basic Act, which establishes accountability frameworks for AI operators; and the Taiwan AI Basic Act, which defines governance principles for AI deployment in regulated sectors.
 
-**4.8 Trust Tier 0 — Optional Human Identity Anchoring**
+**4.11 Trust Tier 0 — Optional Human Identity Anchoring**
 
 The MolTrust Protocol is agent-centric. Anonymous deployment is permitted. No human identity disclosure is required to register an agent, issue credentials, or participate in the trust network. This is by design: many legitimate agent deployments — research prototypes, open-source tools, privacy-preserving services — have no reason to disclose the identity of their operators.
 
@@ -232,6 +274,36 @@ This separation means routine agent interactions carry no blockchain overhead. T
 **Stake**
 
 Agents may optionally deposit a stake at registration — a defined amount held in a smart contract. The stake creates an economic commitment to declared behavior: it is returned on clean deregistration and forfeited if a confirmed violation is recorded. Stake is one signal among others; it is not required for participation.
+
+**5.1 Multi-Chain Wallet Binding**
+
+MolTrust is chain-agnostic by design. Wallet binding supports Ethereum, Base L2, and Solana. Additional chains follow the same principle: the agent signs a standardized message with its private key, MolTrust verifies the signature, and binds the wallet address cryptographically to the DID.
+
+Solana uses Ed25519 — the same signature scheme MolTrust uses internally for its own signing keys. This makes Solana-native agents first-class citizens in the MolTrust trust model. No adapter, no bridge contract, no additional dependency.
+
+Each chain binding produces a chain-specific payment service entry in the agent's DID Document, enabling cross-chain payment readiness from the moment of binding.
+
+---
+
+## 5b. Interoperability
+
+**External DID Bridging**
+
+The MolTrust Protocol acknowledges that agents already have existing identities in other ecosystems. DID Bridging allows an external DID identity to be cryptographically linked to a `did:moltrust` identity — without abandoning the external identity.
+
+The bridge proof is a signature over both DIDs, created with the wallet bound to the `did:moltrust` identity. This makes the link cryptographically provable and tamper-evident. Bridging is not transitive: if A bridges to B and B bridges to C, resolving A does not return C. Each link is independent and independently revocable.
+
+Any DID method that supports Ed25519 or secp256k1 signing can bridge to MolTrust. The protocol does not prescribe which external methods are valid — it only requires that the linking proof is cryptographically verifiable.
+
+**Cross-Ecosystem Trust Score Import**
+
+Agents that have built reputation in external systems can import that signal as a basis for their MolTrust trust score. External scores are:
+
+- Mapped logarithmically to the MolTrust scale (0–100)
+- Weighted at 0.3 relative to native MolTrust endorsements (1.0)
+- Subject to a 45-day half-life (vs. 90 days for native scores)
+
+This design ensures that a one-time external score cannot permanently dominate an agent's standing. Trust must be continuously earned through verified interactions. External reputation provides a starting point — not a permanent advantage.
 
 ---
 
@@ -331,6 +403,12 @@ The MolTrust Protocol defines a minimal, open standard for agent verification ba
 
 The protocol formalizes a five-party trust chain (Developer, Owner, Agent, Instructor, Counterparty) in which each link is cryptographically verifiable, and introduces the Agent Authorization Envelope (AAE) — a machine-readable structure defining mandate, constraints, and validity for every issued credential. The AAE enables pre-transaction trust verification: any counterparty can inspect an agent's authorized scope before committing to an interaction.
 
+AAE constraints are enforced through a three-layer model — cryptographic tamper-proofing (Ed25519 + JCS), API-level trust score degradation and credential revocation, and kernel-level syscall monitoring via Falco eBPF integration — ensuring that enforcement operates independently of the agent's own runtime.
+
+The protocol composes with other agent trust frameworks through cross-protocol mapping specifications: qntm Authority Constraints (shared JCS/Ed25519 primitives), Agent Provider Service grade-level mapping, and a three-level decision-equivalence model for comparing agent outcomes across protocol boundaries.
+
+Outcome verification extends trust scoring from historical behavior to predictive accuracy, with FlagScore measuring detection system performance against actual market resolutions — creating a verifiable track record for the detection infrastructure itself.
+
 The protocol aligns with the Singapore IMDA Model AI Governance Framework for Agentic AI across its four dimensions — risk bounding, human accountability, technical controls, and end-user responsibility — and is designed for compatibility with the EU AI Act and emerging APAC regulatory frameworks. An optional Trust Tier 0 provides KYC-backed human identity anchoring for enterprise and regulated deployments without compromising the protocol's agent-centric, permissionless design.
 
 The protocol is designed to:
@@ -340,9 +418,11 @@ The protocol is designed to:
 - Function across jurisdictions, platforms, and economic systems without modification
 - Remain separable from any single operator, including MolTrust
 
+The protocol supports multi-chain identity through wallet binding (Ethereum, Base, Solana), external DID bridging for cross-ecosystem portability, and trust score import with reduced weight and accelerated decay.
+
 The protocol does not govern agent behavior, evaluate agent output, or substitute for legal accountability. It provides the verifiable factual substrate on which those functions can be built.
 
-A reference implementation is available at **api.moltrust.ch**. Protocol specification, credential schemas, and integration packages are published as open source at **github.com/MoltyCel**. The companion Technical Specification (v0.3) provides complete data models, verification flows, and conformance requirements.
+A reference implementation is available at **api.moltrust.ch**. Protocol specification, credential schemas, and integration packages are published as open source at **github.com/MoltyCel**. The companion Technical Specification (v0.7) provides complete data models, verification flows, and conformance requirements.
 
 ---
 
