@@ -17,7 +17,7 @@ The standard is built on existing open specifications (W3C DID, W3C Verifiable C
 
 The Protocol supports multi-chain wallet binding (Ethereum, Base L2, Solana), external DID bridging for cross-ecosystem interoperability, and cross-ecosystem trust score import. It aligns with the Singapore IMDA Model AI Governance Framework for Agentic AI (January 2026) and is designed to remain compatible with the EU AI Act (August 2026 enforcement) and emerging APAC regulatory frameworks.
 
-MolTrust is the first agent trust framework with kernel-level constraint enforcement — AAE constraints are not only cryptographically tamper-proof but also enforced at the Linux kernel level via Falco eBPF integration (in progress, April 2026).
+MolTrust is the first agent trust framework with kernel-level constraint enforcement — AAE constraints are not only cryptographically tamper-proof but also enforced at the Linux kernel level via Falco eBPF integration (live, April 2026).
 
 *Technical specifications, data models, and conformance requirements are defined in the companion document: The MolTrust Protocol: Technical Specification (v0.7).*
 
@@ -256,6 +256,27 @@ Critically, Trust Tier 0 does not affect agent DID independence. A verified deve
 - It does not make MolTrust a regulated identity provider. MolTrust does not perform KYC — it accepts and verifies credentials issued by accredited third parties.
 
 Trust Tier 0 is an opt-in accountability layer, expressible via the AAE CONSTRAINTS block, that bridges the protocol's agent-centric design with the human accountability requirements of regulated industries and emerging governance frameworks.
+
+---
+
+
+## 4b. Three-Layer Enforcement: From Declaration to Proof
+
+Most agent authorization frameworks stop at declaration: the agent claims it will respect constraints. Some add verification: the API checks credentials on every call. MolTrust adds a third layer: kernel-level enforcement that the agent cannot bypass from userspace.
+
+This matters because the threat model for autonomous agents differs fundamentally from traditional software. A human employee who violates policy is visible — their actions leave traces, colleagues notice, audits catch it. An autonomous agent that modifies its own authorization envelope before acting leaves no human trace unless the infrastructure beneath it is watching.
+
+Falco, the CNCF-graduated eBPF security tool deployed across AWS, GCP, and Azure, provides exactly this: syscall-level observation that operates below the agent's execution context. Combined with MolTrust's IPR recording and on-chain anchoring, a policy violation attempt — even one that is ultimately blocked by container permissions — becomes a permanent, verifiable event in the agent's trust history.
+
+The three layers are complementary, not redundant:
+
+- **Cryptography** proves identity and authorization at issuance time
+- **API verification** proves compliance at request time
+- **Kernel enforcement** proves behavioral integrity at runtime
+
+No single layer is sufficient. Together, they close the gap that RSAC 2026 identified as the hardest open problem in agent identity: policy self-modification detection.
+
+Reference implementation: https://github.com/HaraldeRoessler/moltrust-falco-bridge
 
 ---
 

@@ -1461,7 +1461,8 @@ Layer 3 — Kernel (in progress)
 
 Layer 3 is a qualitative difference: Layers 1 and 2 rely on the agent's runtime environment to report violations. Layer 3 operates below the agent's process boundary — the agent cannot suppress or modify the detection signal.
 
-Status: Layer 3 integration is in progress (April 2026). The architecture is validated; the Falco bridge pod is being deployed.
+Status: Layer 3 is live (April 2026). Reference implementation: https://github.com/HaraldeRoessler/moltrust-falco-bridge
+Deployed on OpenClaw gateway instance (prod). Test DID did:moltrust:662a7181e0154998 demonstrates trust score degradation on Falco-detected violations.
 
 ### 9.2 Webhook Payload Schema
 
@@ -1504,7 +1505,8 @@ metadata:
     moltrust.ch/aae-id: "urn:uuid:<aae-id>"
 ```
 
-Status: Test setup live with test DID `did:moltrust:662a7181e0154998`. Falco Bridge Pod deployment in progress.
+Status: Live. Test DID did:moltrust:662a7181e0154998 with seeded baseline 70.0. Falco Bridge Pod deployed on OpenClaw gateway.
+Reference implementation: https://github.com/HaraldeRoessler/moltrust-falco-bridge
 
 ---
 
