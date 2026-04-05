@@ -64,6 +64,7 @@ This distinction resolves the central design tension in any open-standard-plus-c
    - 9.1 Architecture
    - 9.2 Webhook Payload Schema
    - 9.3 Falco Rule Design
+    9.4 Sequential Action Safety (SAS)
 10. Governance Layer
    - 10.1 Layer Classification
    - 10.2 aps.txt Security Analysis
@@ -1462,6 +1463,103 @@ Layer 3 — Kernel (in progress)
 Layer 3 is a qualitative difference: Layers 1 and 2 rely on the agent's runtime environment to report violations. Layer 3 operates below the agent's process boundary — the agent cannot suppress or modify the detection signal.
 
 Status: Layer 3 is live (April 2026). Reference implementation: https://github.com/HaraldeRoessler/moltrust-falco-bridge
+
+### 9.4 Sequential Action Safety (SAS)
+
+**Status:** Live — Phase 1 (WARN-only)
+**Deployed:** April 2026
+
+#### Overview
+
+MoltGuard evaluates each agent action individually against the AAE envelope (scope, spend, validity). SAS adds a pre-execution check for **order-sensitive action sequences** — detecting cases where individually permitted actions produce catastrophic outcomes when executed in the wrong order.
+
+**Example:**
+
+```
+Action A: DELETE /data/customers/backup   → AAE permits ✅
+Action B: WRITE  /data/customers/export   → AAE permits ✅
+
+A before B = data loss (irreversible) ❌
+B before A = safe ✅
+```
+
+Both actions pass AAE authorization. SAS detects the order dependency.
+
+#### Safety Residual Formula
+
+The core metric is the **Safety Residual** — an asymmetric measure of whether a proposed action is more destructive than a prior action on overlapping resources:
+
+```
+R = max(0, Φ(proposed) - Φ(past)) × overlap(proposed, past)
+```
+
+Where `Φ(action)` is the reversibility score of the action type:
+
+| Action | Φ (Reversibility) | Rationale |
+|---|---|---|
+| DELETE, PURGE, REVOKE, TERMINATE | 1.0 | Irreversible |
+| TRANSFER | 0.95 | USDC on-chain — practically irreversible |
+| WRITE | 0.6 | Partially reversible |
+| UPDATE | 0.5 | Partially reversible |
+| READ, LIST, QUERY | 0.0 | Fully reversible |
+
+The `overlap` function measures path similarity, stopping at the first divergence:
+
+```
+/data/customers/backup vs /data/customers/export → 2/3 = 0.667
+/api/v1/users vs /api/v1/orders → 0.0 (diverges at segment 3)
+```
+
+**Special rule:** DELETE/PURGE/TERMINATE after READ/WRITE on the same resource produces a residual capped at 0.9 with a 2x multiplier, reflecting the high risk of destroying data that was just accessed.
+
+#### Thresholds and Verdicts
+
+| Residual | Verdict | Phase 1 (current) | Phase 2 |
+|---|---|---|---|
+| 0.0 – 0.29 | SAFE | Execute | Execute |
+| 0.3 – 0.69 | WARN | Execute + IPR record | Execute + IPR record |
+| 0.7 – 1.0 | BLOCK | Execute + IPR record | Block + arbitration |
+
+Phase 1 operates in WARN-only mode. All actions execute, but order-sensitive sequences are flagged and recorded as IPR events on Base L2.
+
+#### API
+
+```
+POST /guard/api/action/check
+{
+  "did": "did:moltrust:<id>",
+  "session_id": "sess_abc123",
+  "proposed_action": {
+    "type": "DELETE",
+    "resource": "/data/customers/backup",
+    "scope": "data:write"
+  }
+}
+```
+
+The `session_id` is required for pairwise checks. Without it, each action is evaluated in isolation. Sessions expire after 1 hour.
+
+#### Position in the Stack
+
+```
+L1    Identity Check      (AgentID / did:moltrust:)
+L2    AAE Authorization   (MANDATE + CONSTRAINTS + VALIDITY)
+L2.5  SAS Pre-Execution   (Sequential Action Safety) ← opt-in
+L3    Trust Score Gate     (MolTrust Score ≥ threshold)
+L4    Falco Enforcement    (Kernel-level, Section 9.1–9.3)
+L5    IPR Anchor           (Base L2 non-repudiation)
+```
+
+SAS is opt-in. Agents that do not call the endpoint are not checked. SAS does not replace AAE authorization — it supplements it with sequence-aware safety analysis.
+
+#### Design Constraints
+
+- Deterministic: no LLM calls, stdlib-only computation
+- Pairwise: checks proposed vs. each prior action, not N-action optimization
+- Ephemeral: session state is in-memory with 1h TTL
+- Non-blocking (Phase 1): WARN events are recorded but do not prevent execution
+
+
 Deployed on OpenClaw gateway instance (prod). Test DID did:moltrust:662a7181e0154998 demonstrates trust score degradation on Falco-detected violations.
 
 ### 9.2 Webhook Payload Schema
@@ -1492,6 +1590,7 @@ When Falco detects a constraint violation, it sends a webhook to the MolTrust IP
 The `agent_did` is resolved from the Kubernetes pod annotation `moltrust.ch/agent-did`.
 
 ### 9.3 Falco Rule Design
+    9.4 Sequential Action Safety (SAS)
 
 Falco rules are derived from AAE `mandate.deniedActions` entries. For each denied action pattern in the AAE, a corresponding Falco rule monitors the relevant syscalls.
 
