@@ -1609,6 +1609,62 @@ Reference implementation: https://github.com/HaraldeRoessler/moltrust-falco-brid
 
 ---
 
+### 9.5 MoltGraph -- Interaction History Graph
+
+**Status:** Live -- Phase 2
+**Deployed:** April 2026
+
+#### Overview
+
+MolTrust Trust Score answers: "How trustworthy is Agent B in general?"
+MoltGraph answers: "How has Agent B performed with agents that Agent A knows?"
+
+#### Position in Stack
+
+L2    AAE Authorization
+L2.5  SAS Pre-Execution
+L2.6  MoltGraph Query (Relationship-specific trust signal)
+L3    Trust Score Gate
+
+#### Data Model
+
+graph_edges table (live): from_did, to_did, context, outcome_score, source, interaction_at, on_chain_anchor.
+
+Outcome mapping: CONFIRMED/grade_up=1.0, PARTIAL=0.6, grade_down=0.3, INCORRECT/revocation=0.0, INCONCLUSIVE=NULL.
+
+#### Auto-Population Sources
+
+- aeoess webhook grade_change/revocation: 1.0 / 0.0
+- x402 USDC payments confirmed on Base: min(1.0, amount/5.0)
+- WG cross-verification results: 1.0
+- IPR verdicts (Phase 5): CONFIRMED=1.0, PARTIAL=0.6
+
+#### Graph Query
+
+2-hop neighbourhood with 45-day half-life decay and 50% hop-2 discount.
+Confidence = min(1.0, datapoints/10). graph_bonus activates only when confidence > 0.3.
+
+#### API Endpoints (live)
+
+GET /guard/api/graph/score/{from_did}/{to_did}?context=
+GET /guard/api/graph/neighbours/{did}?min_score=
+GET /guard/api/graph/stats
+POST /guard/api/graph/edge (API-key required)
+
+Privacy: hop counts not exposed. All queries require API-key.
+
+#### Trust Score Integration
+
+GET /skill/trust-score/{did}?requester={requester_did}
+graph_bonus = neighbourhood_score x 10 x confidence (max +10 points)
+
+#### Phases
+
+Phase 1 (done): Table + seed edges + source column.
+Phase 2 (live): All endpoints + aeoess webhook + x402 hook.
+Phase 3 (next): graph_bonus in Trust Score formula.
+
+
 ## 10. Governance Layer
 
 ### 10.1 Layer Classification
