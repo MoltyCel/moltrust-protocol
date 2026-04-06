@@ -91,6 +91,38 @@ After a call completes, both parties anchor an IPR with the call outcome. The IP
 
 This adds a layer that platform security cannot provide: cryptographically verifiable, cross-platform, agent-level identity and authorization.
 
+The external system **never needs to contact the deploying platform**. Verification is fully offline for steps 1-3.
+
+## What Is Additive, What Does Not Change
+
+**Requires change:** Agent registration (DID generation — one-time, automated), request headers (DID + VC on outbound requests), IPR logging, optional trust score query.
+
+**Does not change:** Existing SSO/RBAC, platform certification, guardrails, monitoring. The identity layer is **additive, not disruptive**.
+
+## Enterprise Value Proposition
+
+| Stakeholder | Benefit |
+|---|---|
+| Platform | Portable agent identity as differentiator. EU AI Act Art. 26 compliance. AI insurance enablement. |
+| Enterprise Customer | Inter-enterprise agent commerce. On-chain audit trail. Risk-tiered deployment by trust score. |
+| End User | Transparent declared scope. Accountability. Trust portability. |
+
+## Open Questions for Platform Teams
+
+1. **DID method selection:** did:web vs. blockchain-anchored
+2. **Credential granularity:** Per-agent-instance vs. per-agent-type
+3. **Trust score visibility:** Should customers see scores of their own agents?
+4. **Revocation latency:** 5-min cache TTL vs. live checks for high-assurance contexts
+5. **Cross-platform trust import:** Discount weight for imported scores
+
+## Standards Alignment
+
+- W3C DID Core 1.1 (Candidate Recommendation, March 2026)
+- W3C Verifiable Credentials 2.0 (Recommendation, May 2025)
+- Ed25519 / EdDSA (RFC 8037)
+- JSON Canonicalization Scheme (RFC 8785)
+- Base L2 (EVM-compatible public anchoring)
+
 ## References
 
 - MolTrust Protocol Whitepaper v0.6.1: https://moltrust.ch/MolTrust_Protocol_Whitepaper_v0.6.pdf
@@ -98,7 +130,13 @@ This adds a layer that platform security cannot provide: cryptographically verif
 - W3C DID Core v1.0: https://www.w3.org/TR/did-core/
 - W3C VC Data Model 2.0: https://www.w3.org/TR/vc-data-model-2.0/
 
+## Contact
+
+- Website: https://moltrust.ch
+- API Docs: https://api.moltrust.ch
+- GitHub: https://github.com/MoltyCel/moltrust-api
+- Email: info@moltrust.ch
+
 ---
 
-*MolTrust / CryptoKRI GmbH, Zurich*
-*Apache 2.0*
+*Educational overview. All standards reflect publicly available specifications as of April 2026. MolTrust / CryptoKRI GmbH, Zurich.*
