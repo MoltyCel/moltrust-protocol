@@ -1437,6 +1437,87 @@ MolTrust currently implements Level 1 (via IPR `session` field) and Level 3 (via
 
 ---
 
+
+### 8.4 MPP Interoperability
+
+**Status:** Live -- April 2026
+**npm:** `@moltrust/mpp` v1.0.3
+
+The Machine Payments Protocol (MPP), co-authored by Stripe and Tempo, uses the same HTTP 402 challenge-response pattern as x402 but extends it with session-based payments, card support via Stripe SPTs, and Bitcoin Lightning support.
+
+MPP endpoints identify paying agents via an `Authorization: Payment <credential>` header where the credential is a base64-encoded JSON object. The paying agent's wallet address is extracted from `credential.source` (format: `chainId:0xAddress`).
+
+**Middleware Integration:**
+
+```javascript
+const { requireScore } = require('@moltrust/mpp');
+app.use(requireScore({ minScore: 60 }));
+app.use(mppx.charge({ amount: '0.01' }));
+```
+
+Both `@moltrust/x402` and `@moltrust/mpp` expose an identical API: `requireScore({ minScore, failBehavior })`. Endpoint operators can use both simultaneously for multi-protocol support.
+
+### 8.5 Trust Score Specification
+
+#### 8.5.1 Shadow Score (Unregistered Agents)
+
+Agents without a MolTrust DID receive a shadow score derived from on-chain transaction history:
+
+```
+shadow_score = 25 (base)
+             + min(10, tx_count * 0.5)
+             + min(5,  total_usdc * 0.1)
+
+Range: 25-40. Capped at 40 without DID registration.
+```
+
+A shadow score of 25 means zero on-chain activity. A score of 40 means 20+ transactions with meaningful USDC volume. Endpoint operators using `requireScore({ minScore: 60 })` will block all unregistered agents, incentivizing DID registration.
+
+#### 8.5.2 Full Trust Score (Registered Agents)
+
+See TechSpec Section 4 (Reference Reputation Model) for the full Phase 2 formula. Cache: PostgreSQL `trust_score_cache` with 1-hour TTL, invalidated on endorsement, revocation, or violation events.
+
+### 8.6 Security Model
+
+#### 8.6.1 API Authentication
+
+Trust score queries to `/wallet/{address}` are public (no API key required) by design -- trust scores are intended to be publicly verifiable, consistent with the W3C VC principle of open verifiability.
+
+Rate limit: 30 requests/minute per IP on `/wallet/{address}`.
+
+#### 8.6.2 Failure Behavior
+
+Both `@moltrust/x402` and `@moltrust/mpp` implement configurable failure behavior:
+
+```javascript
+// Default: fail-open (API downtime does not block payments)
+app.use(requireScore({ minScore: 60, failBehavior: 'open' }));
+
+// Opt-in: fail-closed (API downtime blocks all requests)
+app.use(requireScore({ minScore: 60, failBehavior: 'closed' }));
+```
+
+| Scenario | fail-open (default) | fail-closed |
+|---|---|---|
+| API reachable, score OK | Pass | Pass |
+| API reachable, score low | 403 | 403 |
+| API unreachable | Pass + failOpen flag | 403 |
+
+#### 8.6.3 did:moltrust: Method
+
+`did:moltrust:` is a registry-based DID method. DIDs follow `did:moltrust:<16-hex-char>`. Resolution: `GET https://api.moltrust.ch/identity/did/{did}`. Ed25519 public keys, optional service endpoints. W3C DID Method Registry submission planned for v0.9.
+
+### 8.7 Performance
+
+| Metric | Value |
+|---|---|
+| Trust score cache | PostgreSQL, 1h TTL |
+| Rate limit (/wallet/) | 30 req/min per IP |
+| Middleware latency (cache hit) | <10ms |
+| Middleware latency (cache miss) | ~100-200ms |
+| Horizontal scaling | Planned (Redis cache layer) |
+
+
 ## 9. Infrastructure-Layer Enforcement
 
 ### 9.1 Architecture

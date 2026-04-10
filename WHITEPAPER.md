@@ -19,7 +19,7 @@ The Protocol supports multi-chain wallet binding (Ethereum, Base L2, Solana), ex
 
 MolTrust is the first agent trust framework with kernel-level constraint enforcement — AAE constraints are not only cryptographically tamper-proof but also enforced at the Linux kernel level via Falco eBPF integration (live, April 2026).
 
-*Technical specifications, data models, and conformance requirements are defined in the companion document: The MolTrust Protocol: Technical Specification (v0.7).*
+*Technical specifications, data models, and conformance requirements are defined in the companion document: The MolTrust Protocol: Technical Specification (v0.8).*
 
 ---
 
@@ -280,6 +280,30 @@ Reference implementation: https://github.com/HaraldeRoessler/moltrust-falco-brid
 
 ---
 
+
+## 4c. Protocol-Agnostic Trust Layer
+
+The MolTrust trust infrastructure is designed to be independent of any specific agent payment protocol. As the agent payment landscape has fragmented into multiple competing standards -- x402 (Coinbase/Cloudflare), MPP (Stripe/Tempo/Visa), AP2 (Google), ACP (OpenAI/Stripe) -- the need for a neutral, portable trust layer has become structurally evident.
+
+No payment protocol defines how an endpoint operator verifies whether a paying agent is legitimate, trustworthy, or has been flagged for abuse. They handle payment mechanics, not agent trust. MolTrust fills this gap.
+
+**The DigiCert Analogy.** DigiCert does not compete with HTTPS -- it makes HTTPS trustworthy. MolTrust does not compete with x402 or MPP -- it makes agent payments trustworthy, regardless of which payment rail the agent uses.
+
+**Protocol Coverage (April 2026)**
+
+| Protocol | Ecosystem | MolTrust Integration |
+|---|---|---|
+| x402 | Coinbase, Cloudflare | `@moltrust/x402` v1.0.1 |
+| MPP | Stripe, Tempo, Visa | `@moltrust/mpp` v1.0.3 |
+| AP2 | Google, 60+ partners | Roadmap v0.9 Q3 2026 |
+| ACP | OpenAI, Stripe | Roadmap v0.9 Q4 2026 |
+
+An agent that registers a W3C DID with MolTrust receives a trust score that is queryable by any endpoint operator regardless of which payment protocol the agent uses. The agent registers once; the trust score is valid everywhere.
+
+This is the structural advantage of building on W3C DID/VC standards rather than protocol-specific identity systems: portability is guaranteed by the standard, not by bilateral agreements.
+
+---
+
 ## 5. Speed and Permanence
 
 The protocol separates two operations that have fundamentally different requirements: verification and accountability.
@@ -443,7 +467,7 @@ The protocol supports multi-chain identity through wallet binding (Ethereum, Bas
 
 The protocol does not govern agent behavior, evaluate agent output, or substitute for legal accountability. It provides the verifiable factual substrate on which those functions can be built.
 
-A reference implementation is available at **api.moltrust.ch**. Protocol specification, credential schemas, and integration packages are published as open source at **github.com/MoltyCel**. The companion Technical Specification (v0.7) provides complete data models, verification flows, and conformance requirements.
+A reference implementation is available at **api.moltrust.ch**. Protocol specification, credential schemas, and integration packages are published as open source at **github.com/MoltyCel**. The companion Technical Specification (v0.8) provides complete data models, verification flows, and conformance requirements.
 
 ---
 
