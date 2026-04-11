@@ -1,11 +1,13 @@
 # The MolTrust Protocol: Technical Specification
-## Version 0.7 — Draft for Review
+## Version 0.8.1 — Draft for Review
 
 **MolTrust / CryptoKRI GmbH, Zurich**
 **April 2026**
 **Status: Informational Draft**
 
 *v0.7 additions: Cross-Protocol Interoperability (qntm/APS), Infrastructure-Layer Enforcement (Falco), Governance Layer, Outcome Verification.*
+
+*v0.8.1 additions: A2A v0.3 Conformance (Sec. 8.8)*
 
 This document is a companion to *The MolTrust Protocol: A Verification Standard for Autonomous Software Agents* (Whitepaper v0.5). It provides the technical definitions, data models, verification flows, and conformance requirements referenced in that document.
 
@@ -1516,6 +1518,52 @@ app.use(requireScore({ minScore: 60, failBehavior: 'closed' }));
 | Middleware latency (cache hit) | <10ms |
 | Middleware latency (cache miss) | ~100-200ms |
 | Horizontal scaling | Planned (Redis cache layer) |
+
+
+### 8.8 A2A v0.3 Conformance
+
+**Status:** Live — April 2026
+
+MolTrust exposes a fully A2A v0.3 conformant Agent Card at:
+
+- `https://api.moltrust.ch/.well-known/agent-card.json`
+- `https://api.moltrust.ch/.well-known/agent.json` (alias)
+- `https://moltrust.ch/.well-known/agent-card.json`
+
+The Agent Card declares five skills (trust-score, did-resolution, credential-verification, wallet-binding, sybil-detection), a MolTrust-specific trust-score extension (`https://moltrust.ch/extensions/trust-score/v1`), and two security schemes (apiKey + X-MolTrust-DID header).
+
+**A2A v0.3 Conformance Checklist:**
+- [x] name, description, url, version fields present
+- [x] provider.organization (CryptoKRI GmbH)
+- [x] capabilities.extensions (trust-score/v1)
+- [x] securitySchemes (apiKey + moltrust DID header)
+- [x] skills array with id, name, description, tags per skill
+- [x] defaultInputModes / defaultOutputModes
+
+The MolTrust trust-score extension enables any A2A-compatible agent or orchestrator to query trust scores and verify agent credentials directly from the Agent Card metadata, without prior knowledge of MolTrust's API structure.
+
+**Trust Score Integration for A2A Clients:**
+
+```
+GET https://api.moltrust.ch/skill/trust-score/{did}
+Header: X-MolTrust-DID: did:moltrust:<requester-id>
+```
+
+A2A clients MAY gate task acceptance on counterparty trust score by including a minimum score requirement in task metadata:
+
+```json
+{
+  "metadata": {
+    "moltrust_min_score": 60,
+    "moltrust_requester_did": "did:moltrust:<id>"
+  }
+}
+```
+
+The MolTrust registry will evaluate the requesting agent's trust score and return payment_ready status alongside the score, enabling combined trust + payment verification in a single API call.
+
+**Relationship to AIP (arXiv:2603.24775):**
+MolTrust implements three of the four criteria identified in Prakash (2026) as missing from existing agent identity protocols: offline attenuable delegation (AAE), expressive chained policy (delegation chain traversal), and provenance-aware completion records (IPR + on-chain anchoring). MCP and A2A wire format bindings for AAE tokens are deferred pending stabilization of the A2A authorization scheme roadmap item.
 
 
 ## 9. Infrastructure-Layer Enforcement

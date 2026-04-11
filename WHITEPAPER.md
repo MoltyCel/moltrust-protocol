@@ -1,7 +1,7 @@
 # The MolTrust Protocol
 ## A Verification Standard for Autonomous Software Agents
 
-**Version 0.7 — Draft for Review**
+**Version 0.8 — Draft for Review**
 **MolTrust / CryptoKRI GmbH, Zurich**
 **March 2026**
 
@@ -430,6 +430,10 @@ The specific combination that MolTrust defines — DID-based agent identity, VC-
 
 ---
 
+### A2A Protocol Conformance
+
+MolTrust is A2A v0.3 conformant. The MolTrust Trust Registry publishes a fully conformant Agent Card at `/.well-known/agent-card.json`, declaring five agent skills and a MolTrust-specific trust-score extension. Any A2A-compatible orchestrator can discover MolTrust's verification capabilities through standard A2A discovery and gate agent interactions on trust score thresholds — without prior integration work. Transport bindings for AAE tokens in MCP and A2A task metadata are planned pending finalization of the A2A authorization scheme specification.
+
 ## 11. Universality
 
 The verification gap described in this paper is not specific to any sector, jurisdiction, or technology stack. Wherever software agents act on behalf of principals, the questions of identity, authorization, and behavioral history arise.
@@ -467,7 +471,7 @@ The protocol supports multi-chain identity through wallet binding (Ethereum, Bas
 
 The protocol does not govern agent behavior, evaluate agent output, or substitute for legal accountability. It provides the verifiable factual substrate on which those functions can be built.
 
-A reference implementation is available at **api.moltrust.ch**. Protocol specification, credential schemas, and integration packages are published as open source at **github.com/MoltyCel**. The companion Technical Specification (v0.8) provides complete data models, verification flows, and conformance requirements.
+A reference implementation is available at **api.moltrust.ch**. Protocol specification, credential schemas, and integration packages are published as open source at **github.com/MoltyCel**. The companion Technical Specification (v0.8.1) provides complete data models, verification flows, and conformance requirements.
 
 ---
 
