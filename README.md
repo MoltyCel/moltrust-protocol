@@ -44,3 +44,20 @@ MolTrust is operated by CryptoKRI GmbH, Zurich, Switzerland.
 - Website: [moltrust.ch](https://moltrust.ch)
 - API: [api.moltrust.ch](https://api.moltrust.ch)
 - X/Twitter: [@MolTrust](https://x.com/MolTrust)
+
+## Building PDFs
+
+Reproducible PDF builds use pandoc + Typst:
+
+```bash
+brew install pandoc typst                   # one-time toolchain
+./scripts/build_pdfs.sh tech_spec           # → docs/MolTrust_Protocol_TechSpec_v<VERSION>.pdf
+./scripts/build_pdfs.sh whitepaper          # → docs/MolTrust_Protocol_Whitepaper_v<VERSION>.pdf
+./scripts/build_pdfs.sh all                 # both
+```
+
+Versions via env vars (`TECH_SPEC_VERSION` default `0.8.1`, `WHITEPAPER_VERSION` default `0.8`).
+
+The pipeline is **single-step** via `pandoc --pdf-engine=typst`. The split form
+(`pandoc --to typst` to a `.typ` file, then `typst compile`) breaks because it
+loses pandoc's Typst template helpers (e.g. `#horizontalrule`).
