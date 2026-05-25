@@ -2,14 +2,14 @@
 ## Version 0.8.1 — Draft for Review
 
 **MolTrust / CryptoKRI GmbH, Zurich**
-**April 2026**
+**May 2026**
 **Status: Informational Draft**
 
 *v0.7 additions: Cross-Protocol Interoperability (qntm/APS), Infrastructure-Layer Enforcement (Falco), Governance Layer, Outcome Verification.*
 
 *v0.8.1 additions: A2A v0.3 Conformance (Sec. 8.8)*
 
-This document is a companion to *The MolTrust Protocol: A Verification Standard for Autonomous Software Agents* (Whitepaper v0.5). It provides the technical definitions, data models, verification flows, and conformance requirements referenced in that document.
+This document is a companion to *The MolTrust Protocol: A Verification Standard for Autonomous Software Agents* (Whitepaper v0.8). It provides the technical definitions, data models, verification flows, and conformance requirements referenced in that document.
 
 ---
 
@@ -2112,7 +2112,7 @@ A conformant implementation is NOT required to:
 
 ### 16.5 Version Compatibility
 
-Version 0.3 is a draft. Breaking changes to Layer A data formats will carry a minimum 12-month deprecation period in future versions. Layer B API changes follow semantic versioning. Layer C changes are non-breaking by definition.
+Version 0.8.1 is a draft. Breaking changes to Layer A data formats will carry a minimum 12-month deprecation period in future versions. Layer B API changes follow semantic versioning. Layer C changes are non-breaking by definition.
 
 ---
 
