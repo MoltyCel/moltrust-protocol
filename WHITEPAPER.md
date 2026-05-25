@@ -3,7 +3,7 @@
 
 **Version 0.8 — Draft for Review**
 **MolTrust / CryptoKRI GmbH, Zurich**
-**March 2026**
+**May 2026**
 
 ---
 
