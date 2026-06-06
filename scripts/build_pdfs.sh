@@ -18,6 +18,7 @@ build_tech_spec() {
   echo "Building TechSpec v${version} → ${out}"
   pandoc TECH_SPEC.md \
     --pdf-engine=typst \
+    --include-in-header=scripts/techspec-header.typ \
     --metadata=title:"The MolTrust Protocol: Technical Specification" \
     --metadata=subtitle:"Version ${version} — Draft for Review" \
     --metadata=author:"MolTrust / CryptoKRI GmbH, Zurich" \
