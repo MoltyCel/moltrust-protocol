@@ -212,6 +212,10 @@ Each agent MUST have a DID conforming to W3C DID Core v1.0. Implementations MAY 
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Optional fields:**
 
 | Field | Type | Notes |
@@ -222,6 +226,10 @@ Each agent MUST have a DID conforming to W3C DID Core v1.0. Implementations MAY 
 | `controller` | DID string | Principal DID — SHOULD be present for sub-agents |
 | `alsoKnownAs` | array | Cross-registry references e.g. ERC-8004 agent ID |
 | `keyAgreement` | array | For encrypted communication channels |
+
+```{=typst}
+]
+```
 
 **Key rotation:** When rotating keys, the agent MUST add the new key to `verificationMethod` with a new key ID, update `authentication` and `assertionMethod` to reference the new key, and retain the old key entry marked with `"revoked": true` and a `revokedDate`. This preserves a verifiable timeline of key epochs.
 
@@ -259,6 +267,10 @@ An agent's authority to act on behalf of a principal MUST be expressed as a W3C 
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **`permittedActions` values:**
 
 | Value | Meaning |
@@ -269,6 +281,10 @@ An agent's authority to act on behalf of a principal MUST be expressed as a W3C 
 | `verify` | May request verification of other agents |
 | `publish` | May publish content on behalf of principal |
 | `*` | All actions permitted (use with caution) |
+
+```{=typst}
+]
+```
 
 Implementations MAY define additional action types using the namespace convention `<namespace>/<action>`.
 
@@ -312,6 +328,10 @@ An Interaction Proof is the primary evidence artifact. It is produced after an i
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Field semantics:**
 
 | Field | Semantics |
@@ -320,6 +340,10 @@ An Interaction Proof is the primary evidence artifact. It is produced after an i
 | `session` | Application-defined session identifier. Multiple proofs MAY reference the same session (e.g. multi-step interactions). Session IDs are scoped to the initiating agent and are not globally unique. |
 | `outcome` | One of: `completed`, `partial`, `disputed`, `failed` |
 | `outcomeHash` | SHA-256 of the canonical outcome payload (see below) |
+
+```{=typst}
+]
+```
 
 **Outcome hash construction:** The hash input MUST be the RFC 8785 canonical JSON serialization of an outcome object containing at minimum:
 
@@ -442,6 +466,10 @@ A Violation Record is a signed artifact attesting that a confirmed protocol viol
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Violation types:**
 
 | Value | Meaning |
@@ -451,6 +479,10 @@ A Violation Record is a signed artifact attesting that a confirmed protocol viol
 | `sybil` | Agent participated in a confirmed sybil cluster |
 | `behavioral-fraud` | Agent deliberately deceived a counterparty |
 | `clone-impersonation` | Clone represented as original agent |
+
+```{=typst}
+]
+```
 
 **Recording process:**
 
@@ -520,6 +552,10 @@ The `mandate` object defines WHAT the agent is permitted to do.
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Field definitions:**
 
 | Field | Type | Description |
@@ -530,6 +566,14 @@ The `mandate` object defines WHAT the agent is permitted to do.
 | `resources` | string[] | OPTIONAL. URI patterns defining the ABAC object layer — which resources the agent may act upon. When present, both action AND resource must match for authorization. |
 | `delegation` | object | OPTIONAL. Controls whether the agent may delegate authority to sub-agents. |
 
+```{=typst}
+]
+```
+
+```{=typst}
+#block(breakable: false)[
+```
+
 **Delegation sub-fields:**
 
 | Field | Type | Default | Description |
@@ -538,6 +582,10 @@ The `mandate` object defines WHAT the agent is permitted to do.
 | `maxSubAgents` | integer | `0` | Maximum number of sub-agents this agent may authorize. |
 | `maxDepth` | integer | `0` | Maximum further delegation depth from this agent. MUST NOT exceed 8. |
 | `attenuationOnly` | boolean | `true` | If `true`, delegated AAEs MUST be strictly equal to or more restrictive than the parent AAE. Sub-agents MUST NOT gain permissions the parent does not hold. |
+
+```{=typst}
+]
+```
 
 #### 2.8.2 Constraints
 
@@ -578,6 +626,10 @@ The `constraints` object defines the operational boundaries WITHIN which permitt
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Duration sub-fields:**
 
 | Field | Type | Description |
@@ -587,6 +639,14 @@ The `constraints` object defines the operational boundaries WITHIN which permitt
 | `allowedDays` | integer[] | Days of the week when the agent may operate. 1 = Monday through 7 = Sunday (ISO 8601 weekday numbering). |
 | `allowedHours` | object | Time window within allowed days. `start` and `end` are integers 0–23 representing hours in the specified timezone. |
 | `timezone` | string | IANA timezone identifier (e.g. `"Europe/Zurich"`, `"America/New_York"`). REQUIRED when `allowedDays` or `allowedHours` is present. |
+
+```{=typst}
+]
+```
+
+```{=typst}
+#block(breakable: false)[
+```
 
 **Limits sub-fields:**
 
@@ -598,6 +658,14 @@ The `constraints` object defines the operational boundaries WITHIN which permitt
 | `maxTransactionsPerHour` | integer | Rate limit on transactions per rolling hour. |
 | `currency` | enum | Currency for threshold values. One of: `USDC`, `EUR`, `CHF`, `USD`. |
 
+```{=typst}
+]
+```
+
+```{=typst}
+#block(breakable: false)[
+```
+
 **Scope sub-fields:**
 
 | Field | Type | Description |
@@ -605,12 +673,24 @@ The `constraints` object defines the operational boundaries WITHIN which permitt
 | `jurisdictions` | string[] | ISO 3166-1 alpha-2 country codes where the agent may operate. Empty array means unrestricted. |
 | `counterpartyMinScore` | integer | Minimum trust score (0–100) required for any counterparty the agent interacts with. |
 
+```{=typst}
+]
+```
+
+```{=typst}
+#block(breakable: false)[
+```
+
 **Obligations sub-fields:**
 
 | Field | Type | Description |
 |---|---|---|
 | `requireHumanApprovalAbove` | number | Transaction value above which human-in-the-loop approval is mandatory, regardless of other thresholds. |
 | `toolAllowlist` | string[] | URI patterns of tools/APIs the agent is permitted to invoke. When present, tool invocations not matching any pattern MUST be denied. |
+
+```{=typst}
+]
+```
 
 #### 2.8.3 Validity
 
@@ -633,6 +713,10 @@ The `validity` object defines WHO issued the envelope, to WHOM it is bound, and 
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Field definitions:**
 
 | Field | Type | Required | Description |
@@ -644,6 +728,14 @@ The `validity` object defines WHO issued the envelope, to WHOM it is bound, and 
 | `revocationEndpoint` | URL | REQUIRED | HTTPS endpoint where verifiers can check if this envelope has been revoked. |
 | `onChainAnchor` | object | OPTIONAL | On-chain reference for the envelope hash, providing tamper evidence. |
 
+```{=typst}
+]
+```
+
+```{=typst}
+#block(breakable: false)[
+```
+
 **On-chain anchor sub-fields:**
 
 | Field | Type | Description |
@@ -651,6 +743,10 @@ The `validity` object defines WHO issued the envelope, to WHOM it is bound, and 
 | `chain` | string | Chain identifier (e.g. `"base-mainnet"`, `"ethereum-mainnet"`). |
 | `block` | integer | Block number containing the anchor transaction. |
 | `txHash` | string | Transaction hash of the anchor. |
+
+```{=typst}
+]
+```
 
 #### 2.8.4 Validation Rules
 
@@ -705,6 +801,10 @@ Trust Tier 0 represents the highest identity assurance level in MolTrust: a deve
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Field semantics:**
 
 | Field | Description |
@@ -716,12 +816,20 @@ Trust Tier 0 represents the highest identity assurance level in MolTrust: a deve
 | `validUntil` | ISO 8601 timestamp of when the KYC verification expires. MUST NOT exceed 365 days from `verifiedAt`. |
 | `jurisdiction` | ISO 3166-1 alpha-2 code of the jurisdiction where the identity was verified. |
 
+```{=typst}
+]
+```
+
 **Issuance rules:**
 
 - The KYC provider MUST be accredited by the registry operator. The list of accredited providers is published at `https://<registry-domain>/.well-known/kyc-providers.json`.
 - The credential MUST NOT contain any personal data (name, address, date of birth, document numbers). The `credentialSubject` attests that verification occurred, not what was verified.
 - Maximum validity: 365 days. Renewal requires re-verification.
 - The credential MUST include a `credentialStatus` field referencing the revocation registry (see Section 2.11).
+
+```{=typst}
+#block(breakable: false)[
+```
 
 **Trust Tier hierarchy:**
 
@@ -731,6 +839,10 @@ Trust Tier 0 represents the highest identity assurance level in MolTrust: a deve
 | Tier 1 | High | Organizational credential (e.g. domain-verified, ERC-8004) |
 | Tier 2 | Medium | Behavioral reputation only (interaction proofs, endorsements) |
 | Tier 3 | Low | Self-declared, no external verification |
+
+```{=typst}
+]
+```
 
 Verifiers MAY use trust tier as a gating criterion. For example, a financial services vertical MAY require Tier 0 for agents transacting above a defined threshold.
 
@@ -832,6 +944,10 @@ When revoked:
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Revocation reason values:**
 
 | Value | Meaning |
@@ -842,6 +958,10 @@ When revoked:
 | `policy_violation` | The credential was revoked due to a policy violation |
 | `superseded` | The credential has been replaced by a newer version |
 | `expiry_acceleration` | The credential is being expired ahead of its natural TTL |
+
+```{=typst}
+]
+```
 
 #### 2.11.3 Bitstring Status List Compatibility
 
@@ -872,6 +992,10 @@ This fail-closed default is deliberate. In an autonomous agent economy, the cost
 
 MolTrust supports wallet binding across multiple blockchain ecosystems. The `chain` parameter in `/identity/nonce` and `/identity/bind` determines the signature scheme used for verification.
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Supported chains:**
 
 | Chain | Signature Scheme | Address Format |
@@ -879,6 +1003,10 @@ MolTrust supports wallet binding across multiple blockchain ecosystems. The `cha
 | `ethereum` (default) | EIP-191 secp256k1 | `0x` hex (20 bytes) |
 | `base` | EIP-191 secp256k1 | `0x` hex (20 bytes) |
 | `solana` | Ed25519 via PyNaCl | Base58 public key |
+
+```{=typst}
+]
+```
 
 **Nonce request (extended):**
 
@@ -1095,6 +1223,10 @@ Agent                  Counterparty          W3C Resolver       Revocation Regis
 
 8. **Decision:** The counterparty returns ALLOW or DENY with a machine-readable reason code.
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Reason codes:**
 
 | Code | Meaning |
@@ -1110,6 +1242,10 @@ Agent                  Counterparty          W3C Resolver       Revocation Regis
 | `denied:counterparty_score_insufficient` | The counterparty's trust score is below the required minimum |
 | `denied:holder_binding_mismatch` | The presenting agent's DID does not match `holderBinding` |
 | `denied:signature_invalid` | The credential signature could not be verified |
+
+```{=typst}
+]
+```
 
 ### 3.3 Authorization Verification
 
