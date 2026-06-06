@@ -1,5 +1,5 @@
 # The MolTrust Protocol: Technical Specification
-## Version 0.8.1 — Draft for Review
+## Version 0.9 — Draft for Review
 
 **MolTrust / CryptoKRI GmbH, Zurich**
 **May 2026**
@@ -8,6 +8,7 @@
 *v0.7 additions: Cross-Protocol Interoperability (qntm/APS), Infrastructure-Layer Enforcement (Falco), Governance Layer, Outcome Verification.*
 
 *v0.8.1 additions: A2A v0.3 Conformance (Sec. 8.8)*
+*v0.9 additions: Enforcement Layer & Governance Transition (Sec. 17) — AAE enforcement layer (advisory) + CEP governance-transition model (designed, not activated)*
 
 This document is a companion to *The MolTrust Protocol: A Verification Standard for Autonomous Software Agents* (Whitepaper v0.8). It provides the technical definitions, data models, verification flows, and conformance requirements referenced in that document.
 
@@ -80,6 +81,10 @@ This distinction resolves the central design tension in any open-standard-plus-c
 14. Privacy Model
 15. Worked Example
 16. Conformance
+17. Enforcement Layer & Governance Transition
+   - 17.1 Enforcement Layer (implemented, advisory)
+   - 17.2 Governance Transition (CEP, designed)
+   - 17.3 Summary of status
 
 ---
 
@@ -207,6 +212,10 @@ Each agent MUST have a DID conforming to W3C DID Core v1.0. Implementations MAY 
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Optional fields:**
 
 | Field | Type | Notes |
@@ -217,6 +226,10 @@ Each agent MUST have a DID conforming to W3C DID Core v1.0. Implementations MAY 
 | `controller` | DID string | Principal DID — SHOULD be present for sub-agents |
 | `alsoKnownAs` | array | Cross-registry references e.g. ERC-8004 agent ID |
 | `keyAgreement` | array | For encrypted communication channels |
+
+```{=typst}
+]
+```
 
 **Key rotation:** When rotating keys, the agent MUST add the new key to `verificationMethod` with a new key ID, update `authentication` and `assertionMethod` to reference the new key, and retain the old key entry marked with `"revoked": true` and a `revokedDate`. This preserves a verifiable timeline of key epochs.
 
@@ -254,6 +267,10 @@ An agent's authority to act on behalf of a principal MUST be expressed as a W3C 
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **`permittedActions` values:**
 
 | Value | Meaning |
@@ -264,6 +281,10 @@ An agent's authority to act on behalf of a principal MUST be expressed as a W3C 
 | `verify` | May request verification of other agents |
 | `publish` | May publish content on behalf of principal |
 | `*` | All actions permitted (use with caution) |
+
+```{=typst}
+]
+```
 
 Implementations MAY define additional action types using the namespace convention `<namespace>/<action>`.
 
@@ -307,6 +328,10 @@ An Interaction Proof is the primary evidence artifact. It is produced after an i
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Field semantics:**
 
 | Field | Semantics |
@@ -315,6 +340,10 @@ An Interaction Proof is the primary evidence artifact. It is produced after an i
 | `session` | Application-defined session identifier. Multiple proofs MAY reference the same session (e.g. multi-step interactions). Session IDs are scoped to the initiating agent and are not globally unique. |
 | `outcome` | One of: `completed`, `partial`, `disputed`, `failed` |
 | `outcomeHash` | SHA-256 of the canonical outcome payload (see below) |
+
+```{=typst}
+]
+```
 
 **Outcome hash construction:** The hash input MUST be the RFC 8785 canonical JSON serialization of an outcome object containing at minimum:
 
@@ -437,6 +466,10 @@ A Violation Record is a signed artifact attesting that a confirmed protocol viol
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Violation types:**
 
 | Value | Meaning |
@@ -446,6 +479,10 @@ A Violation Record is a signed artifact attesting that a confirmed protocol viol
 | `sybil` | Agent participated in a confirmed sybil cluster |
 | `behavioral-fraud` | Agent deliberately deceived a counterparty |
 | `clone-impersonation` | Clone represented as original agent |
+
+```{=typst}
+]
+```
 
 **Recording process:**
 
@@ -515,6 +552,10 @@ The `mandate` object defines WHAT the agent is permitted to do.
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Field definitions:**
 
 | Field | Type | Description |
@@ -525,6 +566,14 @@ The `mandate` object defines WHAT the agent is permitted to do.
 | `resources` | string[] | OPTIONAL. URI patterns defining the ABAC object layer — which resources the agent may act upon. When present, both action AND resource must match for authorization. |
 | `delegation` | object | OPTIONAL. Controls whether the agent may delegate authority to sub-agents. |
 
+```{=typst}
+]
+```
+
+```{=typst}
+#block(breakable: false)[
+```
+
 **Delegation sub-fields:**
 
 | Field | Type | Default | Description |
@@ -533,6 +582,10 @@ The `mandate` object defines WHAT the agent is permitted to do.
 | `maxSubAgents` | integer | `0` | Maximum number of sub-agents this agent may authorize. |
 | `maxDepth` | integer | `0` | Maximum further delegation depth from this agent. MUST NOT exceed 8. |
 | `attenuationOnly` | boolean | `true` | If `true`, delegated AAEs MUST be strictly equal to or more restrictive than the parent AAE. Sub-agents MUST NOT gain permissions the parent does not hold. |
+
+```{=typst}
+]
+```
 
 #### 2.8.2 Constraints
 
@@ -573,6 +626,10 @@ The `constraints` object defines the operational boundaries WITHIN which permitt
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Duration sub-fields:**
 
 | Field | Type | Description |
@@ -582,6 +639,14 @@ The `constraints` object defines the operational boundaries WITHIN which permitt
 | `allowedDays` | integer[] | Days of the week when the agent may operate. 1 = Monday through 7 = Sunday (ISO 8601 weekday numbering). |
 | `allowedHours` | object | Time window within allowed days. `start` and `end` are integers 0–23 representing hours in the specified timezone. |
 | `timezone` | string | IANA timezone identifier (e.g. `"Europe/Zurich"`, `"America/New_York"`). REQUIRED when `allowedDays` or `allowedHours` is present. |
+
+```{=typst}
+]
+```
+
+```{=typst}
+#block(breakable: false)[
+```
 
 **Limits sub-fields:**
 
@@ -593,6 +658,14 @@ The `constraints` object defines the operational boundaries WITHIN which permitt
 | `maxTransactionsPerHour` | integer | Rate limit on transactions per rolling hour. |
 | `currency` | enum | Currency for threshold values. One of: `USDC`, `EUR`, `CHF`, `USD`. |
 
+```{=typst}
+]
+```
+
+```{=typst}
+#block(breakable: false)[
+```
+
 **Scope sub-fields:**
 
 | Field | Type | Description |
@@ -600,12 +673,24 @@ The `constraints` object defines the operational boundaries WITHIN which permitt
 | `jurisdictions` | string[] | ISO 3166-1 alpha-2 country codes where the agent may operate. Empty array means unrestricted. |
 | `counterpartyMinScore` | integer | Minimum trust score (0–100) required for any counterparty the agent interacts with. |
 
+```{=typst}
+]
+```
+
+```{=typst}
+#block(breakable: false)[
+```
+
 **Obligations sub-fields:**
 
 | Field | Type | Description |
 |---|---|---|
 | `requireHumanApprovalAbove` | number | Transaction value above which human-in-the-loop approval is mandatory, regardless of other thresholds. |
 | `toolAllowlist` | string[] | URI patterns of tools/APIs the agent is permitted to invoke. When present, tool invocations not matching any pattern MUST be denied. |
+
+```{=typst}
+]
+```
 
 #### 2.8.3 Validity
 
@@ -628,6 +713,10 @@ The `validity` object defines WHO issued the envelope, to WHOM it is bound, and 
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Field definitions:**
 
 | Field | Type | Required | Description |
@@ -639,6 +728,14 @@ The `validity` object defines WHO issued the envelope, to WHOM it is bound, and 
 | `revocationEndpoint` | URL | REQUIRED | HTTPS endpoint where verifiers can check if this envelope has been revoked. |
 | `onChainAnchor` | object | OPTIONAL | On-chain reference for the envelope hash, providing tamper evidence. |
 
+```{=typst}
+]
+```
+
+```{=typst}
+#block(breakable: false)[
+```
+
 **On-chain anchor sub-fields:**
 
 | Field | Type | Description |
@@ -646,6 +743,10 @@ The `validity` object defines WHO issued the envelope, to WHOM it is bound, and 
 | `chain` | string | Chain identifier (e.g. `"base-mainnet"`, `"ethereum-mainnet"`). |
 | `block` | integer | Block number containing the anchor transaction. |
 | `txHash` | string | Transaction hash of the anchor. |
+
+```{=typst}
+]
+```
 
 #### 2.8.4 Validation Rules
 
@@ -700,6 +801,10 @@ Trust Tier 0 represents the highest identity assurance level in MolTrust: a deve
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Field semantics:**
 
 | Field | Description |
@@ -711,12 +816,20 @@ Trust Tier 0 represents the highest identity assurance level in MolTrust: a deve
 | `validUntil` | ISO 8601 timestamp of when the KYC verification expires. MUST NOT exceed 365 days from `verifiedAt`. |
 | `jurisdiction` | ISO 3166-1 alpha-2 code of the jurisdiction where the identity was verified. |
 
+```{=typst}
+]
+```
+
 **Issuance rules:**
 
 - The KYC provider MUST be accredited by the registry operator. The list of accredited providers is published at `https://<registry-domain>/.well-known/kyc-providers.json`.
 - The credential MUST NOT contain any personal data (name, address, date of birth, document numbers). The `credentialSubject` attests that verification occurred, not what was verified.
 - Maximum validity: 365 days. Renewal requires re-verification.
 - The credential MUST include a `credentialStatus` field referencing the revocation registry (see Section 2.11).
+
+```{=typst}
+#block(breakable: false)[
+```
 
 **Trust Tier hierarchy:**
 
@@ -726,6 +839,10 @@ Trust Tier 0 represents the highest identity assurance level in MolTrust: a deve
 | Tier 1 | High | Organizational credential (e.g. domain-verified, ERC-8004) |
 | Tier 2 | Medium | Behavioral reputation only (interaction proofs, endorsements) |
 | Tier 3 | Low | Self-declared, no external verification |
+
+```{=typst}
+]
+```
 
 Verifiers MAY use trust tier as a gating criterion. For example, a financial services vertical MAY require Tier 0 for agents transacting above a defined threshold.
 
@@ -827,6 +944,10 @@ When revoked:
 }
 ```
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Revocation reason values:**
 
 | Value | Meaning |
@@ -837,6 +958,10 @@ When revoked:
 | `policy_violation` | The credential was revoked due to a policy violation |
 | `superseded` | The credential has been replaced by a newer version |
 | `expiry_acceleration` | The credential is being expired ahead of its natural TTL |
+
+```{=typst}
+]
+```
 
 #### 2.11.3 Bitstring Status List Compatibility
 
@@ -867,6 +992,10 @@ This fail-closed default is deliberate. In an autonomous agent economy, the cost
 
 MolTrust supports wallet binding across multiple blockchain ecosystems. The `chain` parameter in `/identity/nonce` and `/identity/bind` determines the signature scheme used for verification.
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Supported chains:**
 
 | Chain | Signature Scheme | Address Format |
@@ -874,6 +1003,10 @@ MolTrust supports wallet binding across multiple blockchain ecosystems. The `cha
 | `ethereum` (default) | EIP-191 secp256k1 | `0x` hex (20 bytes) |
 | `base` | EIP-191 secp256k1 | `0x` hex (20 bytes) |
 | `solana` | Ed25519 via PyNaCl | Base58 public key |
+
+```{=typst}
+]
+```
 
 **Nonce request (extended):**
 
@@ -1090,6 +1223,10 @@ Agent                  Counterparty          W3C Resolver       Revocation Regis
 
 8. **Decision:** The counterparty returns ALLOW or DENY with a machine-readable reason code.
 
+```{=typst}
+#block(breakable: false)[
+```
+
 **Reason codes:**
 
 | Code | Meaning |
@@ -1105,6 +1242,10 @@ Agent                  Counterparty          W3C Resolver       Revocation Regis
 | `denied:counterparty_score_insufficient` | The counterparty's trust score is below the required minimum |
 | `denied:holder_binding_mismatch` | The presenting agent's DID does not match `holderBinding` |
 | `denied:signature_invalid` | The credential signature could not be verified |
+
+```{=typst}
+]
+```
 
 ### 3.3 Authorization Verification
 
@@ -1811,6 +1952,8 @@ Layer 3 (Governance) sits between Authorization and Execution. It defines organi
 
 The `VerifiedGovernanceCredential` VC type is planned for Q3 2026. It will encode organizational governance policies as machine-readable, signed artifacts.
 
+The authority to activate runtime enforcement (advisory → enforce) is governed separately by the Combined Enforcement Protocol (Section 17.2); it is distinct from the organizational `VerifiedGovernanceCredential` policy artifact described here.
+
 ### 10.2 aps.txt Security Analysis
 
 The Agent Provider Service (APS) protocol uses `aps.txt` files for provider discovery. A security analysis identified 5 attack vectors:
@@ -2112,7 +2255,114 @@ A conformant implementation is NOT required to:
 
 ### 16.5 Version Compatibility
 
-Version 0.8.1 is a draft. Breaking changes to Layer A data formats will carry a minimum 12-month deprecation period in future versions. Layer B API changes follow semantic versioning. Layer C changes are non-breaking by definition.
+Version 0.9 is a draft. Breaking changes to Layer A data formats will carry a minimum 12-month deprecation period in future versions. Layer B API changes follow semantic versioning. Layer C changes are non-breaking by definition.
+
+---
+
+## 17. Enforcement Layer & Governance Transition
+
+This chapter describes (Part A) the AAE constraint-enforcement layer as **currently implemented in advisory mode**, and (Part B) the **designed** governance model that would authorize a transition to active enforcement. It is a roadmap-level overview: it states *what* the layer does and *what status* it has, not implementation internals.
+
+Relationship to earlier chapters: this layer consumes the on-chain anchors of Section 6, sits alongside the runtime/kernel enforcement of Section 9 (Infrastructure-Layer Enforcement), and operates within the Governance Layer of Section 10. Section 9 enforces at the runtime/infrastructure boundary — cryptographic integrity (Layer 1), API-level trust-score and revocation consequences (Layer 2), kernel syscall detection (Layer 3 / Falco) and sequence safety (SAS). This chapter operates at the **credential/MANDATE-evaluation boundary**: whether a verified Agent Authorization Envelope permits a proposed action, producing signed verdicts. The two are complementary.
+
+---
+
+### 17.1 Part A — Enforcement Layer (implemented, advisory)
+
+The AAE enforcement layer is **implemented and running in advisory mode**: it verifies authorization envelopes, evaluates proposed actions against them, and produces signed, auditable verdicts. In advisory mode a DENY verdict is **verified and recorded but not enforced** — the action is not blocked. Active blocking (the *enforce* mode) is a roadmap step gated on the governance transition of Part B (see §17.2.4).
+
+The layer has three components.
+
+#### 17.1.1 Acceptance Gate (AAE verification at submit time)
+
+Before an envelope is stored or evaluated, it is verified as a compact JWS (per the AAE schema, Section 2.8) — **fail-closed**:
+
+- **Signature & signing-authority:** the envelope's signature is verified against the issuer's key, with an explicit `EdDSA`-only algorithm allow-list (no algorithm downgrade), and the signing DID MUST equal the credential issuer.
+- **Schema:** the payload MUST carry a well-formed MANDATE / CONSTRAINTS / VALIDITY structure.
+- **DID methods:** `did:moltrust` resolves against the reference registry (Section 5); `did:web` resolution is supported through an egress-controlled resolver.
+- **Canonicalization:** verification binds to the exact signed bytes; the parsed structure is used only for schema checks.
+
+An envelope that fails any check is rejected (not stored). A **default-DENY** rule governs evaluation: a required constraint that cannot be evaluated yields DENY, never a silent pass.
+
+#### 17.1.2 Evaluator (action evaluation, advisory)
+
+The evaluator decides whether a proposed action is permitted by a verified envelope, evaluating the three AAE blocks:
+
+- **MANDATE** — is the action within the granted scope;
+- **CONSTRAINTS** — per-type checks (e.g. maximum transaction value, allowed domains, rate limits, single-use, validity window);
+- **VALIDITY** — temporal validity (not-before / not-after, with clock-skew tolerance).
+
+Each decision is recorded as a **signed verdict** (Ed25519, domain-separated, externally verifiable against the registry key) and, on DENY, an associated immutable violation record. Value-bearing constraints distinguish a **rail-verified** value from a merely client-asserted one; a client-asserted value on a required constraint yields DENY. This complements — and does not replace — the per-action gateway check referenced in Section 9.4 (MoltGuard): the registry-side evaluator produces a signed, anchorable verdict and violation record at the credential boundary.
+
+**Mode:** the evaluator runs in **ADVISORY** mode. Violations are verified and logged (signed verdict + violation record, anchorable per Section 6); they are **not blocked**. The mandatory-chokepoint *enforce* mode — where a DENY prevents the action — is **Component 3 on the roadmap** and is gated per §17.2.4.
+
+#### 17.1.3 Envelope Store
+
+Accepted envelopes are persisted in an append-only store with:
+
+- a **content-hash primary key** (the key is the hash of the canonical signed bytes — content and identifier cannot diverge);
+- a **single-use / replay guard** (a single-use envelope cannot be consumed twice for the same scope);
+- **immutability** (no update or delete of a stored envelope; corrections are new envelopes).
+
+This makes the evidence trail tamper-evident and consistent with the on-chain anchoring of Section 6.
+
+---
+
+### 17.2 Part B — Governance Transition (CEP, designed; not activated)
+
+Part A runs in advisory mode today. Turning on active enforcement requires deciding **who is authorized** to flip the *enforce* switch. The Combined Enforcement Protocol (CEP) is the **designed** model for that authority. **CEP is not activated.** This section is a roadmap-level summary; the full design lives in the MolTrust ADR *CEP Governance* and the *CEP-3 Threshold Specification* (internal, accepted as design).
+
+#### 17.2.1 Problem
+
+The authority to activate enforcement must not depend on a **person** (a founder does not survive a 10-year horizon), a **single chain** (it can disappear, censor, or fork), or a **single instance** (it can be shut down or compromised). CEP replaces such anchors with **objective, publicly recomputable conditions**.
+
+#### 17.2.2 Core concepts (overview)
+
+- **5-condition ramp (AND).** The transition occurs only when five conditions hold *simultaneously*: a minimum elapsed time; a minimum number of Sybil-qualified relying parties; distribution over a minimum number of independent clusters; no single actor above a voting-weight cap; and no single cluster above a share cap. A single threshold is manipulable — the AND-conjunction is not.
+- **Honest-verifier data availability ("verification > production").** The condition data is published to decentralized, permanent storage and anchored as a `(merkle_root, data_uri)` tuple across multiple chains. The transition trigger is a **deterministic function anyone can recompute** from the published data — there is no privileged measuring party.
+- **Keyed commitment + cryptographic erasure (data protection).** Relying-party identifiers are never anchored in clear; only keyed commitments are. Deletion destroys the key (cryptographic erasure), after which the anchored commitment is non-attributable — reconciling permanent integrity proofs with the right to erasure.
+- **Staged verification.** A permissioned ramp-up phase (verifiers bound by data-processing agreements) precedes a target phase of zero-knowledge verification that proves the recomputation **without disclosing** the underlying data.
+- **Scope position.** MolTrust is a **verification / enforcement protocol layer, not the deployer** of a high-risk AI system (cf. TLS/PKI: a certificate authority issues and lets parties verify; it does not supervise each use). The duty of human oversight over a high-risk *deployment* rests with the **relying party** that uses the protocol to gate its agents. The protocol is oversight-**enabling** (verifiable verdicts, default-DENY, audit trail, public veto), not oversight-replacing.
+
+#### 17.2.3 Testnet vs. Mainnet parameters (explicit)
+
+The transition thresholds differ by network. Testnet values exist to **demonstrate the mechanism**; mainnet values are the **production target**. They are not interchangeable.
+
+| Parameter | Testnet (demonstration) | Mainnet (target) |
+|---|---|---|
+| N — Sybil-qualified relying parties | 11 | 101 |
+| K — independent clusters | 3 | 4 |
+| Y — max share per cluster | ≥ 34 % | 33 % |
+| X — max voting weight per actor | 10 % | 10 % |
+| T — timelock / public-veto window | 31 days | 31 days |
+
+Rationale for the K difference: with the byzantine-tolerance relation N ≥ 3f + 1, **K = 4 (mainnet)** tolerates one captured/faulty cluster (f = 1) — true fault-tolerance hardening. **K = 3 (testnet)** corresponds to f = 0: it demonstrates the cluster-diversity mechanism end-to-end without claiming production-grade tolerance. The invariant **Y ≥ 1/K** is preserved in both rows (testnet K = 3 → Y ≥ 34 % > 33.3 %; mainnet K = 4 → Y = 33 % ≥ 25 %), so neither configuration is structurally unsatisfiable.
+
+The mechanism is therefore **demonstrable on testnet** while the mainnet configuration remains the (not-yet-activated) target.
+
+#### 17.2.4 Activation gates
+
+Active *enforce* mode (Part A becoming blocking) is gated on two independent conditions, both of which must be met before any enforcement code is activated:
+
+- **Gate-1 — thresholds fixed and anchored.** The parameters above are written down and chain-agnostically anchored before the ramp-up starts. *Status: the values are **fixed** (CEP-3 threshold specification); chain-agnostic anchoring is pending the multi-chain prerequisite below.*
+- **Gate-2 — prerequisites built.** A relying-party registry with cryptographic (DID-bound) identity and cluster attribution; an explicit *enforce* state in the authorization model; and multi-chain anchoring. *Status: open.*
+
+Until both gates are met, the evaluator remains in **advisory** mode (Part A): verified, recorded, **not blocked**. Activation is a deliberate, separate step, not a side effect of publishing this specification.
+
+---
+
+### 17.3 Summary of status
+
+| Element | Status |
+|---|---|
+| AAE acceptance gate (verify at submit) | Implemented |
+| Evaluator (MANDATE/CONSTRAINTS/VALIDITY, signed verdicts) | Implemented — **advisory** |
+| Envelope store (content-hash PK, replay guard, immutable) | Implemented |
+| Active *enforce* mode (blocking) | Roadmap (gated, §17.2.4) |
+| CEP governance transition | **Designed**, not activated |
+| Mechanism on testnet | Demonstrable |
+
+This chapter adds no normative conformance requirement to Section 16; it documents an implemented advisory layer and a designed governance transition. Conformance for active enforcement will be specified when the activation gates (§17.2.4) are met.
 
 ---
 
