@@ -41,7 +41,7 @@ on splice if Lars prefers a different slot.
 
 This chapter describes (Part A) the AAE constraint-enforcement layer as **currently implemented in advisory mode**, and (Part B) the **designed** governance model that would authorize a transition to active enforcement. It is a roadmap-level overview: it states *what* the layer does and *what status* it has, not implementation internals.
 
-Relationship to earlier chapters: this layer consumes the on-chain anchors of Section 6, sits alongside the runtime/kernel enforcement of Section 9 (Infrastructure-Layer Enforcement), and operates within the Governance Layer of Section 10. Section 9 enforces at the syscall/runtime boundary (Falco/eBPF, SAS); this chapter enforces at the **credential/MANDATE boundary** (does a verified Agent Authorization Envelope permit a proposed action). The two are complementary.
+Relationship to earlier chapters: this layer consumes the on-chain anchors of Section 6, sits alongside the runtime/kernel enforcement of Section 9 (Infrastructure-Layer Enforcement), and operates within the Governance Layer of Section 10. Section 9 enforces at the runtime/infrastructure boundary — cryptographic integrity (Layer 1), API-level trust-score and revocation consequences (Layer 2), kernel syscall detection (Layer 3 / Falco) and sequence safety (SAS). This chapter operates at the **credential/MANDATE-evaluation boundary**: whether a verified Agent Authorization Envelope permits a proposed action, producing signed verdicts. The two are complementary.
 
 ---
 
@@ -70,7 +70,7 @@ The evaluator decides whether a proposed action is permitted by a verified envel
 - **CONSTRAINTS** — per-type checks (e.g. maximum transaction value, allowed domains, rate limits, single-use, validity window);
 - **VALIDITY** — temporal validity (not-before / not-after, with clock-skew tolerance).
 
-Each decision is recorded as a **signed verdict** (Ed25519, domain-separated, externally verifiable against the registry key) and, on DENY, an associated immutable violation record. Value-bearing constraints distinguish a **rail-verified** value from a merely client-asserted one; a client-asserted value on a required constraint yields DENY.
+Each decision is recorded as a **signed verdict** (Ed25519, domain-separated, externally verifiable against the registry key) and, on DENY, an associated immutable violation record. Value-bearing constraints distinguish a **rail-verified** value from a merely client-asserted one; a client-asserted value on a required constraint yields DENY. This complements — and does not replace — the per-action gateway check referenced in Section 9.4 (MoltGuard): the registry-side evaluator produces a signed, anchorable verdict and violation record at the credential boundary.
 
 **Mode:** the evaluator runs in **ADVISORY** mode. Violations are verified and logged (signed verdict + violation record, anchorable per Section 6); they are **not blocked**. The mandatory-chokepoint *enforce* mode — where a DENY prevents the action — is **Component 3 on the roadmap** and is gated per §17.2.4.
 
