@@ -1,0 +1,137 @@
+% ============================================================================
+% Verifiable Agent Authorization and Trust Propagation
+% A Protocol-Level Approach to Cross-Vertical Identity for Autonomous AI Systems
+%
+% MolTrust Protocol — arXiv preprint v1.0
+% Author: Lars Kersten Kroehl
+% Affiliation: MolTrust Protocol
+% Target: arXiv cs.CR (primary), cs.AI (secondary)
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+
+% ---------- Encoding & Fonts ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% Arial-like sans-serif for main text
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+% \usepackage{microtype}    % optional
+
+% ---------- Layout ----------
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\setstretch{1.05}
+\usepackage{parskip}
+
+% ---------- Math ----------
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+% ---------- Tables ----------
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{longtable}
+
+% ---------- Code listings ----------
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{codekeyword}{RGB}{0,0,180}
+\definecolor{codestring}{RGB}{163,21,21}
+\definecolor{codecomment}{RGB}{100,100,100}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{codebg},
+  keywordstyle=\color{codekeyword}\bfseries,
+  stringstyle=\color{codestring},
+  commentstyle=\color{codecomment}\itshape,
+  breaklines=true,
+  breakatwhitespace=false,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+  showstringspaces=false,
+  frame=single,
+  framesep=4pt,
+  rulecolor=\color{gray!40},
+  numbers=none,
+  columns=flexible,
+  xleftmargin=0pt,
+  xrightmargin=0pt
+}
+\lstdefinelanguage{json}{
+  string=[s]{"}{"},
+  stringstyle=\color{codestring},
+  comment=[l]{//},
+  commentstyle=\color{codecomment}
+}
+
+% ---------- Figures & graphics ----------
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric,fit,calc,shadows.blur,backgrounds}
+\usepackage{float}
+
+% ---------- Cross-references & links ----------
+\usepackage{xurl}  % aggressive URL line breaking for bibliography
+\usepackage[colorlinks=true,
+            linkcolor=blue!50!black,
+            citecolor=blue!50!black,
+            urlcolor=blue!50!black,
+            pdfauthor={Lars Kersten Kroehl},
+            pdftitle={From Specification to Deployment: Empirical Evidence from a W3C VC + DID Trust Infrastructure for Autonomous Agents},
+            pdfsubject={MolTrust Protocol arXiv preprint},
+            pdfkeywords={agent identity, W3C DID, verifiable credentials, trust propagation, Sybil resistance, MolTrust, AAE}]{hyperref}
+\usepackage[capitalize,noabbrev]{cleveref}
+
+% ---------- Bibliography ----------
+\usepackage[backend=biber,
+            style=ieee,
+            sorting=none,
+            maxbibnames=10,
+            giveninits=true]{biblatex}
+\addbibresource{references.bib}
+
+% ---------- Header/Footer ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\lhead{\small MolTrust Protocol --- Kroehl, 2026}
+\rhead{\small arXiv preprint v1.0}
+\cfoot{\thepage}
+
+% ---------- Theorems (for claims) ----------
+\newtheorem{claim}{Claim}
+
+% ---------- Document ----------
+\title{\textbf{From Specification to Deployment:\\[0.3em]
+Empirical Evidence from a W3C VC + DID Trust Infrastructure\\[0.2em]
+for Autonomous Agents}}
+
+\author{Lars Kersten Kroehl\\
+  \normalsize MolTrust / CryptoKRI GmbH, Zurich\\
+  \normalsize \href{mailto:lars@moltrust.ch}{lars@moltrust.ch} $\cdot$ \href{https://moltrust.ch}{moltrust.ch}}
+
+\date{22 April 2026}
+
+\begin{document}
+
+% Global sloppy to prefer extra word spacing over overflow
+\sloppy
+\emergencystretch=3em
+
+% Force citation numbering [1]-[37] to match original paper.
+% These nocite calls register refs in the correct order before any inline \cite appears.
+\nocite{ref1_agentmarket,ref2_neville,ref3_entrolabs,ref4_prince,ref5_cloudflare,ref6_w3cdid,ref7_w3cvc,ref8_imda,ref9_nistcaisi,ref10_nccoe,ref11_anthropic,ref12_google,ref13_falcobridge,ref14_schroederdewitt,ref15_hurong,ref16_syros,ref17_acharya,ref18_ferrag,ref19_owasp,ref20_mao,ref21_imdafull,ref22_cosais,ref23_euaiact,ref24_cosai,ref25_entra,ref26_motwani,ref27_kroehlssrn,ref28_techspec,ref29_abac,ref30_rar,ref31_jcs,ref32_ed25519,ref33_schnabl,ref34_biscuit,ref35_openclaw,ref36_rodriguezgarzon,ref37_erc8004}
+
+\maketitle
+
+\input{body.tex}
+
+% BIBLIOGRAPHY
+\printbibliography
+
+\end{document}
