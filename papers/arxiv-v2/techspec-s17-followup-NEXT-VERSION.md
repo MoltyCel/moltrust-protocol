@@ -15,6 +15,7 @@
 | 1 | **(a)/(b) two enforcement scopes** | code-verified 2026-06-10 (`app/enforcement/*`, `/vc/aae/evaluate`); arXiv-v2 spine §6.1 (PR #7) | **new §17.1.x** (below) |
 | 2 | **Conformance 5/5 → 4/5 + 1 open item** | already live: `moltrust-api` CONFORMANCE.md (PR #152) + `moltrust-web` aip-conformance.html (PR #64); arXiv-v2 §7.2 | align any §16/§17 conformance phrasing (no normative change) |
 | 3 | **R0→R2 decentralization-maturity ladder** | analysis 2026-06-09 (this cycle); CEP-3 #145 + §17.2.3 | **additive note to §17.2.3** (below) |
+| 4 | **Override-record format (operator-signed)** | ai_review consistency pass 2026-06-10 (technical + eu-compliance); resolves the one finding | **new §17.1.y** deliverable definition (below) |
 
 ---
 
@@ -91,15 +92,66 @@ additive framing of the pre-activation phase v0.9 leaves unnamed.
 
 ---
 
+## Item 4 — new §17.1.y: Override-record format (operator-signed) — DELIVERABLE DEFINITION
+
+> **Type: format-spec / deliverable definition. DO NOT BUILD NOW** — buildable when the first
+> operator integrates scope-(a) enforcement (Item 1). This entry *fixes the format* so the build,
+> when it happens, is unambiguous; it does not schedule the build.
+
+**Rationale.** The ai_review consistency pass (2026-06-10, technical + eu-compliance, both panels
+independently) confirmed scope (a) is consistent with the protocol-layer position, with **one**
+finding: an *MT-signed* override record would make MT process the operator's decision
+(GDPR Art. 4(2) — processing arises at signature time, even without storage) → MT becomes a
+processor → contradicts "MT holds no personal data" and "the operator decides". The fix is a format
+choice that *strengthens* the position; it re-opens nothing. It lands here, not in §6.1: §6.1 stays
+**unchanged** — it asserts nothing about override-record signing (only "signed DENY … with its own
+override"), so it is already consistent.
+
+**Proposed normative deliverable definition (additive subsection in §17.1):**
+
+> **§17.1.y — Override-record format.** When an operator runs scope-(a) enforcement (§17.1.x(a))
+> and exercises an override, the override is recorded as follows.
+>
+> - **Signing authority.** The override record is **operator-signed** (operator DID / eIDAS key).
+>   MT signs **only** the DENY *verdict*; MT **never** signs the override. The operator-signed
+>   record **embeds the MT-signed DENY verdict as evidence** (W3C **VC → VP** pattern: the MT
+>   verdict is the VC; the operator wraps it, adds its decision, and signs the whole as a VP).
+>   *Consequence: MT holds no personal data and performs no Art. 4(2) processing of the operator's
+>   decision; the conscious-decision evidence is cryptographically held by the operator.*
+> - **Mandatory fields (normative).** `action_id`, `aae_hash` + `aae_version`, `nonce`,
+>   `timestamp`, `operator_id`, `operator_signature` (over the above + the embedded MT verdict).
+> - **Replay protection.** Each pending action carries a unique `pending_id`; an override record
+>   binds to exactly one `pending_id` / `action_id` (no record replay across actions).
+> - **State loss = fail-closed.** If the operator gateway loses pending state (e.g. crash) the
+>   default holds: the action is **discarded**, not allowed. Fail-closed is the crash default.
+> - **Standing policy vs. auto-default.** A standing-policy override MUST be distinguishable from a
+>   silent default: it carries an explicit **validity window** and a **re-confirmation** requirement
+>   on expiry. Without these it is legally attackable as a "default without a conscious decision"
+>   (cf. Art. 14 human-oversight evidence). A standing policy is itself an operator-signed record.
+>
+> MT's deliverables for scope (a) are therefore: the signed DENY verdict, **this** override-record
+> format, and a reference SDK. The notification/UX and the operator key custody are the operator's.
+
+**Non-contradiction:** MT's signing surface is *narrowed* (verdict only), consistent with the
+§17.1.2 verdict service and the §17.1.x scope split. No change to scope (b) or to §6.1.
+
+**Legal-process (counsel / Kirchinger, not design):** AGB wording that MT = protocol/verdict layer,
+operator carries Art. 14 human-oversight incl. for standing policies, MT signature attests
+mandate-check integrity (not network policy). Tracked separately; not part of this format spec.
+
+---
+
 ## Cross-references
 - arXiv-v2 spine §6.1 (this PR #7) — the (a)/(b) prose for the paper.
 - arXiv-v2 §7.2 — conformance "4/5 + 1 open item" (Item 2).
 - `docs/decisions/ADR-CEP-governance-v8.md` (PR #143, ACCEPTED) — CEP design of record.
 - `docs/specs/cep-3-thresholds.md` (PR #145, commit `b2eb0ea`) — frozen K/Y/X, hard invariants.
+- ai_review consistency pass 2026-06-10 (`~/moltstack/reviews/20260610_*operator-local-override-*`) — Item 4 source.
 - TECH_SPEC v0.9 §17 (anchored block 46,986,137) — the unchanged base.
 
 ## Anchor-cycle checklist (do when v2 is anchored, NOT before)
-- [ ] Fold Items 1–3 into TECH_SPEC as next version (e.g. v0.10) — additive, §17 v0.9 untouched in history.
+- [ ] Fold Items 1–4 into TECH_SPEC as next version (e.g. v0.10) — additive, §17 v0.9 untouched in history.
+- [ ] Override-record format (Item 4) shipped as a deliverable spec + reference SDK when the first operator integrates scope (a) — not before.
 - [ ] Build PDF (`TECH_SPEC_VERSION=… LC_ALL=en_US.UTF-8 ./scripts/build_pdfs.sh tech_spec`).
 - [ ] Anchor next-version sha256 on Base L2 alongside the arXiv-v2 anchor (one cycle).
 - [ ] publications/integrity.html: new Current card; v0.9 → Historical (kept reachable, like v0.8.1).
