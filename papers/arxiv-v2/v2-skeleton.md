@@ -8,13 +8,22 @@
 
 ---
 
-## Title — 3 options (governance-centered; v1.9 title was deployment/These-a centered)
+## Title — FINAL (Lars, 2026-06-10)
 
-1. **"Who Authorizes Enforcement? An Operator-Independent Governance Transition for Autonomous-Agent Trust Infrastructure"**
-2. **"From Advisory to Enforced Without an Anchor: A Publicly-Verifiable Governance Transition for Agent Authorization"**
-3. **"Decentralizing Enforcement Authority: A Conditions-Based Governance Transition for Autonomous-Agent Trust"**
+**"Enforcement Without an Operator — A Governance Transition for Autonomous-Agent Trust"**
+Subtitle line: *Empirical Evidence from a W3C VC + DID Trust Infrastructure.*
 
-*(v1.9 subtitle "Empirical Evidence from a W3C VC + DID Trust Infrastructure" can survive as a secondary line under any of these — the empiricism is now the supporting evidence, not the headline.)*
+> Title describes the **contribution** (the designed CEP model), not today's status. The text holds
+> "designed, not activated / advisory" throughout — title and status-wording must not diverge.
+> Abstract + §1 clarify early that "without an operator" is the model's *property-goal*; live status = advisory.
+
+*(Candidates considered: "Who Authorizes Enforcement?…", "From Advisory to Enforced Without an Anchor…",
+"Decentralizing Enforcement Authority…" — final is a combination of main line + subtitle.)*
+
+## Locked decisions (Lars, 2026-06-10)
+1. Title = above.
+2. §7.4 Cross-protocol interoperability → **folded into §8 Discussion** (no standalone section).
+3. Full-text order = **spine first** (§4 → §5 → §6), then §1–§3, then §7–§9. **STOP after the spine for review.**
 
 ---
 

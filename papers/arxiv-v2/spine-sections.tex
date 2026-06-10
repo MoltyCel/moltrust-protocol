@@ -1,0 +1,164 @@
+% =====================================================================
+% arXiv v2 — SPINE SECTIONS (These-b governance transition)
+% Draft for Lars review. Full-text order: §4 -> §5 -> §6 (this file).
+% These map to the v2 skeleton sections 4, 5, 6. Section numbers are
+% assigned by LaTeX at assembly time; here they stand alone for review.
+%
+% Source discipline (skeleton + Lars 2026-06-10):
+%   - CEP design = TECH_SPEC v0.9 §17, anchored Base L2 block 46,986,137
+%     (ref28_techspec). SUMMARISE + REFERENCE, do not re-derive.
+%   - Wording: advisory / designed / demonstrable. No "enforces" /
+%     "provably secure" / "decentralized governance is active".
+%   - Western citation anchors only via EXISTING bib keys here; the new
+%     lineage anchors (optimistic-rollup, Sybil-resistance, DAO
+%     governance) are introduced + cited in §2 (Related Work, deferred).
+%     Marked below with "% CITE-§2:" so the §2 pass wires them in.
+% =====================================================================
+
+% ---------------------------------------------------------------------
+\section{The Governance-Transition Problem}
+\label{sec:problem}
+% Material: TECH_SPEC §17.2.1 + ADR CEP-Governance + v1.9 §3.5 (promoted).
+% ---------------------------------------------------------------------
+
+An enforcement layer that can block an agent's action is a position of power, and power needs an authorising party. Section~\ref{sec:background} described the MolTrust enforcement layer as it runs today: it verifies an Agent Authorization Envelope (AAE), evaluates a proposed action against the envelope's MANDATE, CONSTRAINTS, and VALIDITY blocks, and emits a signed, anchorable verdict. That layer runs in \textbf{advisory} mode. A DENY verdict is verified and recorded, but the action is not blocked \cite{ref28_techspec}. The transition from advisory verdicts to \emph{active enforcement} — where a DENY actually prevents the action — is deliberately gated, and the gate is not a technical switch but a governance one: \textbf{who is authorised to turn enforcement on?}
+
+This is the question the title of this paper names. ``Enforcement without an operator'' is a \emph{property goal} of the model we describe, not a claim about the system's present state. The reference deployment enforces nothing today; it advises. What follows is the design by which the authority to enforce could be transferred away from any single operator — and an honest account (Section~\ref{sec:scope}) of how far that design has actually been carried.
+
+\subsection{Why the obvious anchors fail}
+
+The authority to activate enforcement must survive the infrastructure's intended lifetime, which for trust infrastructure is measured in years, not release cycles. Three intuitive places to put that authority each fail under that horizon \cite{ref28_techspec}:
+
+\begin{itemize}
+  \item \textbf{A person.} Binding the switch to a founder or a named operator does not survive a ten-year horizon: people leave, organisations are acquired, keys are lost or compelled. A trust layer whose enforcement authority dies with a person is not infrastructure.
+  \item \textbf{A single chain.} Anchoring the authority to one ledger inherits that ledger's mortality and politics: it can halt, censor, reorganise, or fork. A verification protocol that is meant to be neutral cannot make its most consequential decision hostage to one chain's governance.
+  \item \textbf{A single instance.} Vesting the switch in one running deployment recreates a single point of failure of exactly the kind that motivated decentralised identity in the first place: the instance can be shut down, seized, or compromised, and with it the authority.
+\end{itemize}
+
+The design replaces all three with \textbf{objective, publicly recomputable conditions}: enforcement activates when a set of measurable facts about the relying-party population holds, and not because any party decided it should.
+
+\subsection{The oracle problem}
+\label{subsec:oracle}
+
+Conditions-based activation moves the difficulty rather than removing it. If a transition fires when ``enough independent relying parties have adopted the protocol,'' then \emph{someone} must measure adoption — count the relying parties, judge their independence, decide the threshold is met. Whoever holds that measurement becomes a new trusted party: an oracle. An oracle that can misreport the world can trigger or suppress enforcement at will, which reintroduces precisely the single point of authority the conditions were meant to eliminate.
+
+We state this plainly as the \textbf{oracle problem} for governance transitions: \emph{a conditions-based switch is only as trustworthy as the party that measures whether the conditions are met}. A governance transition that does not confront this problem has merely relabelled its operator as a ``measurement service.'' Section~\ref{sec:cep} sets out the Combined Enforcement Protocol (CEP), whose central move (Section~\ref{subsec:hvda}) is to make the measurement a deterministic function that anyone can recompute, so that no party holds the oracle.
+
+% ---------------------------------------------------------------------
+\section{The Combined Enforcement Protocol (CEP)}
+\label{sec:cep}
+% Core contribution. Material: TECH_SPEC v0.9 §17.2 (PRIMARY, anchored
+% block 46,986,137 = ref28_techspec) + ADR CEP-Governance + CEP-3
+% Threshold Spec. Summarise + reference; do NOT re-derive the design.
+% ---------------------------------------------------------------------
+
+CEP is the \textbf{designed} model for the enforcement-activation authority introduced in Section~\ref{sec:problem}. \textbf{CEP is not activated.} Its full design is fixed in the MolTrust \emph{CEP Governance} architecture decision record and the \emph{CEP-3 Threshold Specification}, and is published at roadmap level — with parameters and rationale — in \S17.2 of the Protocol Technical Specification v0.9, which is anchored on Base L2 as an immutable, independently citable record of the design as of its acceptance.\footnote{TECH\_SPEC v0.9 \S17, anchored at Base L2 block 46{,}986{,}137 under payload \texttt{MolTrust/TechSpec/0.9} (sha256:\texttt{462af65a\ldots}); see \cite{ref28_techspec}. We summarise the design here so the paper is self-contained; we do not restate its internals, and we treat the anchored specification, not this paper, as the authoritative source.} The purpose of this section is to make the mechanism legible, not to re-derive it: each subsection states what the mechanism does and why it answers a specific failure from Section~\ref{sec:problem}.
+
+\subsection{A five-condition activation ramp (AND)}
+\label{subsec:ramp}
+
+The transition from advisory to active enforcement occurs only when five conditions hold \emph{simultaneously} \cite{ref28_techspec}:
+
+\begin{enumerate}
+  \item a minimum elapsed time since the thresholds were fixed and anchored (a timelock and public-veto window);
+  \item a minimum number $N$ of Sybil-qualified relying parties;
+  \item distribution of those relying parties over a minimum number $K$ of independent clusters;
+  \item no single actor holding more than a share $X$ of the voting weight;
+  \item no single cluster holding more than a share $Y$ of the total.
+\end{enumerate}
+
+The conjunction is the point. Any single threshold — ``$N$ relying parties'' alone — is manipulable: an adversary mints identities until the count is met. Requiring all five at once means an adversary must simultaneously clear a Sybil filter, populate multiple independent clusters, and stay under both a per-actor and a per-cluster cap, while a timelock exposes the attempt to public veto. The conditions are not additive signals to be weighed; they are gates that must all open, and the cost of opening them jointly is what the design substitutes for an operator's judgement.
+
+\subsection{Honest-verifier data availability: dissolving the oracle}
+\label{subsec:hvda}
+
+The five conditions are facts about the relying-party population, and Section~\ref{subsec:oracle} warned that whoever measures those facts becomes an oracle. CEP removes the oracle rather than trusting it. The condition data is published to decentralised, permanent storage and anchored as a \texttt{(merkle\_root, data\_uri)} tuple across multiple chains; the activation trigger is then a \textbf{deterministic function that any party can recompute} from the published data \cite{ref28_techspec}. There is no privileged measuring party: a relying party, a skeptic, or a regulator can independently fetch the committed data, recompute the five-condition predicate, and arrive at the same verdict.
+
+We call this stance \emph{verification $>$ production}: the design does not ask anyone to trust that the conditions were met; it makes the determination cheap to verify and impossible to monopolise. The lineage is the same security argument that underwrites optimistic rollups, where correctness rests not on trusting a producer but on the ability of any verifier to recompute and challenge a published claim.% CITE-§2: optimistic-rollup security model (verification-not-production lineage) — add citation in §2 Related Work.
+Multi-chain anchoring of the commitment tuple means the determination also survives the failure or censorship of any one chain, addressing the single-chain anchor of Section~\ref{sec:problem} at the data layer as well.
+
+\subsection{Keyed commitment and cryptographic erasure}
+\label{subsec:erasure}
+
+Publishing condition data permanently collides with data-protection law: relying parties are identifiable entities, and the right to erasure (e.g.\ Art.~17 GDPR) is difficult to reconcile with an immutable anchor. CEP reconciles the two by never anchoring relying-party identifiers in clear. Only \textbf{keyed commitments} to those identifiers are anchored; the cleartext lives in the permissioned data layer. Erasure is performed by destroying the key (\textbf{cryptographic erasure}), after which the anchored commitment is non-attributable — the integrity proof remains, but it can no longer be tied to a person \cite{ref28_techspec}. Permanent verifiability and the right to be forgotten are thus held at once, rather than traded off.
+
+\subsection{Staged verification: permissioned ramp-up to zero-knowledge}
+\label{subsec:staged}
+
+The recomputability of Section~\ref{subsec:hvda} is introduced in two stages. A \textbf{permissioned ramp-up phase} comes first: verifiers are bound by data-processing agreements and recompute the predicate over the committed data under contract. A \textbf{target phase} then replaces that contractual trust with \textbf{zero-knowledge verification}, which proves the recomputation was performed correctly \emph{without disclosing} the underlying relying-party data \cite{ref28_techspec}. The staging matters for honesty about status: the mechanism is exercised first under permissioned assumptions, and the privacy-preserving end-state is a later, separately built phase (Section~\ref{subsec:open}). Note the scope of the zero-knowledge component: it strengthens the \emph{verification} of the conditions; it is not itself the governance authority.
+
+\subsection{Cluster diversity proven from structure}
+\label{subsec:clusters}
+
+Condition~3 — distribution over $K$ independent clusters — is the design's defence against an adversary who satisfies a headcount with sockpuppets. Independence is therefore not allowed to rest on \emph{declared} categories (a relying party asserting ``I am a different kind of organisation''), which an adversary controls for free. It is computed from \textbf{structure}: clusters are derived from the relying-party endorsement graph by reciprocal-Jaccard analysis, the same machinery this system already uses for Sybil detection at the trust-scoring layer (Section~\ref{sec:evidence}). Two relying parties whose endorsement neighbourhoods overlap above a reciprocal threshold collapse into one cluster regardless of how they describe themselves, so an adversary cannot manufacture diversity by manufacturing labels. Diversity is thus a property the public can recompute from the committed graph, consistent with Section~\ref{subsec:hvda}.% CITE-§2: Sybil-resistance literature (SybilGuard / SybilLimit / BrightID, Gitcoin) as the lineage for graph-structural diversity — add in §2.
+
+\subsection{Parameters and activation gates}
+\label{subsec:params}
+
+The activation thresholds differ by network. The testnet values exist to \emph{demonstrate} the mechanism end to end; the mainnet values are the production \emph{target}. They are not interchangeable \cite{ref28_techspec}.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}llcc@{}}
+\toprule
+ & \textbf{Parameter} & \textbf{Testnet (demonstration)} & \textbf{Mainnet (target)} \\
+\midrule
+$N$ & Sybil-qualified relying parties & 11 & 101 \\
+$K$ & Independent clusters & 3 & 4 \\
+$Y$ & Max share per cluster & $\ge 34\%$ & $33\%$ \\
+$X$ & Max voting weight per actor & $10\%$ & $10\%$ \\
+$T$ & Timelock / public-veto window & 31 days & 31 days \\
+\bottomrule
+\end{tabular}
+\caption{CEP activation thresholds. Testnet values demonstrate the mechanism; mainnet values are the not-yet-activated production target. Source: \S17.2.3 of the anchored Technical Specification \cite{ref28_techspec}.}
+\label{tab:cep-params}
+\end{table}
+
+The cluster count differs by design. Under the byzantine-tolerance relation $N \ge 3f+1$, the mainnet $K = 4$ tolerates one captured or faulty cluster ($f = 1$) — genuine fault-tolerance hardening — whereas the testnet $K = 3$ corresponds to $f = 0$: it demonstrates the cluster-diversity mechanism without claiming production-grade tolerance. The invariant $Y \ge 1/K$ is preserved in both rows (testnet $K = 3 \Rightarrow Y \ge 34\% > 33.3\%$; mainnet $K = 4 \Rightarrow Y = 33\% \ge 25\%$), so neither configuration is structurally unsatisfiable. These thresholds are also markedly stricter than the concentration limits typical of on-chain DAO governance, where a single actor or a small coalition can frequently meet a quorum.% CITE-§2: DAO / on-chain governance concentration (Nakamoto coefficient, timelocks) for the comparison — add in §2.
+
+Activation is finally gated on two independent conditions, both of which must be met before any enforcement code is switched on \cite{ref28_techspec}:
+
+\begin{itemize}
+  \item \textbf{Gate-1 — thresholds fixed and anchored.} The parameters of Table~\ref{tab:cep-params} are written down and chain-agnostically anchored before the ramp-up begins. \emph{Status: the values are fixed (CEP-3 Threshold Specification); chain-agnostic anchoring is pending the multi-chain prerequisite.}
+  \item \textbf{Gate-2 — prerequisites built.} A relying-party registry with cryptographic (DID-bound) identity and cluster attribution; an explicit \emph{enforce} state in the authorization model; and multi-chain anchoring. \emph{Status: open.}
+\end{itemize}
+
+Until both gates are met, the evaluator remains advisory: verified, recorded, not blocked. Activation is a deliberate, separate step — not a side effect of publishing this paper or the specification it summarises.
+
+% ---------------------------------------------------------------------
+\section{Scope and Honest Limits}
+\label{sec:scope}
+% Material: TECH_SPEC §17.2.2 (scope position) + ADR CEP-Governance
+% (Konflikt-2 oversight) + v1.9 §7.1–7.2 reframed.
+% De-escalate "Claim A"/"provably". Wording discipline enforced here.
+% ---------------------------------------------------------------------
+
+A design that activates enforcement invites a fair question about responsibility and overreach. This section states the protocol's scope, the limits of what we claim, and the problems that remain open — before the deployment evidence of Section~\ref{sec:evidence}, so that the evidence is read against an honest boundary.
+
+\subsection{A protocol layer, not a deployer}
+\label{subsec:protocol-not-deployer}
+
+MolTrust is a \textbf{verification and enforcement \emph{protocol} layer, not the deployer} of a high-risk AI system. The analogy is TLS and the public-key infrastructure: a certificate authority issues certificates and lets any party verify them; it does not supervise each TLS session, and it is not the operator of the websites that rely on it \cite{ref28_techspec}. CEP likewise produces verifiable verdicts and, eventually, a verifiable enforcement-activation event; it does not operate the agents whose actions are gated.
+
+The consequence for regulatory duty is deliberate. The obligation of \emph{human oversight} over a high-risk deployment — including under Art.~14 of the EU AI Act \cite{ref23_euaiact} — rests with the \textbf{relying party} that uses the protocol to gate its own agents, not with the protocol. What the protocol provides is oversight-\textbf{enabling} machinery: signed and independently verifiable verdicts, a default-DENY evaluation rule, an append-only audit trail, and a public-veto window during the activation ramp. It is oversight-enabling, not oversight-replacing; it equips a relying party to discharge its duty, and does not purport to discharge that duty on the relying party's behalf.
+
+\subsection{Designed, not activated — and what ``demonstrable'' means}
+\label{subsec:designed-not-activated}
+
+We are explicit about status, and we hold the title to it. The enforcement layer is \textbf{advisory} today: it verifies and records, it does not block (Section~\ref{sec:background}). CEP is \textbf{designed and gated}, not live (Section~\ref{sec:cep}); both activation gates remain unmet. The mechanism is \textbf{demonstrable on testnet}: the testnet parameters of Table~\ref{tab:cep-params} let the five-condition ramp, the recomputable trigger, and the cluster-diversity check run end to end, which establishes that the mechanism works — not that decentralised governance is in force.
+
+We therefore avoid three overclaims that an earlier framing of this work risked. We do not say the system \emph{enforces} — it advises. We do not say its governance is \emph{decentralised and active} — it is designed and gated. And we do not describe any property as \emph{provably secure}; the appropriate claim is that the activation predicate is publicly recomputable and the mechanism is demonstrable, which is a verifiability claim, not a proof of security. Where the deployment evidence in Section~\ref{sec:evidence} reports conformance, it does so at the same standard: against the independent AIP/IBCT verifier the implementation satisfies \textbf{four of the five} features, with expressive chained policy recorded as an open item rather than a pass.
+
+\subsection{Open problems}
+\label{subsec:open}
+
+Three problems are named here rather than hidden:
+
+\begin{itemize}
+  \item \textbf{Treasury governance.} CEP decentralises the authority to \emph{activate enforcement}; it does not by itself decentralise the funding and management of the infrastructure. The treasury remains a governance anchor whose decentralisation is unsolved here.
+  \item \textbf{The zero-knowledge phase.} The privacy-preserving end-state of Section~\ref{subsec:staged} — proving recomputation without disclosing relying-party data — is designed but not built; the demonstrable mechanism today runs under the permissioned, data-processing-agreement assumptions of the ramp-up phase.
+  \item \textbf{Weak subjectivity for late joiners.} A party joining long after activation must obtain a trustworthy recent reference point to verify the committed history, rather than recomputing from genesis. Bounding and distributing that reference point is an open design question.
+\end{itemize}
+
+None of these is incidental, and stating them is part of the claim: the contribution is a governance-transition design with a demonstrable mechanism and a clearly bounded set of unfinished problems, not a finished decentralised system.
