@@ -1,0 +1,118 @@
+% ============================================================================
+% Enforcement Without an Operator — A Governance Transition for Autonomous-Agent Trust
+% MolTrust Protocol — arXiv preprint v2 (replacement of arXiv:2605.06738)
+% Author: Lars Kersten Kroehl
+% Target: arXiv cs.CR (primary), cs.AI, cs.MA
+% Assembly: front-sections.tex (Abstract, §1–§3) + spine-sections.tex (§4–§6)
+%           + back-sections.tex (§7–§9). Bib one level down in scaffold-from-v1/.
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+
+% ---------- Encoding & Fonts ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+% ---------- Layout ----------
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\setstretch{1.05}
+\usepackage{parskip}
+
+% ---------- Math ----------
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+% ---------- Tables ----------
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{longtable}
+
+% ---------- Code listings ----------
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{codestring}{RGB}{163,21,21}
+\definecolor{codecomment}{RGB}{100,100,100}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{codebg},
+  breaklines=true,
+  showstringspaces=false,
+  frame=single,
+  framesep=4pt,
+  rulecolor=\color{gray!40},
+  numbers=none,
+  columns=flexible
+}
+
+% ---------- Figures & graphics ----------
+\usepackage{graphicx}
+\usepackage{float}
+
+% ---------- Cross-references & links ----------
+\usepackage{xurl}
+\usepackage[colorlinks=true,
+            linkcolor=blue!50!black,
+            citecolor=blue!50!black,
+            urlcolor=blue!50!black,
+            pdfauthor={Lars Kersten Kroehl},
+            pdftitle={Enforcement Without an Operator: A Governance Transition for Autonomous-Agent Trust},
+            pdfsubject={MolTrust Protocol arXiv preprint v2},
+            pdfkeywords={agent authorization, enforcement governance, decentralized governance, oracle problem, honest-verifier data availability, Sybil resistance, W3C DID, verifiable credentials, MolTrust, CEP, AAE}]{hyperref}
+\usepackage[capitalize,noabbrev]{cleveref}
+
+% ---------- Bibliography ----------
+% CANONICAL (arXiv submit) bibliography: biblatex + biber, style=ieee.
+% arXiv runs biber for biblatex submissions. A separate local-validation
+% commit switches this block to natbib+bibtex because the build server lacks
+% biblatex/biber — that variant is for PDF validation only; THIS is canonical.
+\usepackage[backend=biber,
+            style=ieee,
+            sorting=none,
+            maxbibnames=10,
+            giveninits=true]{biblatex}
+\addbibresource{scaffold-from-v1/references.bib}
+
+% ---------- Header/Footer ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\lhead{\small MolTrust Protocol --- Kroehl, 2026}
+\rhead{\small arXiv preprint v2}
+\cfoot{\thepage}
+
+% ---------- Theorems ----------
+\newtheorem{claim}{Claim}
+
+% ---------- Document ----------
+\title{\textbf{Enforcement Without an Operator}\\[0.3em]
+\large A Governance Transition for Autonomous-Agent Trust\\[0.2em]
+\normalsize\normalfont Empirical Evidence from a W3C VC + DID Trust Infrastructure}
+
+\author{Lars Kersten Kroehl\\
+  \normalsize MolTrust / CryptoKRI GmbH, Zurich\\
+  \normalsize \href{mailto:lars@moltrust.ch}{lars@moltrust.ch} $\cdot$ \href{https://moltrust.ch}{moltrust.ch}}
+
+\date{June 2026}
+
+\begin{document}
+
+\sloppy
+\emergencystretch=3em
+
+\maketitle
+
+\input{front-sections.tex}   % Abstract + §1 Introduction + §2 Related Work + §3 Background
+\input{spine-sections.tex}   % §4 Problem + §5 CEP + §6 Scope & Limits
+\input{back-sections.tex}    % §7 Deployment Evidence + §8 Discussion + §9 Conclusion
+
+\printbibliography
+
+\end{document}

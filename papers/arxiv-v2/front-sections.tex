@@ -1,0 +1,84 @@
+% =====================================================================
+% arXiv v2 — FRONT SECTIONS: Abstract + §1 Intro + §2 Related Work + §3 Background
+% Frame around the finished spine (§4–§6). Resolves \label{sec:background}.
+% Wording discipline: advisory / designed / demonstrable. No "enforces" /
+% "provably secure". (a)/(b) scope distinction held consistent with §6.1.
+% Material reframed from v1.9 (body.tex) — These-b spine; These-a supporting.
+% =====================================================================
+
+\begin{abstract}
+Autonomous AI agents now transact at production scale — 69{,}000 bots executing 165 million transactions across \$50 million USDC in cumulative volume on a single marketplace — without any shared trust layer between participants \cite{ref1_agentmarket}. Regulators (Singapore IMDA, NIST CAISI, EU AI Act) and major AI laboratories have converged on the same requirement: an open, verifiable trust infrastructure for agents that no single vendor can deliver alone. A trust layer that can \emph{block} an agent's action holds real power, and that power needs an authorising party. This paper asks the question the convergence leaves open: \textbf{who is authorised to activate enforcement}, without binding that authority to a person, a chain, or a single instance?
+
+We present the Combined Enforcement Protocol (CEP): a conditions-based, publicly recomputable governance transition that decentralises enforcement-activation authority to a five-condition predicate any party can recompute from anchored data, dissolving the oracle problem such conditions usually reintroduce. We distinguish two scopes. \textbf{Operator-local} enforcement — a relying party gating its own agent against its own mandate — needs no governance transition and is buildable on the deployed substrate today. \textbf{Network-wide, operator-independent} enforcement is the scope CEP governs; it is \emph{designed}, gated, and \emph{advisory} until its activation conditions are met. The title's ``without an operator'' is a property of the network-wide scope and a goal of the model, not a description of today's status: the reference substrate runs advisory, the mechanism is demonstrable on testnet, and the governance transition is designed. The deployed W3C VC + DID infrastructure — live since March 2026 across eight credential verticals, with on-chain anchoring on Base L2 — supplies the supporting evidence that the substrate is real.
+\end{abstract}
+
+% ---------------------------------------------------------------------
+\section{Introduction}
+\label{sec:intro}
+% Material: v1.9 §1 reframed around the governance question + §17.2.1.
+% ---------------------------------------------------------------------
+
+The deployment of autonomous AI agents has moved from proof-of-concept into production commerce. A single marketplace reports 69{,}000 autonomous bots executing 165 million transactions across \$50 million USDC in cumulative volume, without any shared trust layer between participants \cite{ref1_agentmarket}. Across financial services, non-human identities now outnumber human employees by wide margins and are growing fast \cite{ref2_neville,ref3_entrolabs}; network data covering a large share of global web traffic shows AI-agent traffic ratios orders of magnitude above human traffic \cite{ref4_prince,ref5_cloudflare}. These are present conditions, not projections.
+
+Regulatory frameworks and industry converge on a structural requirement: an open, portable, cryptographically verifiable trust infrastructure for agents \cite{ref8_imda,ref9_nistcaisi,ref10_nccoe,ref11_anthropic,ref12_google}. W3C Decentralized Identifiers and Verifiable Credentials provide the right primitives \cite{ref6_w3cdid,ref7_w3cvc}, and a growing body of work shows how to assemble them into agent trust systems (Section~\ref{sec:related}). Such infrastructures remove single points of failure for \emph{verification}: any party can check a signed credential without a central service. But verification is only half of trust. The other half is \emph{enforcement} — refusing an action that violates an authorization — and an enforcement layer that can block an action recreates exactly the single point of authority that decentralised verification removed. \textbf{Who is authorised to turn enforcement on?}
+
+This paper's contribution is an answer that does not depend on a person, a chain, or a single instance. We separate two scopes of enforcement, because they have different authorising parties and the distinction is what makes the question tractable:
+
+\begin{itemize}
+  \item \textbf{Operator-local enforcement.} A relying party may gate \emph{its own} agent against \emph{its own} authorization, under its own authority — exactly as any deployer bounds its own software. This needs no governance transition; it is buildable on the deployed substrate today.
+  \item \textbf{Network-wide, operator-independent enforcement.} A \emph{mandatory} chokepoint that gates a \emph{third party's} agent — enforcement whose authority must not rest on any single operator. This is the hard scope, and the one this paper's governance design addresses.
+\end{itemize}
+
+The title, ``Enforcement Without an Operator,'' names a property of the second scope and a \emph{goal} of the model — not a claim about the system's present state. We are explicit from the outset: the reference enforcement layer runs \textbf{advisory} today (it verifies and records, it does not block at the network scope); the governance transition is \textbf{designed} and gated, not active; and the mechanism is \textbf{demonstrable on testnet}. A reader who concludes ``but you still have an operator'' is correct about the present and is precisely the distinction we draw — operator-independence is the designed property of the network-wide scope, reached through the transition this paper sets out, not a description of the live deployment.
+
+Our contributions are: (1) a precise statement of the governance-transition problem and its oracle sub-problem (Section~\ref{sec:problem}); (2) the Combined Enforcement Protocol, a conditions-based, publicly recomputable transition that dissolves the oracle problem (Section~\ref{sec:cep}); (3) an explicit scope-and-limits account, including the operator-local vs.\ network-wide distinction and an honest status (Section~\ref{sec:scope}); and (4) deployment evidence that the substrate is real — live since March 2026 across eight verticals, with on-chain anchoring (Section~\ref{sec:evidence}).
+
+% ---------------------------------------------------------------------
+\section{Related Work and Positioning}
+\label{sec:related}
+% Material: v1.9 §2 CONDENSED + extended with the three lineage anchors.
+% Western anchors mandatory; never an exclusively non-western source base.
+% ---------------------------------------------------------------------
+
+\subsection{Regulatory and institutional context}
+
+The Singapore IMDA \textit{Model AI Governance Framework for Agentic AI} (January 2026) is the first comprehensive governance framework for autonomous agents; it requires each agent to carry a verifiable digital identity and an audit trail of which agent acted under whose authorisation \cite{ref8_imda,ref21_imdafull}. NIST's Center for AI Standards and Innovation launched an AI Agent Standards Initiative (February 2026), and the associated NCCoE concept paper frames the gap directly: agents are commonly treated as generic service accounts without dedicated identity, authorization, or accountability controls \cite{ref9_nistcaisi,ref10_nccoe,ref22_cosais}. The EU AI Act (Regulation (EU) 2024/1689) applies Article~14 (Human Oversight) and Article~15 (Accuracy, Robustness, Cybersecurity) to autonomous agents in high-risk domains \cite{ref23_euaiact}; the allocation of the Article~14 duty is central to our scope position (Section~\ref{subsec:protocol-not-deployer}).
+
+\subsection{Industry framework convergence}
+
+Anthropic's \textit{Trustworthy Agents in Practice} (April 2026) states that the model layer alone cannot secure agentic AI and calls for shared infrastructure no single vendor can provide, favouring open standards over proprietary alternatives \cite{ref11_anthropic}. Google's SAIF~2.0 Agent Risk Map identifies rogue-action and over-permissioned-tool risks and the principles of well-defined controllers, limited powers, and observable actions \cite{ref12_google,ref24_cosai}; Microsoft's Entra Agent ID addresses agent identity within a single enterprise perimeter \cite{ref25_entra}. These efforts establish the need; none answers who may authorise network-wide enforcement across organisational boundaries.
+
+\subsection{Academic foundations}
+
+Closest to this work are deployed-or-prototyped agent trust systems. SAGA \cite{ref16_syros} provides centralised, formally analysed policy enforcement through a trusted Provider — strong within one administrative domain, but it presupposes the very trusted party we seek to avoid at the network scope. Hu and Rong \cite{ref15_hurong} give a six-category taxonomy of inter-agent trust (Brief, Claim, Proof, Stake, Reputation, Constraint); Schroeder de Witt \cite{ref14_schroederdewitt} frames multi-agent security as a field with threats specific to agent interaction \cite{ref26_motwani}. Acharya's TIVA \cite{ref17_acharya} and Rodriguez Garzon et al.\ \cite{ref36_rodriguezgarzon} describe DID + VC + on-chain-anchoring architectures conceptually; Rodriguez Garzon et al.\ explicitly identify the limitation of an LLM in sole charge of security procedures, motivating enforcement that operates independently of the model layer. Threat taxonomies by Ferrag et al.\ \cite{ref18_ferrag} (cross-mapped to CVE/NVD) and Mao et al.\ \cite{ref20_mao} catalogue the attack surface, alongside the OWASP agentic-security material \cite{ref19_owasp}. None of these treats the \emph{governance} of enforcement activation as the object of design.
+
+\subsection{Governance, data-availability, and Sybil-resistance lineages}
+\label{subsec:lineages}
+
+CEP draws three lineages from outside the agent-trust literature, each of which informs a specific mechanism in Section~\ref{sec:cep}.
+
+\textbf{On-chain governance and concentration.} Analyses of DAO voting power show that on-chain governance frequently concentrates in a few actors, with low Nakamoto coefficients and weak participation \cite{ref39_daogov}. This is the baseline CEP's concentration caps (Section~\ref{subsec:params}) are designed to beat, and the comparison point for why timelocks and per-actor/per-cluster bounds matter.
+
+\textbf{Optimistic-rollup security (verification \texttt{>} production).} Optimistic rollups establish correctness not by trusting a block producer but by letting any verifier recompute and challenge a published claim \cite{ref38_arbitrum}. CEP's honest-verifier data availability (Section~\ref{subsec:hvda}) borrows this stance directly: the activation predicate is a deterministic function anyone can recompute from anchored data, so no party holds the oracle.
+
+\textbf{Sybil resistance from graph structure.} Social-graph Sybil defences \cite{ref40_sybilguard} and proof-of-personhood / unique-humanity systems \cite{ref41_brightid} establish that resistance to identity fabrication is better grounded in structural relationships than in self-declared attributes. CEP's cluster-diversity condition (Section~\ref{subsec:clusters}) follows this lineage: independence is computed from the endorsement graph, not from declared categories.
+
+\subsection{Position summary}
+
+This paper is complementary to the verification-and-identity work above and orthogonal to it in one respect: its object is not another way to verify or to enforce, but the \emph{authority} to switch network-wide enforcement on. That object is what scope (b) and CEP address; the deployed substrate (Section~\ref{sec:background}) is the evidence that the question is not hypothetical.
+
+% ---------------------------------------------------------------------
+\section{Background: An Advisory Trust-and-Enforcement Substrate}
+\label{sec:background}
+% Material: v1.9 §3.1–3.4 CONDENSED + §17.1 advisory framing. Short; feeds spine.
+% ---------------------------------------------------------------------
+
+This section condenses the deployed substrate to just enough to ground the governance argument; full normative definitions are in the Protocol Technical Specification \cite{ref28_techspec}. The point to carry forward is that the substrate exists and runs \textbf{advisory} — it verifies and records, it does not block at the network scope — so the open question is who turns it from advisory to enforced.
+
+\textbf{Four primitives.} Each agent holds a W3C Decentralized Identifier \cite{ref6_w3cdid}, with ownership proven by an Ed25519 key; the reference method is \texttt{did:moltrust}, but any method supporting Ed25519/secp256k1 is conformant. Authorization is expressed as a W3C Verifiable Credential \cite{ref7_w3cvc} supporting attenuating delegation chains any verifier can traverse independently. Behaviour is recorded as Interaction Proof Records — dual-signed, Merkle-anchored on Base L2 — accumulating into a registry-computed Trust Score (Section~\ref{sec:evidence}). All three are expressed in open, portable formats, so evidence issued by one party is verifiable by any other.
+
+\textbf{The Agent Authorization Envelope (AAE).} The machine-evaluable authorization object carries three normative blocks: \textbf{MANDATE} (permitted purpose, allowed/denied action patterns, delegation rules), \textbf{CONSTRAINTS} (time windows, financial thresholds, jurisdictions, counterparty minimums, obligations), and \textbf{VALIDITY} (issuer, holder binding, mandatory expiry, revocation, optional anchor). Any conformant evaluator enforces default-deny, deny-precedence, attenuation-only delegation, and mandatory expiry. The design reuses NIST SP~800-162 ABAC \cite{ref29_abac}, RFC~9396 \cite{ref30_rar}, RFC~8785 JCS \cite{ref31_jcs}, and Ed25519Signature2020 \cite{ref32_ed25519}.
+
+\textbf{Three-layer architecture, advisory today.} Authorization is checked at three layers: \emph{cryptographic} (Ed25519 + RFC~8785, tamper-evident by construction), \emph{API} (trust-score and revocation consequences, fail-closed on unreachable revocation), and \emph{kernel} (Falco eBPF detection below the agent's process boundary \cite{ref13_falcobridge}). In the reference deployment these run \textbf{advisory}: a DENY is produced as a signed, anchorable verdict and recorded, but the action is not blocked at the network scope \cite{ref28_techspec}. Operator-local blocking (scope (a), Section~\ref{subsec:protocol-not-deployer}) is available to a relying party in its own gateway; network-wide blocking is what the governance transition gates.
+
+\textbf{Decentralised evidence, centralised registry — for now.} The evidence layer is genuinely verifier-independent: any party with an issuer's key validates any signed artifact without a central service. The reference registry, however, is operated by one organisation, and the authority to activate network-wide enforcement is, today, undecided. That undecided authority is the subject of the rest of the paper, and the problem it poses is the subject of the next section.
