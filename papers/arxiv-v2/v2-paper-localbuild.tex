@@ -1,0 +1,106 @@
+% ============================================================================
+% LOCAL VALIDATION BUILD ONLY — NOT the arXiv submit source.
+% Canonical submit source = v2-paper.tex (biblatex + biber, style=ieee).
+% This variant swaps biblatex→natbib+bibtex because the build server (TeX Live
+% 2023) ships no biblatex/biber. It exists solely to produce a validation PDF;
+% reconstruct the submit build from v2-paper.tex. Inputs the SAME section files.
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+
+% ---------- Encoding & Fonts ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+% ---------- Layout ----------
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\setstretch{1.05}
+\usepackage{parskip}
+
+% ---------- Math ----------
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+% ---------- Tables ----------
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{longtable}
+
+% ---------- Code listings ----------
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codebg}{RGB}{248,248,248}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{codebg},
+  breaklines=true,
+  showstringspaces=false,
+  frame=single,
+  framesep=4pt,
+  rulecolor=\color{gray!40},
+  numbers=none,
+  columns=flexible
+}
+
+% ---------- Figures & graphics ----------
+\usepackage{graphicx}
+\usepackage{float}
+
+% ---------- Cross-references & links ----------
+\usepackage{xurl}
+\usepackage[colorlinks=true,
+            linkcolor=blue!50!black,
+            citecolor=blue!50!black,
+            urlcolor=blue!50!black,
+            pdfauthor={Lars Kersten Kroehl},
+            pdftitle={Enforcement Without an Operator: A Governance Transition for Autonomous-Agent Trust},
+            pdfsubject={MolTrust Protocol arXiv preprint v2 (local validation build)}]{hyperref}
+\usepackage[capitalize,noabbrev]{cleveref}
+
+% ---------- Bibliography (LOCAL BUILD: natbib + bibtex; canonical = biblatex/biber) ----------
+\usepackage[numbers,sort&compress]{natbib}
+
+% ---------- Header/Footer ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\lhead{\small MolTrust Protocol --- Kroehl, 2026}
+\rhead{\small arXiv preprint v2 (local build)}
+\cfoot{\thepage}
+
+% ---------- Theorems ----------
+\newtheorem{claim}{Claim}
+
+% ---------- Document ----------
+\title{\textbf{Enforcement Without an Operator}\\[0.3em]
+\large A Governance Transition for Autonomous-Agent Trust\\[0.2em]
+\normalsize\normalfont Empirical Evidence from a W3C VC + DID Trust Infrastructure}
+
+\author{Lars Kersten Kroehl\\
+  \normalsize MolTrust / CryptoKRI GmbH, Zurich\\
+  \normalsize \href{mailto:lars@moltrust.ch}{lars@moltrust.ch} $\cdot$ \href{https://moltrust.ch}{moltrust.ch}}
+
+\date{June 2026}
+
+\begin{document}
+
+\sloppy
+\emergencystretch=3em
+
+\maketitle
+
+\input{front-sections.tex}   % Abstract + §1 Introduction + §2 Related Work + §3 Background
+\input{spine-sections.tex}   % §4 Problem + §5 CEP + §6 Scope & Limits
+\input{back-sections.tex}    % §7 Deployment Evidence + §8 Discussion + §9 Conclusion
+
+\bibliographystyle{ieeetr}
+\bibliography{scaffold-from-v1/references}
+
+\end{document}
