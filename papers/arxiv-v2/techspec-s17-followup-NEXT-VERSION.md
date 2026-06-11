@@ -8,7 +8,15 @@
 > the anchored v0.9; each item only *names* something v0.9 left implicit or has since been
 > corrected outside the spec.
 
-**Bundle for the v2 anchor cycle (three additive items):**
+> **REFRAME 2026-06-11 (Lars):** CEP is an **optional, advisory trust convention**, not binding
+> network-wide enforcement. Throughout the items below, read "network-wide enforcement" / scope (b) /
+> "activate enforce mode" as **"an optional network-wide trust convention with an operator-independent
+> *maturity signal*"** — CEP compels no one; the transaction decision always sits with the agent/operator;
+> "activation" means *recognising the convention as network-mature* (a publicly recomputable fact), not
+> turning on coercion. This narrows what §17.2.4 must claim (a maturity signal, not an enforce switch) and
+> moots the adversarial "respawn trigger" / "parameter anchor" holes, because no authority is asserted.
+
+**Bundle for the v2 anchor cycle (additive items):**
 
 | # | Item | Source / already-done | §17 touch-point |
 |---|---|---|---|
@@ -16,6 +24,7 @@
 | 2 | **Conformance 5/5 → 4/5 + 1 open item** | already live: `moltrust-api` CONFORMANCE.md (PR #152) + `moltrust-web` aip-conformance.html (PR #64); arXiv-v2 §7.2 | align any §16/§17 conformance phrasing (no normative change) |
 | 3 | **R0→R2 decentralization-maturity ladder** | analysis 2026-06-09 (this cycle); CEP-3 #145 + §17.2.3 | **additive note to §17.2.3** (below) |
 | 4 | **Override-record format (operator-signed)** | ai_review consistency pass 2026-06-10 (technical + eu-compliance); resolves the one finding | **new §17.1.y** deliverable definition (below) |
+| 5 | **Stake as an OPTIONAL trust signal** | adversarial stake round 2026-06-11 (§I) + reframe to optional convention | **new §17.2.5** design note (below) |
 
 ---
 
@@ -138,6 +147,36 @@ override"), so it is already consistent.
 **Legal-process (counsel / Kirchinger, not design):** AGB wording that MT = protocol/verdict layer,
 operator carries Art. 14 human-oversight incl. for standing policies, MT signature attests
 mandate-check integrity (not network policy). Tracked separately; not part of this format spec.
+
+---
+
+## Item 5 — new §17.2.5: Stake as an OPTIONAL trust signal (DESIGN, not built)
+
+> **Type: design note. DO NOT BUILD NOW.** Reframed from "enforcement mechanism that forfeits on respawn"
+> to a **voluntary credibility signal**, consistent with the CEP optional-convention reframe.
+
+**Rationale.** The adversarial stake round (research-notes §I) showed that a *forced* stake (forfeit-on-
+respawn) has two structural holes: the forfeit *trigger* is unspecifiable without an adjudicator (= the
+slashing the design rejects), and a *fixed* amount re-creates a central parameter-setter. **Both holes
+presuppose compulsion.** Under the optional-convention reframe CEP coerces nothing, so stake is recast:
+
+- **Stake = an optional, voluntary credibility signal**: an agent/operator MAY bond capital as a
+  *self-imposed* signal of commitment; counterparties MAY weight it as they choose. It is an **offer, not a
+  gate** — no minimum is imposed for any base-layer (scope (a)) interaction.
+- **No forfeit trigger, no adjudicator, no protocol-set amount**: because nothing is enforced, there is no
+  burn-on-respawn event to attribute and no authority deciding a mandatory amount. The agent chooses whether
+  and how much to bond; the holes A (trigger) and B (fixed anchor) from §I are **moot** — there is no
+  compelled mechanism to specify.
+- **TrustScore (behaviour-in-system) and stake (voluntary commitment signal) stay separate** — two optional
+  inputs a relying party may weigh, neither imposed.
+- **Honest limit (into the paper):** a voluntary signal deters nothing by itself; it only lets a willing
+  agent *price its own credibility*. It does not solve respawn — it gives counterparties one more optional
+  datum. Consistent with "CEP = optional convention, not a solution."
+- Reference implementation (if a relying party ever wants to read bonded capital) is chain-agnostic and a
+  later build; MolTrust does not custody. **Belongs here, not in the anchored §17.**
+
+**Non-contradiction:** removes the forced-enforcement framing the §I round attacked; asserts no authority,
+so introduces no new anchor. Supersedes the earlier research-notes §H "forfeit/fixed" framing.
 
 ---
 

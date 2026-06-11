@@ -8,10 +8,17 @@
 
 ---
 
-## Title — FINAL (Lars, 2026-06-10)
+## Title — SUPERSEDED by the optional-convention reframe (2026-06-11); Lars to choose
 
-**"Enforcement Without an Operator — A Governance Transition for Autonomous-Agent Trust"**
-Subtitle line: *Empirical Evidence from a W3C VC + DID Trust Infrastructure.*
+> The 2026-06-10 title "Enforcement Without an Operator — A Governance Transition…" is **withdrawn**:
+> the reframe makes CEP an **optional, advisory trust convention**, so a title promising *enforcement*
+> over-claims. Three governance-/convention-centred options (Lars chooses); working compile title = #1:
+> 1. **"An Optional Trust Convention for Autonomous Agents — Recomputable Maturity Without a Central Authority"**
+> 2. **"Convention over Coercion — A Voluntary, Operator-Independent Trust Layer for Autonomous-Agent Authorization"**
+> 3. **"Advisory Trust Governance for Autonomous Agents — When Is a Network-Wide Convention Ready?"**
+> Subtitle line (kept): *Empirical Evidence from a W3C VC + DID Trust Infrastructure.*
+
+*(Withdrawn 2026-06-10 final: "Enforcement Without an Operator — A Governance Transition for Autonomous-Agent Trust.")*
 
 > Title describes the **contribution** (the designed CEP model), not today's status. The text holds
 > "designed, not activated / advisory" throughout — title and status-wording must not diverge.
