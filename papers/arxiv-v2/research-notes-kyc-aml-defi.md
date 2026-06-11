@@ -193,3 +193,175 @@ On-chain vote + timelock + often multisig guardian, but empirically concentrated
 `ref54_ethos` (arXiv:2412.17114, on-chain agent governance — differentiate) · `ref55_chaffer_kya`
 (SSRN 5162127, KYA identity governance) · `ref56_hulsse` (Hülsse 2008, AML blacklist lineage).
 *(ref38 Arbitrum, ref39 Fritsch-DAO, ref40 SybilGuard, ref41 BrightID already in references.bib.)*
+
+---
+
+## G. Adversarial multi-model eval — what the paper MUST preempt (2026-06-11)
+
+Panel: ai_review eu-compliance (GPT-5 + Gemini 3.1 Pro + Perplexity Sonar + Mistral) **+** a separate
+direct Fable-5 call. Two independent sources converged on the **same** deadliest point: *CEP does not
+remove the anchor, it relocates it to less-visible/less-accountable places, and FATF's consequence
+mechanism does not transfer to respawnable agents.* Source artifacts (gitignored, on server):
+`~/moltstack/reviews/20260611_135956_analogy-adversarial-eval_review.md` +
+`~/moltstack/reviews/20260611_fable5_analogy_adversarial.txt`.
+
+### 10-point must-preempt list (maps to the writing sections)
+
+**§2.x (the analogy):**
+1. **Identity scarcity is FATF's load-bearing assumption** — its consequence bites only on non-forkable
+   targets. Either argue (not assert) what replaces it for respawnable agents, **or** scope explicitly to
+   agents with costly persistent identity and own the loss of generality. ← central attack.
+2. **KYC is *mandated by* AML, not parallel to it** → repair the proportion or downgrade it to a heuristic.
+3. **Reconcile IMF −7.55% vs. Case-Ruchala & Nance null in the same paragraph** — state which the argument
+   relies on and what survives if the null is right.
+4. **Agents have no legal personhood** → frame KYA as proxy-for-a-principal, not agent-as-subject.
+
+**§5 (CEP framing):**
+5. **Name the four relocated anchors yourselves** — (i) genesis/amendment authority, (ii) Sybil-
+   qualification authority, (iii) adversary-writable reciprocal-Jaccard graph, (iv) data-availability
+   curation — and state for each: immutable (Tornado horn) or governed (DAO horn). Silence here = reject.
+6. **Adversarial-gaming analysis of the reciprocal-Jaccard independence criterion** under adversary-writable
+   interaction graphs (a public deterministic predicate is also a pre-verification oracle for attackers).
+7. **Determinism ≠ neutrality** — deterministic consequential exclusion without appeal is an Art.22-type
+   problem; add a human-review/appeal path or defend the determinism.
+
+**§8 (honest comparison):**
+8. **Title/abstract** — "Enforcement Without an Operator" / "operator-independent" as unqualified property
+   claims contradict the §8 approximation stance → put the "property-goal, not live status" qualifier in
+   sentence 1, not only §6.
+9. **"Closer to both horns"** is unfalsifiable (mature systems judged on runtime data vs. CEP on whiteboard)
+   → give a metric or downgrade to conjecture + label the maturity asymmetry.
+10. **Confront Van Loon against ourselves** — name the *functional* operator when activation misfires;
+    concede "operator-less" relocates liability to the artifact's authors.
+
+### EU-panel additions (beyond Fable-5, argument-relevant)
+- Unanimous: **"operator-less" = impermissible attribution under EU law** (AI Act Art.16, GDPR Art.4/26);
+  whoever sets N/K/X/Y is the legal operator / joint controller. GPT-5 turned the paper's own Tornado Cash
+  point against it.
+- **Art.22 GDPR**: deterministic network exclusion without human-in-the-loop = prohibited automated
+  decision → sharpens point 7 into an appeal-duty.
+- **No Rechtsfähigkeit**: KYA:KYC also breaks *at law* (agent = proxy, "Sybil-qualification" ≠ LoA identity).
+- Panel verdict: "GRUNDLEGEND ÜBERARBEITEN" — converges with Fable-5: paper currently occupies *neither* horn.
+
+### Fable-5 full critique (verbatim, stop_reason=end_turn)
+
+> **Q1 — The analogy fails at BOTH ends of the proportion, and the consequence mechanism does not transfer.**
+> *Attack 1:* KYC is not "local enforcement under one's own authority" — it is itself the product of the
+> network-governance regime. A bank performing KYC is executing FATF Recommendation 10 as transposed into
+> national law, under threat of license revocation/fines/criminal liability. KYC *is* AML's local
+> enforcement arm — the capillary end of the same coercive system, not its independent counterpart. So the
+> clean dichotomy (a)=autonomous local authority / (b)=network governance misdescribes the precedent: (a) is
+> *mandated by* (b). The proportion equates a voluntary local practice with a legally coerced one, and a
+> hoped-for consensus mechanism with a hegemonic one.
+> *Attack 2:* FATF's consequence is parasitic on properties agents lack — targets are states with a single
+> persistent non-forkable identity, enormous sunk costs, no exit, sovereign-priced reputation. The −7.55%-
+> of-GDP pain is exclusion applied to an entity that cannot leave the game. Agents: identity respawn ≈ free;
+> forking is the default failure response in the cited DeFi ecosystem; no reputation balance-sheet.
+> "Market/network exclusion" excludes a keypair — the cheapest thing in the system. The transfer takes a
+> mechanism whose entire force comes from identity scarcity into a domain defined by identity abundance.
+> The mechanism does not weaken in transfer; it evaporates.
+> *Attack 3:* The fence stipulates Case-Ruchala & Nance: the FATF consequence is a "rational myth" — null
+> even for states with maximal exit costs. If mythical for Pakistan, what is it for a stateless process that
+> re-instantiates in 200ms? The paper cannot cite the IMF figure for force and the null for honesty and keep
+> both.
+> *Attack 4:* "No central police" is false — every FATF member has actual police/prosecutors/prison. De-
+> risking happens because banks fear *their own regulator*. FATF is a coordination layer over coercion
+> monopolies; US dollar-clearing hegemony is the engine. CEP has no coercion substrate at all.
+>
+> **Q2 — CEP relocates the anchor to four less-visible, less-accountable places; one re-imports the SPOF.**
+> *Anchor 1 — Genesis/amendment authority:* someone deploys the predicate, defines Sybil-qualification, fixes
+> the 5-AND. Immutable → Tornado horn (ungovernable, can't patch a gamed Jaccard; Van Loon → liability to
+> deployers). Upgradeable → the upgrade key is the operator (DAO/multisig horn, Gini-0.99). No third
+> position. CEP time-shifts centralization from runtime (visible) to design-time (invisible, ossified).
+> *Attack 2 — Sybil-qualification is the new FATF Plenary:* whoever defines "Sybil-qualified" holds the
+> designation power, with less legitimacy and no mutual-evaluation. Either external attestation (re-imports a
+> centralized identity issuer → collapses (b) into (a)) or endogenous graph/stake (gamed by cheap identities/
+> rented stake).
+> *Attack 3 — the reciprocal-Jaccard graph is adversary-writable:* interactions cost ≈0; a single adversary
+> manufactures K disjoint low-overlap clusters by construction. Structural independence is the *easiest*
+> property for a Sybil to fabricate because the metric is public and deterministic — the attacker recomputes
+> and optimizes against it. "Anyone can recompute" is symmetric: any attacker can pre-verify their evasion.
+> *Attack 4 — DA is the Chainalysis oracle in a new hat:* "anyone recomputes from anchored data" presupposes
+> honest/complete submission, a live censorship-resistant anchor, detectable withholding. Who guarantees the
+> feed? List curation under one key was the paper's own diagnosed SPOF; CEP relocates it one layer down to
+> interaction-data curation, harder to see/audit.
+> *Attack 5 (EU lens):* "operator-less" is liability laundering the courts already reject — AI Act provider/
+> deployer, DORA, MiCA "fully decentralized", GDPR controllership post-Wirtschaftsakademie all trigger a
+> judicial search for the *functional* operator (parameter-setters, deployers, DA maintainer). Van Loon =
+> "no operator to stop" resolves as "prosecute the developers."
+>
+> **Q3 — where "approximation" quietly becomes "achievement."**
+> The **title is the confession**: "Enforcement Without an Operator" asserts the resolution of the very horn
+> the body disclaims. "operator-independent" claims independence as a *property*, but the design supports it
+> only as an *intent*, contingent on un-gamed Sybil-qualification, honest DA, unexercised amendment power —
+> each an operator-shaped dependency. "Closer to BOTH horns" is an unfalsifiable comparative (mature systems'
+> worst observed days vs. a paper design's best intended day). "Neutral, verifier-independent" exceeds the
+> stance — a 5-AND ramp with specific thresholds is a *policy*; determinism is policy frozen at genesis, not
+> neutrality (the exact Chainalysis critique, turned on the authors). The analogy itself is the largest
+> over-claim: "the AML of agents" borrows 30 years of institutional legitimacy CEP hasn't earned.
+>
+> **Q4 — the rejection sentence:** *"CEP's entire enforcement theory presupposes the one thing FATF's targets
+> have and autonomous agents constitutively lack — a scarce, persistent, costly-to-abandon identity whose
+> exclusion hurts — so the protocol inherits FATF's centralized-trigger problem in relocated form (Sybil-
+> qualification authority, data-availability curation, design-time parameter genesis) while discarding the
+> only mechanism that ever made FATF's distributed consequence bite; it thus occupies neither horn of its own
+> trade-off, and the title claims a property the paper's own §8 admits it does not have."*
+
+---
+
+## H. The stake resolution — our answer to the respawn problem (DESIGN, not built; 2026-06-11)
+
+> For the writing phase + the adversarial Task-3 test. This is a **designed** additive extension, NOT
+> retro-fitted into the anchored §17 — it belongs in the §17-followup (like (a)/(b) and the R0→R2 ladder).
+
+### The respawn problem (from §G)
+FATF's enforcement-by-consequence bites only on **non-forkable, costly-to-abandon identity** (states).
+Autonomous agents have **zero-cost identity respawn** → excluding a keypair is a mere latency event; the
+mechanism "evaporates" on transfer. This is the deadliest attack on the analogy and must be answered, not
+deflected.
+
+### Rejected answers (with reason)
+- **Human verification (option B):** contradicts independent A2A — 1:N agents per transaction, no human per
+  action. **Rejected.**
+- **Costly reputation over time:** the MolTrust TrustScore counts *correct transactions*, not elapsed time →
+  buildup can be fast → time is not a respawn lever. **Rejected.** *(Side-finding open: audit the TechSpec
+  score time-component to confirm there is no de-facto time gate.)*
+- **Enforcement proportional to stake-at-risk ("CEP within CEP"):** introduces a new evaluator anchor, too
+  complex. **Rejected.**
+
+### Chosen answer — Stake (economic scarcity)
+Two **separate** protective elements, different attack surfaces — do not conflate:
+- **TrustScore** = protection against *bad behaviour inside the system*. Graduated, market-driven: a low
+  score → others avoid the agent, no intervention needed.
+- **Stake** = protection against *identity flight (respawn)*. Bonded capital that is **forfeited on
+  exit/respawn** → a black sheep cannot restart from zero as a wolf in sheep's clothing without losing
+  capital.
+
+**Mechanics (each choice defends the "no operator" property):**
+- **FIXED** minimum stake for scope-(b) participation (amount later in the TechSpec). Fixed deliberately:
+  no management, no communication, no taxation surface.
+- **FORFEIT, not slashing** → no stake management, no adjudicator (no new anchor).
+- **BURNED** (burn address) → incentive-neutral; no beneficiary, no treasury → preserves "no operator".
+- **CHAIN-AGNOSTIC** as a *mechanism requirement*: bind capital + conditionally forfeit + no-one-custodies +
+  deterministically verifiable. **MolTrust does NOT custody.**
+- **Reference implementation on Base L2** (EVM, forfeit logic trivial, buildable today).
+- **BTC/Lightning explicitly NOT** (fact-based: no programmable forfeit-contract logic). Quantum risk hits
+  all chains equally → an argument *for* the chain-agnostic abstraction, not for any one chain.
+
+**Scope:** stake applies **only to scope (b) / network-wide high-trust participation.** Scope (a) stays
+**stake-free and open** → independent A2A at the base layer is preserved.
+
+### Honest limit (belongs in the paper)
+Stake does **not solve** respawn — it **prices** it: raises attack cost from zero to ≥ stake. Against a
+well-funded attacker (attack gain > stake) it is **no protection**. Consistent with "CEP = approximation,
+not 100%". It converts the binary "exclusion is free to escape" into a continuous "escape costs the stake",
+which is the most the operator-less constraint allows.
+
+### How it answers the §G attacks (preview for Task 3)
+- Directly addresses §G-1 (identity scarcity): stake **manufactures** the scarcity FATF gets from
+  statehood — economic, not identity-based.
+- Does NOT by itself dissolve §G-5 anchors (who sets the stake amount? = still a parameter-genesis question,
+  §G-5-i) — the burn+fixed+forfeit choices *narrow* but do not eliminate the genesis anchor. To be tested
+  adversarially in Task 3.
+- Status: **DESIGN only.** Reference build is a later step when scope (b) becomes real. Goes into the
+  §17-followup as an additive design extension, NOT into the anchored §17 v0.9.
