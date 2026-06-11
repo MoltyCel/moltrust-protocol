@@ -21,8 +21,14 @@
    (also portfolio **−2.9%**), "large and statistically significant" (abstract verbatim). Mechanism =
    **de-risking** — but framed as *a* mechanism (alongside a "market-enforcement/heuristic" channel),
    not *the* sole one. Components don't sum to the −7.6% headline (separate specs/samples).
-   ⚠️ imf.org PDF + SSRN 403'd: figures from the paper's abstract (RePEc/EconBiz) + multiple verbatim
-   secondary quotes, **not** from the results tables. To-do E1.
+   ✅ **E1 CLOSED — TABLE-LEVEL CONFIRMED** (Table 1, read via a third-party mirror of the official
+   print PDF after imf.org/SSRN 403'd): Total **−7.550\*\*\*** (SE 1.522, 95%CI [−10.53,−4.57]),
+   FDI **−3.034\*\*\***, Portfolio **−2.926\*\*\***, Other **−3.551\*\*\*** — all sig. at 1%, year+country
+   FE, robust SE clustered by country. **Method = double-selection lasso (NOT synthetic control — correct
+   the earlier note).** Sample = **89 EMDCs, quarterly 2000q1–2017q4**, event window k=3. Robustness:
+   k=4→−8.203, k=2→−5.789, k=1→−4.836; resampling (SMOTE/RU) −6.3…−7.5. Authors' caveat: greylist obs
+   ≈0.7% of sample; −7.6% ≈ GFC 25th-percentile decline. (A floating secondary −3.2/−3.3/−3.1 was WRONG
+   — it conflated Table 2 sub-components; disregard.) Mirror authoritative-but-not-imf.org.
 
 2. **FATF "rational myth" counter-finding — HOLDS `[P]` (abstract).**
    Case-Ruchala, D. & Nance, M. T. (2024), *The Limits of Enforcement in Global Financial Governance:
@@ -41,8 +47,10 @@
    Summit (APWG/IEEE), pp. 1–5. Single author, Center for Hemispheric Defense Studies, Washington DC.
    Thesis confirmed (apply the FATF intergovernmental/blacklisting model to Internet/cyber governance).
    Author confirmed via OpenAlex W2115379802 + author Academia.edu; it is a **conceptual/position paper**.
-   ⚠️ **DOI 10.1109/eCrime.2011.5978781 does NOT resolve via doi.org/CrossRef (404)** — cite the IEEE
-   Xplore arnumber/URL (ieeexplore.ieee.org/document/5978781) alongside the DOI. DBLP doesn't index it.
+   ✅ **E2 CLOSED — citation LOCKED.** DOI is **dead at the agency level** (404 at both doi.org AND
+   api.crossref.org; OpenAlex lists no DOI) — **do NOT cite the DOI as resolvable.** Locked citation:
+   *Newmeyer, Kevin. "The FATF as a Model for Internet Governance." In 2011 eCrime Researchers Summit,
+   pp. 1–5. APWG/IEEE, 2011.* Anchor URL = `https://ieeexplore.ieee.org/document/5978781`. DBLP doesn't index it.
 
 4. **FATF Plenary centralization + current lists — HOLDS `[P-arch]` (1 correction).**
    - Plenary = "**the decision-making body of the FATF. Its decisions are taken by consensus**" (Mandate
@@ -54,6 +62,13 @@
      (confirmed). ⚠️ fatf-gafi.org live 403'd → read via archive.org snapshots + a regulator's verbatim
      reproduction. 13 Feb 2026 is the most recent firmly-confirmed list (a possible June 2026 update not
      verifiable from a dated official source yet).
+   ✅ **E3 CLOSED.** Grey list = **22** enumerated (Algeria, Angola, Bolivia, Bulgaria, Cameroon, Côte
+   d'Ivoire, DR Congo, Haiti, Kenya, Kuwait\*, Lao PDR, Lebanon, Monaco, Namibia, Nepal, Papua New
+   Guinea\*, South Sudan, Syria, Venezuela, Vietnam, Virgin Islands UK, Yemen; \*=new), 13 Feb 2026
+   Mexico City Plenary (11–13 Feb). Plenary-centrality locked: ICRG Procedures (2022) "recommendations…
+   **put to Plenary for decision**" (`fatf-gafi.org/content/dam/fatf-gafi/methodology/Assessment-Follow-Up-ICRG-Procedures-2022.pdf…`).
+   **No June 2026 superseding list** confirmed; 13 Feb 2026 stands. Sources: financialcrime.lu (verbatim
+   FATF outcomes), Comsure (enumerated 22), Basel Institute. archive.org unreachable this run → regulator reproductions.
 
 ---
 
@@ -149,15 +164,21 @@ On-chain vote + timelock + often multisig guardian, but empirically concentrated
 
 ---
 
-## E. Open verification to-dos (before quoting in the paper)
+## E. Verification to-dos — ALL CLOSED (2026-06-11)
 
-- **E1.** IMF WP 2021/153 — pull the PDF in a browser to lock table-level figures/coefficients/sample
-  (abstract + secondary confirmed, results tables not directly read).
-- **E2.** Newmeyer 2011 — DOI doesn't resolve via doi.org; confirm IEEE Xplore page renders + final
-  page range (1–5) for the citation; keep author = Kevin Newmeyer (OpenAlex-confirmed).
-- **E3.** FATF lists — re-confirm against a June-2026 plenary update if one publishes before submission
-  (current firm date = 13 Feb 2026; grey list = 22).
-- **E4.** Prior-art "first" — manual SSRN/HeinOnline pass before any novelty-"first" wording.
+- **E1 ✅ CLOSED** — IMF table-level figures confirmed (Table 1: −7.550/−3.034/−2.926/−3.551, all 1% sig;
+  double-selection lasso; 89 EMDCs, 2000–2017). See A1. *(Optional: re-pull from imf.org canonical before
+  final submission to cite the official host rather than the mirror.)*
+- **E2 ✅ CLOSED** — Newmeyer citation locked; DOI dead at CrossRef → cite IEEE Xplore URL. See A3.
+- **E3 ✅ CLOSED** — grey list = 22 (13 Feb 2026), Plenary-centrality locked, no June-2026 supersede. See A4.
+- **E4 ✅ CLOSED (gap firmed)** — deeper pass (Google Scholar/arXiv/SSRN/ACM/IEEE) found NO work making the
+  AML/FATF-operator-less-enforcement-FOR-agents move. New adjacents to differentiate: **ETHOS, arXiv:2412.17114**
+  (on-chain registry/DAO/soulbound revocation — central/cryptographic, not reputational-consequence);
+  **Chaffer, "Know Your Agent…", SSRN 5162127** (identity governance); **Hülsse (2008)** on the AML blacklist
+  (FATF-mechanism lineage). The "KYA extends FATF Travel Rule to agents" line = **vendor/blog only**
+  (Captain Compliance/MetaComp), not peer-reviewed. **A bare "first" is NOT defensible** → use the agreed
+  "to our knowledge, no prior work…" wording with an explicit closest-prior-work paragraph (Yan 2024 / AgentCity
+  / KYA-identity / Newmeyer-Nance lineage).
 
 ---
 
@@ -168,5 +189,7 @@ On-chain vote + timelock + often multisig guardian, but empirically concentrated
 `ref46_eas` (Ethereum Attestation Service docs) · `ref47_chainalysis_oracle` (Chainalysis sanctions oracle) ·
 `ref48_yan_norms` (arXiv:2403.15128) · `ref49_quadri_kya` (arXiv:2605.25376) ·
 `ref50_grogan_agentfacts` (arXiv:2506.13794) · `ref51_fsb_cbr` (FSB correspondent-banking data) ·
-`ref52_fatf_mandate` (FATF Mandate/Plenary) · `ref53_nance_regime` (Crime Law Soc Change 2017).
+`ref52_fatf_mandate` (FATF Mandate/Plenary) · `ref53_nance_regime` (Crime Law Soc Change 2017) ·
+`ref54_ethos` (arXiv:2412.17114, on-chain agent governance — differentiate) · `ref55_chaffer_kya`
+(SSRN 5162127, KYA identity governance) · `ref56_hulsse` (Hülsse 2008, AML blacklist lineage).
 *(ref38 Arbitrum, ref39 Fritsch-DAO, ref40 SybilGuard, ref41 BrightID already in references.bib.)*
