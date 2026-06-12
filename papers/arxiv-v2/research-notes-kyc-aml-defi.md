@@ -365,3 +365,62 @@ which is the most the operator-less constraint allows.
   adversarially in Task 3.
 - Status: **DESIGN only.** Reference build is a later step when scope (b) becomes real. Goes into the
   §17-followup as an additive design extension, NOT into the anchored §17 v0.9.
+
+---
+
+## J. WHAT IS CEP FOR — adversarial use-case round (2026-06-12)
+
+Panel: ai_review `--mode technical` (GPT-5 + Gemini 3.1 Pro + Perplexity) **+** direct technical calls to
+**Mistral Large** and **Fable-5**. Five models, all technical (no compliance lens this round). Source
+artifacts (server, gitignored): `20260612_fable5_usecase.txt`, `20260612_mistral_usecase.txt`,
+`20260612_110358_usecase-adversarial-eval_review.md`.
+
+### Convergence — the one killer (UNANIMOUS across all 5)
+> **"CEP makes boundary-authority non-monopolisable / controls it" is technically FALSE.** CEP is an
+> external *advisory oracle*; the boundary-owner keeps the enforcement monopoly. The proof is the paper's
+> **own optionality axiom**: you cannot constrain an authority with an instrument it may unilaterally
+> disapply. The optional/advisory reframe (which saved the prior round) now **undermines** the "controls
+> authority" thesis. You can have *optional* OR *controls authority*, not both.
+
+### SURVIVE / FALL (use cases)
+| Use case | Verdict | Reason |
+|---|---|---|
+| **Consortium of co-equal, mutually-distrusting peers** (exogenous binding charter) | **SURVIVES — narrow, degraded** | Only mechanism-derived capability + real payer (the members): **mutual recomputable audit** of jointly-agreed admission rules. Headline "non-monopolisable authority" must be CUT → what survives = audit among already-bound co-equals. |
+| **Corporate single-operator** (platform house-rules) | **FALLS** | Relabeling; dominated by signed allowlist + transparency log; the CEP-specific multi-party component is the one the owner is incentivised to refuse. |
+| **State / authoritarian** | **FALLS** | Served only by *degenerating* to a signed blacklist (fake diversity, false DA) → technically inert + politically self-defeating for neutrality. |
+| **Enforcement-resistance (reverse)** | **FALLS** | Wishful symmetry: optional publication + honest-verifier DA + no remedy → no capability vs a non-cooperative excluder (the only one that matters); needs a TEE at the blocker. |
+| **Core open/closed dichotomy** | **FALLS** | Tautological as stated; breaks at Sybil-resistance, settlement rails, hub dominance (local boundary = de-facto universal at a hub). |
+
+### Sharpest rejection sentence (Fable-5)
+> *"By the paper's own optionality axiom, CEP can constrain a boundary-owner only with that owner's consent,
+> so its sole claimed contribution — non-monopolisable authority over the boundary — is logically
+> unattainable by design; every use case reduces to a signed allowlist the owner already had, a degenerate
+> blacklist that deletes the distinguishing assumptions, or a transparency promise extracted from exactly
+> the adversary it purports to expose."*
+
+False-positive to ignore: the panel rued "no formal spec / no W3C refs" — that critiques the thesis-summary
+eval doc, not the paper (which has §3 primitives + W3C refs + §5 mechanics).
+
+### Five points for Abstract/§1 sharpening (the WOFÜR that holds) — adopted by Lars 2026-06-12
+1. **Drop "controls / non-monopolisable authority"** → **"recomputable accountability over a
+   voluntarily-drawn boundary."** Auditability ≠ de-monopolisation; resolves the optional-vs-control tension.
+2. **Load-bearing setting = the consortium** (co-equal, mutually-distrusting peers under a shared charter):
+   mutual recomputable audit of jointly-agreed admission rules. Sharpen Abstract/§1 to THIS.
+3. **Drop enforcement-resistance as a technical claim** (no capability without a TEE at the blocker).
+4. **State/authoritarian**: not a "neutral instance" — degenerates to a blacklist + kills neutrality; drop or
+   own honestly as dual-use-but-degenerate.
+5. **Neutrality**: not "neutral mechanism" (properties vary by application). Frame as "recomputable
+   accountability is useful to anyone who distrusts a boundary-authority — strongest in the consortium,
+   redundant in the monopoly, empty in the authoritarian case." Lead lineage = trustless systems
+   (optimistic/ZK rollups, verifiable ML, SSI predicates: *a recomputable claim under mutual mistrust*),
+   NOT KYC/AML.
+
+### Two REMOVED sentences (Lars, premises refuted — 2026-06-12)
+- ~~"But verification is only half of trust."~~ — in a borderless agent world verification is the whole;
+  enforcement is not universally demanded.
+- ~~"…who is authorised to activate enforcement?"~~ — presupposes demanded enforcement that does not exist.
+
+### v1.9 continuity (Lars directive)
+Paper continues **arXiv:2605.06738** ("From Specification to Deployment", cs.CR); make the continuity visible
+in Abstract + §1, self-cite in References (`ref57_kroehl_v19`), supports the replacement path. Must still
+stand on its own.
