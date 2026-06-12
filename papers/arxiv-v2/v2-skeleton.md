@@ -8,7 +8,13 @@
 
 ---
 
-## Title — SUPERSEDED by the optional-convention reframe (2026-06-11); Lars to choose
+## Title — FINAL (Lars, 2026-06-12)
+
+**"Trust Without Trusting — A Recomputable Trust Protocol for Autonomous Agents"**
+Subtitle: *Empirical Evidence from a W3C VC + DID Trust Infrastructure.* CEP renamed **Combined Evidence
+Protocol** (acronym kept; E: Enforcement→Evidence) throughout the paper; anchored TechSpec §17 name unchanged.
+
+## (history) Title — SUPERSEDED by the optional-convention reframe (2026-06-11)
 
 > The 2026-06-10 title "Enforcement Without an Operator — A Governance Transition…" is **withdrawn**:
 > the reframe makes CEP an **optional, advisory trust convention**, so a title promising *enforcement*
