@@ -14,7 +14,13 @@
 % Material: TECH_SPEC §17.2.1 + ADR CEP-Governance + v1.9 §3.5 (promoted).
 % ---------------------------------------------------------------------
 
-Wherever a boundary is drawn, authority over it accrues to its drawer — the power to decide who is admitted and who is excluded — and that authority can be exercised opaquely. Section~\ref{sec:background} described the MolTrust layer as it runs today: it verifies an Agent Authorization Envelope (AAE), evaluates a proposed action against the envelope's MANDATE, CONSTRAINTS, and VALIDITY blocks, and emits a signed, anchorable verdict that any party recomputes; whether to act on it is the relying party's decision \cite{ref28_techspec}. An operator can already act on a verdict for its \emph{own} agent (Section~\ref{subsec:protocol-not-deployer}). The harder question is network-wide: how can the \emph{use} of boundary-authority be held to account by parties that distrust its holder? The aim is accountability that is itself trustworthy — evidence anyone can recompute — resting on recomputation rather than a new trusted party.
+Wherever a boundary is drawn, authority over it accrues to its drawer — the power to decide who is admitted and who is excluded — and that authority can be exercised opaquely. Section~\ref{sec:background} described the MolTrust layer as it runs today: it verifies an Agent Authorization Envelope (AAE), evaluates a proposed action against the envelope's MANDATE, CONSTRAINTS, and VALIDITY blocks, and emits a signed, anchorable verdict that any party recomputes; whether to act on it is the relying party's decision \cite{ref28_techspec}. An operator can already act on a verdict for its \emph{own} agent (Section~\ref{subsec:protocol-not-deployer}). The harder question is network-wide, and it is the question this paper sets out to answer:
+
+\begin{quote}
+\emph{How can the use of boundary-authority be held to account by parties that distrust its holder?}
+\end{quote}
+
+\noindent The aim is accountability that is itself trustworthy — evidence anyone can recompute — resting on recomputation rather than a new trusted party.
 
 This is what the Combined Evidence Protocol provides, and it provides it \emph{as evidence}: the protocol audits how authority is used, while the authority itself stays with whoever holds it (Section~\ref{sec:scope}). The rest of this section states why the natural ways to certify such evidence fail, and the oracle problem any conditions-based scheme must dissolve.
 
