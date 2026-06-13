@@ -1,21 +1,26 @@
 % snippet-recompute — §5.2, how any verifier recomputes the five-condition predicate.
 % \input-able bare lstlisting (the paper wraps it in a float with caption).
 % Pseudocode: fetch -> recompute 5 conditions -> AND -> result. Reusable as source.
+% weight(.) and sybil_clear(.) are fixed normatively (see caption) so every input is
+% read from the committed, anchored data.
 \begin{lstlisting}[basicstyle=\ttfamily\footnotesize,breaklines=true,frame=single,
                    framesep=4pt,xleftmargin=2pt,mathescape=true]
-# inputs: the anchored commitment, fixed thresholds (N, K, X, Y, T, T_min)
+# inputs: the anchored commitment + the fixed thresholds (N, K, X, Y, T, T_min);
+#   weight(.)   = governance trust-weight, fixed by the CEP-3 threshold spec (Sec. 5.6)
+#   sybil_clear = the registry's three-mechanism Sybil filter (Sec. 7.3)
 (merkle_root, data_uri, anchored_at) := read_anchor()      # any chain
-data := download(data_uri); assert merkle(data) == merkle_root
+data   := download(data_uri); assert merkle(data) == merkle_root
+vetoes := { v in data.vetoes : sybil_clear(v.by) }         # qualified public vetoes
 
 Q := { rp in data : rp.active and trust(rp) >= T_min and sybil_clear(rp) }
 clusters := connected_components( reciprocal_jaccard(Q, 0.8) )
 W := sum_{rp in Q} weight(rp)
 
-c1 := (now - anchored_at)                  >= T          # timelock / veto window
-c2 := |Q|                                  >= N          # Sybil-qualified RPs
-c3 := |clusters|                           >= K          # independent clusters
-c4 := max_{rp in Q} weight(rp) / W         <= X          # per-actor cap
-c5 := max_{cl in clusters} weight(cl) / W  <= Y          # per-cluster cap
+c1 := (now - anchored_at) >= T  and  vetoes == {}   # timelock elapsed AND no qualified veto
+c2 := |Q|                                  >= N     # Sybil-qualified relying parties
+c3 := |clusters|                           >= K     # independent clusters
+c4 := max_{rp in Q} weight(rp) / W         <= X     # per-actor cap
+c5 := max_{cl in clusters} weight(cl) / W  <= Y     # per-cluster cap
 
 return c1 and c2 and c3 and c4 and c5      # all five -> evidence holds
 \end{lstlisting}
