@@ -102,6 +102,13 @@
 
 \maketitle
 
+% MolTrust logo, top-left corner of the first page (figures/moltrust-logo.pdf, from the SVG source).
+\begin{tikzpicture}[remember picture, overlay]
+  \node[anchor=north west, inner sep=0pt]
+    at ([xshift=1.0cm, yshift=-0.85cm]current page.north west)
+    {\includegraphics[height=1.1cm]{figures/moltrust-logo}};
+\end{tikzpicture}
+
 \input{front-sections.tex}   % Abstract + §1 Introduction + §2 Related Work + §3 Background
 \input{spine-sections.tex}   % §4 Problem + §5 CEP + §6 Scope & Limits
 \input{back-sections.tex}    % §7 Deployment Evidence + §8 Discussion + §9 Conclusion
