@@ -1,0 +1,31 @@
+% fig-recompute-flow — §5.2, verification > production.
+% Any verifier fetches the committed (merkle_root, data_uri), recomputes the
+% five-condition predicate, and reaches the same result. No privileged measurer.
+% Standalone-buildable AND \input-able. Monochrome, sober. Reusable.
+\documentclass[border=4pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc}
+\begin{document}
+\begin{tikzpicture}[
+  dbox/.style={draw=black, thin, rounded corners=1pt, align=center, font=\small\sffamily,
+              fill=black!4, inner sep=5pt, text width=32mm},
+  vrf/.style={draw=black, thin, rounded corners=1pt, align=center, font=\small\sffamily,
+              fill=black!4, inner sep=4pt, text width=24mm, minimum height=8mm},
+  flow/.style={-{Latex[length=2mm]}, thin},
+  clab/.style={font=\footnotesize\sffamily, text=black!60},
+  node distance=7mm and 26mm
+]
+\node[dbox] (anchor) {committed data\\[1pt]$(\textsf{merkle\_root},\ \textsf{data\_uri})$\\[1pt]multi-chain anchor};
+\node[vrf, right=of anchor] (v2) {Verifier B};
+\node[vrf, above=of v2] (v1) {Verifier A};
+\node[vrf, below=of v2] (v3) {Verifier $\dots$};
+\node[dbox, right=of v2] (res) {same result\\[1pt]predicate holds / not};
+\foreach \v in {v1,v2,v3} \draw[flow] (anchor.east) -- (\v.west);
+\foreach \v in {v1,v2,v3} \draw[flow] (\v.east) -- (res.west);
+\node[clab, above] at ($(anchor)!0.5!(v1)$) {fetch};
+\node[clab, above] at ($(v1)!0.5!(res)$) {recompute};
+\node[font=\footnotesize\sffamily\itshape, text=black!60, below=8mm of res,
+      text width=44mm, align=center]
+     {anyone recomputes the five-condition predicate; no privileged measurer};
+\end{tikzpicture}
+\end{document}

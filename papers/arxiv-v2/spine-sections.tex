@@ -68,13 +68,33 @@ CEP combines five conditions about the relying-party population into a single pr
 
 The conjunction is the point — and the source of the name. Any single threshold — ``$N$ relying parties'' alone — is manipulable: an adversary mints identities until the count is met. \emph{Combining} all five means an adversary must simultaneously clear a Sybil filter, populate multiple independent clusters, and stay under both a per-actor and a per-cluster cap, while a timelock exposes the attempt to public veto. The conditions form a conjunction of gates that must all open, and the cost of opening them jointly is what makes the combined predicate strong evidence rather than a single gameable number.
 
+\begin{figure}[ht]
+\centering
+\input{figures/fig-cep-conditions.tex}
+\caption{The five conditions combined. Evidence holds only when all five gates open at once; any one missing yields no signal. The conjunction, not any single threshold, is the load-bearing element.}
+\label{fig:cep-conditions}
+\end{figure}
+
 \subsection{Honest-verifier data availability: dissolving the oracle}
 \label{subsec:hvda}
 
 The five conditions are facts about the relying-party population, and Section~\ref{subsec:oracle} warned that whoever measures those facts becomes an oracle. CEP removes the oracle rather than trusting it. The condition data is published to decentralised, permanent storage and anchored as a \texttt{(merkle\_root, data\_uri)} tuple across multiple chains; the evidence is then a \textbf{deterministic function that any party can recompute} from the published data \cite{ref28_techspec}. There is no privileged measuring party: a relying party, a skeptic, or a regulator can independently fetch the committed data, recompute the five-condition predicate, and arrive at the same answer.
 
+\begin{figure}[ht]
+\centering
+\input{figures/fig-recompute-flow.tex}
+\caption{Verification $>$ production. Any verifier fetches the committed $(\textsf{merkle\_root},\,\textsf{data\_uri})$, recomputes the five-condition predicate, and reaches the same result; there is no privileged measurer.}
+\label{fig:recompute-flow}
+\end{figure}
+
 We call this stance \emph{verification $>$ production}: the design lets anyone verify that the conditions were met rather than asking them to trust it, making the determination cheap to verify and impossible to monopolise. The lineage is the same security argument that underwrites optimistic rollups, where correctness rests not on trusting a producer but on the ability of any verifier to recompute and challenge a published claim \cite{ref38_arbitrum}.
 Multi-chain anchoring of the commitment tuple means the determination also survives the failure or censorship of any one chain, addressing the single-chain certifier of Section~\ref{sec:problem} at the data layer as well.
+
+\begin{figure}[ht]
+\input{snippets/snippet-recompute.tex}
+\caption{The recompute predicate. A verifier reads the anchored commitment, downloads and checks the committed data, rebuilds the qualified set and clusters, and evaluates the five conditions; their conjunction is the evidence.}
+\label{lst:recompute}
+\end{figure}
 
 \subsection{Keyed commitment and cryptographic erasure}
 \label{subsec:erasure}

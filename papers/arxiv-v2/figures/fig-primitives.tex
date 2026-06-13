@@ -1,0 +1,27 @@
+% fig-primitives — §3, the four primitives (DID -> VC -> IPR -> Trust Score).
+% Standalone-buildable AND \input-able into the paper (parent loads tikz+standalone).
+% Monochrome, sober. Reusable (website/slides/docs).
+\documentclass[border=4pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\begin{document}
+\begin{tikzpicture}[
+  pbox/.style={draw=black, thin, rounded corners=1pt, align=center, inner sep=5pt,
+              font=\small\sffamily, fill=black!4, minimum height=13mm, text width=23mm},
+  flow/.style={-{Latex[length=2mm]}, thin},
+  clab/.style={font=\footnotesize\sffamily, text=black!60},
+  node distance=13mm
+]
+\node[pbox] (did) {\textbf{DID}\\[1pt]identity};
+\node[pbox, right=of did] (vc)  {\textbf{Verifiable Credential}\\[1pt]authorization};
+\node[pbox, right=of vc]  (ipr) {\textbf{Interaction Proof Records}\\[1pt]behaviour};
+\node[pbox, right=of ipr] (ts)  {\textbf{Trust Score}\\[1pt]aggregate};
+\draw[flow] (did) -- (vc);
+\draw[flow] (vc)  -- (ipr);
+\draw[flow] (ipr) -- (ts);
+\node[clab, below=2mm of did] {who it is};
+\node[clab, below=2mm of vc]  {what it may do};
+\node[clab, below=2mm of ipr] {what it did};
+\node[clab, below=2mm of ts]  {how it scored};
+\end{tikzpicture}
+\end{document}

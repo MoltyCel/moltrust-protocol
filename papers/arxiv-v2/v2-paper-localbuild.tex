@@ -51,6 +51,11 @@
 % ---------- Figures & graphics ----------
 \usepackage{graphicx}
 \usepackage{float}
+% TikZ + standalone: figures live in figures/*.tex as standalone-buildable files,
+% \input here. Parent loads the union of all libraries the figures use.
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric,fit,calc,backgrounds}
+\usepackage{standalone}
 
 % ---------- Cross-references & links ----------
 \usepackage{xurl}

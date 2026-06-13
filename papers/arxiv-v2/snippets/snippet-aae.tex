@@ -1,0 +1,27 @@
+% snippet-aae — §3, a realistic Agent Authorization Envelope (MANDATE/CONSTRAINTS/VALIDITY).
+% \input-able bare lstlisting (the paper wraps it in a float with caption).
+% Reusable as source. Parent loads listings.
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize,breaklines=true,frame=single,
+                   framesep=4pt,xleftmargin=2pt,showstringspaces=false]
+{
+  "mandate": {
+    "purpose": "commerce",
+    "allow":  ["https://api.shop.example/v1/orders/*"],
+    "deny":   ["https://api.shop.example/v1/admin/*"],
+    "delegation": { "allowed": false }
+  },
+  "constraints": {
+    "max_transaction_value": { "amount": 250000, "currency": "USDC" },
+    "rate_limit":   "PT1H;max=20",
+    "allowed_hours": { "tz": "Europe/Zurich", "from": "08:00", "to": "20:00" },
+    "counterparty_min_trust": 60
+  },
+  "validity": {
+    "issuer":     "did:moltrust:bank-9f2a",
+    "holder":     "did:moltrust:agent-7c3a",
+    "not_before": "2026-06-01T00:00:00Z",
+    "not_after":  "2026-09-01T00:00:00Z",
+    "revocation": "https://api.moltrust.ch/revocation/aae/7c3a"
+  }
+}
+\end{lstlisting}

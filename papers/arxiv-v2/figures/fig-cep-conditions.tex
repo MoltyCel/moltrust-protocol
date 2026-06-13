@@ -1,0 +1,30 @@
+% fig-cep-conditions — §5.1, the five CEP conditions combined (AND).
+% The conjunction is the load-bearing element: all five gates open, or no signal.
+% Standalone-buildable AND \input-able. Monochrome, sober. Reusable.
+\documentclass[border=4pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\begin{document}
+\begin{tikzpicture}[
+  cond/.style={draw=black, thin, rounded corners=1pt, align=left, font=\small\sffamily,
+               fill=black!4, text width=50mm, minimum height=8mm, inner sep=4pt},
+  gate/.style={draw=black, thin, circle, font=\large, minimum size=13mm, fill=black!6},
+  obox/.style={draw=black, thin, rounded corners=1pt, align=center, font=\small\sffamily,
+              fill=black!4, text width=28mm, minimum height=11mm, inner sep=4pt},
+  flow/.style={-{Latex[length=2mm]}, thin},
+  node distance=3mm
+]
+\node[cond] (c1) {$T$\ \ minimum elapsed time (timelock + public veto)};
+\node[cond, below=of c1] (c2) {$N$\ \ Sybil-qualified relying parties};
+\node[cond, below=of c2] (c3) {$K$\ \ independent clusters};
+\node[cond, below=of c3] (c4) {$X$\ \ max per-actor voting weight};
+\node[cond, below=of c4] (c5) {$Y$\ \ max per-cluster share};
+\node[gate, right=24mm of c3] (and) {$\bigwedge$};
+\node[obox, right=15mm of and] (sig) {recomputable evidence};
+\foreach \c in {c1,c2,c3,c4,c5} \draw[flow] (\c.east) -- (and.west);
+\draw[flow] (and) -- (sig);
+\node[font=\footnotesize\sffamily\itshape, text=black!60, below=4mm of sig,
+      text width=34mm, align=center]
+     {all five hold $\Rightarrow$ evidence;\\ any one missing $\Rightarrow$ none};
+\end{tikzpicture}
+\end{document}
