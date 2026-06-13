@@ -1,30 +1,34 @@
 % fig-cep-conditions — §5.1, the five CEP conditions combined (AND).
-% The conjunction is the load-bearing element: all five gates open, or no signal.
-% Standalone-buildable AND \input-able. Monochrome, sober. Reusable.
+% Standalone-buildable AND \input-able. Uniform condition boxes, muted palette,
+% the AND-gate (the conjunction = the load-bearing element) accented.
 \documentclass[border=4pt]{standalone}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta}
+\input{colors.tex}
 \begin{document}
 \begin{tikzpicture}[
-  cond/.style={draw=black, thin, rounded corners=1pt, align=left, font=\small\sffamily,
-               fill=black!4, text width=50mm, minimum height=8mm, inner sep=4pt},
-  gate/.style={draw=black, thin, circle, font=\large, minimum size=13mm, fill=black!6},
-  obox/.style={draw=black, thin, rounded corners=1pt, align=center, font=\small\sffamily,
-              fill=black!4, text width=28mm, minimum height=11mm, inner sep=4pt},
-  flow/.style={-{Latex[length=2mm]}, thin},
-  node distance=3mm
+  cond/.style={draw=figline, line width=0.5pt, rounded corners=2pt, align=left,
+               text=figline, font=\small\sffamily, fill=figfill,
+               text width=52mm, minimum height=10mm, inner sep=4pt},
+  gate/.style={draw=figaccent, line width=0.7pt, circle, text=figaccent,
+               font=\Large, minimum size=14mm, fill=figaccentfill},
+  obox/.style={draw=figline, line width=0.5pt, rounded corners=2pt, align=center,
+               text=figline, font=\small\sffamily, fill=figfill,
+               text width=28mm, minimum height=14mm, inner sep=4pt},
+  flow/.style={-{Latex[length=2.2mm]}, draw=figline, line width=0.6pt},
+  node distance=3.5mm
 ]
 \node[cond] (c1) {$T$\ \ minimum elapsed time (timelock + public veto)};
 \node[cond, below=of c1] (c2) {$N$\ \ Sybil-qualified relying parties};
 \node[cond, below=of c2] (c3) {$K$\ \ independent clusters};
 \node[cond, below=of c3] (c4) {$X$\ \ max per-actor voting weight};
 \node[cond, below=of c4] (c5) {$Y$\ \ max per-cluster share};
-\node[gate, right=24mm of c3] (and) {$\bigwedge$};
-\node[obox, right=15mm of and] (sig) {recomputable evidence};
+\node[gate, right=30mm of c3] (and) {$\bigwedge$};
+\node[obox, right=16mm of and] (sig) {recomputable evidence};
 \foreach \c in {c1,c2,c3,c4,c5} \draw[flow] (\c.east) -- (and.west);
 \draw[flow] (and) -- (sig);
-\node[font=\footnotesize\sffamily\itshape, text=black!60, below=4mm of sig,
-      text width=34mm, align=center]
+\node[font=\footnotesize\sffamily\itshape, text=figmuted, below=5mm of sig,
+      text width=36mm, align=center]
      {all five hold $\Rightarrow$ evidence;\\ any one missing $\Rightarrow$ none};
 \end{tikzpicture}
 \end{document}
