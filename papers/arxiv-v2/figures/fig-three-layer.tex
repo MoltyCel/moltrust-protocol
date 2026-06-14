@@ -1,24 +1,23 @@
-% fig-three-layer — §3, the three-layer architecture as stacked layer boxes.
-% Standalone-buildable AND \input-able. Uniform boxes, muted palette,
-% accent number badges mark the layer hierarchy.
+% fig-three-layer — §3, the three-layer architecture as a real top-down stacked
+% layer model inside an enclosing frame (Layer 1 top -> Layer 3 bottom).
+% Standalone-buildable AND \input-able. Muted palette (figures/colors.tex).
 \documentclass[border=4pt]{standalone}
 \usepackage{tikz}
-\usetikzlibrary{positioning}
+\usetikzlibrary{positioning,fit}
 \input{colors.tex}
 \begin{document}
 \begin{tikzpicture}[
-  lyr/.style={draw=figline, line width=0.5pt, rounded corners=2pt, align=left,
-              text=figline, font=\small\sffamily, fill=figfill,
-              text width=96mm, minimum height=15mm, inner sep=6pt},
-  num/.style={draw=figaccent, line width=0.6pt, fill=figaccentfill, text=figaccent,
-              circle, font=\small\sffamily\bfseries, minimum size=8mm, inner sep=0pt},
-  node distance=2mm
+  lyr/.style={draw=figline, line width=0.4pt, align=left, text=figline, font=\small\sffamily,
+              fill=figfill, text width=88mm, minimum height=16mm, inner sep=6pt, anchor=north}
 ]
-\node[lyr] (l1) {\textbf{Cryptographic} \ Ed25519 over RFC~8785 canonical JSON: AAE boundaries tamper-evident, verifiable without infrastructure.};
-\node[lyr, below=of l1] (l2) {\textbf{API} \ Registry-level trust-score and revocation consequences; fail-closed on an unreachable revocation endpoint.};
-\node[lyr, below=of l2] (l3) {\textbf{Kernel} \ Falco eBPF detection below the agent's process boundary, recording violations the agent runtime cannot suppress.};
-\node[num, left=4mm of l1] (n1) {1};
-\node[num, left=4mm of l2] (n2) {2};
-\node[num, left=4mm of l3] (n3) {3};
+% three layers stacked top-to-bottom, sharing borders (a true stack)
+\node[lyr] (l1) at (0,0)
+  {\textbf{Layer 1 \ Cryptographic}\\[2pt]\footnotesize Ed25519 over RFC~8785 canonical JSON: AAE boundaries tamper-evident, verifiable without infrastructure.};
+\node[lyr, below=0pt of l1.south, anchor=north] (l2)
+  {\textbf{Layer 2 \ API}\\[2pt]\footnotesize Registry-level trust-score and revocation consequences; fail-closed on an unreachable revocation endpoint.};
+\node[lyr, below=0pt of l2.south, anchor=north] (l3)
+  {\textbf{Layer 3 \ Kernel}\\[2pt]\footnotesize Falco eBPF detection below the agent's process boundary, recording violations the agent runtime cannot suppress.};
+% enclosing architecture frame (accent)
+\node[draw=figaccent, line width=0.9pt, rounded corners=2pt, fit=(l1)(l2)(l3), inner sep=2.5pt] (frame) {};
 \end{tikzpicture}
 \end{document}

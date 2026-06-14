@@ -83,7 +83,7 @@ This section condenses the deployed system to just enough to ground the governan
 
 \textbf{Four primitives.} Each agent holds a W3C Decentralized Identifier \cite{ref6_w3cdid}, with ownership proven by an Ed25519 key; the reference method is \texttt{did:moltrust}, but any method supporting Ed25519/secp256k1 is conformant. Authorization is expressed as a W3C Verifiable Credential \cite{ref7_w3cvc} supporting attenuating delegation chains any verifier can traverse independently. Behaviour is recorded as Interaction Proof Records — dual-signed, Merkle-anchored on Base L2 — accumulating into a registry-computed Trust Score (Section~\ref{sec:evidence}). All three are expressed in open, portable formats, so evidence issued by one party is verifiable by any other.
 
-\begin{figure}[ht]
+\begin{figure}[tb]
 \centering
 \input{figures/fig-primitives.tex}
 \caption{The four primitives: a DID identifies the agent, a Verifiable Credential authorizes it, Interaction Proof Records record its behaviour, and the Trust Score aggregates that record.}
@@ -92,7 +92,7 @@ This section condenses the deployed system to just enough to ground the governan
 
 \textbf{The Agent Authorization Envelope (AAE).} The machine-evaluable authorization object carries three normative blocks: \textbf{MANDATE} (permitted purpose, allowed/denied action patterns, delegation rules), \textbf{CONSTRAINTS} (time windows, financial thresholds, jurisdictions, counterparty minimums, obligations), and \textbf{VALIDITY} (issuer, holder binding, mandatory expiry, revocation, optional anchor). Any conformant evaluator applies default-deny, deny-precedence, attenuation-only delegation, and mandatory expiry. The design reuses NIST SP~800-162 ABAC \cite{ref29_abac}, RFC~9396 \cite{ref30_rar}, RFC~8785 JCS \cite{ref31_jcs}, and Ed25519Signature2020 \cite{ref32_ed25519}.
 
-\begin{figure}[ht]
+\begin{figure}[tb]
 \input{snippets/snippet-aae.tex}
 \caption{A representative Agent Authorization Envelope. A commerce agent may place orders but is denied the admin path (deny takes precedence over allow); it is bounded by a per-transaction value, a rate limit, a time window, and a counterparty-trust floor, with mandatory expiry and a revocation endpoint.}
 \label{lst:aae}
@@ -100,7 +100,7 @@ This section condenses the deployed system to just enough to ground the governan
 
 \textbf{Three-layer architecture.} Authorization is checked at three layers: \emph{cryptographic} (Ed25519 + RFC~8785, tamper-evident by construction), \emph{API} (trust-score and revocation consequences, fail-closed on unreachable revocation), and \emph{kernel} (Falco eBPF detection below the agent's process boundary \cite{ref13_falcobridge}). In the reference deployment a DENY is produced as a signed, anchorable verdict that any party recomputes, and recorded; whether to act on the verdict is the relying party's decision \cite{ref28_techspec}. Operator-local blocking (scope (a), Section~\ref{subsec:protocol-not-deployer}) is available to a relying party in its own gateway; at the network scope the protocol produces recomputable evidence that operators opt into, rather than a chokepoint imposed on them.
 
-\begin{figure}[ht]
+\begin{figure}[tb]
 \centering
 \input{figures/fig-three-layer.tex}
 \caption{The three-layer architecture: each layer states what it checks and at which boundary, from cryptographic integrity through registry-level consequences to kernel-level detection.}
