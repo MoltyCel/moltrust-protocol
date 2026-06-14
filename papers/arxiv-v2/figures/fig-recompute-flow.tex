@@ -9,16 +9,16 @@
 \begin{tikzpicture}[
   dbox/.style={draw=figline, line width=0.5pt, rounded corners=2pt, align=center,
                text=figline, font=\small\sffamily, fill=figfill,
-               text width=32mm, minimum height=16mm, inner sep=4pt},
-  dacc/.style={dbox, draw=figaccent, fill=figaccentfill, text=figaccent},
+               text width=34mm, minimum height=16mm, inner sep=5pt},
+  dacc/.style={dbox, draw=figaccent, fill=figaccentfill, text=figaccent, text width=30mm},
   vrf/.style={draw=figline, line width=0.5pt, rounded corners=2pt, align=center,
               text=figline, font=\small\sffamily, fill=figfill,
-              text width=24mm, minimum height=10mm, inner sep=3pt},
+              text width=22mm, minimum height=10mm, inner sep=3pt},
   flow/.style={-{Latex[length=2.2mm]}, draw=figline, line width=0.6pt},
   clab/.style={font=\footnotesize\sffamily, text=figmuted},
-  node distance=9mm and 30mm
+  node distance=9mm and 26mm
 ]
-\node[dbox] (anchor) {committed data\\[1pt]$(\textsf{merkle\_root},\ \textsf{data\_uri})$\\[1pt]multi-chain anchor};
+\node[dbox] (anchor) {committed data\\[1pt]{\footnotesize $(\textsf{merkle\_root},\ \textsf{data\_uri})$}\\[1pt]multi-chain anchor};
 \node[vrf, right=of anchor] (v2) {Verifier B};
 \node[vrf, above=of v2] (v1) {Verifier A};
 \node[vrf, below=of v2] (v3) {Verifier $\dots$};
