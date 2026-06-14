@@ -16,17 +16,17 @@
               text width=24mm, minimum height=10mm, inner sep=3pt},
   flow/.style={-{Latex[length=2.2mm]}, draw=figline, line width=0.6pt},
   clab/.style={font=\footnotesize\sffamily, text=figmuted},
-  node distance=6mm and 28mm
+  node distance=9mm and 30mm
 ]
 \node[dbox] (anchor) {committed data\\[1pt]$(\textsf{merkle\_root},\ \textsf{data\_uri})$\\[1pt]multi-chain anchor};
 \node[vrf, right=of anchor] (v2) {Verifier B};
 \node[vrf, above=of v2] (v1) {Verifier A};
 \node[vrf, below=of v2] (v3) {Verifier $\dots$};
 \node[dacc, right=of v2] (res) {same result\\[1pt]predicate holds / not};
-\draw[flow] (anchor.east) -- node[clab, above, midway] {fetch} (v2.west);
-\draw[flow] (anchor.east) -- (v1.west);
-\draw[flow] (anchor.east) -- (v3.west);
-\draw[flow] (v2.east) -- node[clab, above, midway] {recompute} (res.west);
+\draw[flow] (anchor.east) -- node[clab, midway, fill=white, inner sep=1.5pt] {fetch} (v2.west);
+\draw[flow] (anchor.north east) -- (v1.west);
+\draw[flow] (anchor.south east) -- (v3.west);
+\draw[flow] (v2.east) -- node[clab, midway, fill=white, inner sep=1.5pt] {recompute} (res.west);
 \draw[flow] (v1.east) -- (res.west);
 \draw[flow] (v3.east) -- (res.west);
 \node[clab, font=\footnotesize\sffamily\itshape, below=7mm of res,

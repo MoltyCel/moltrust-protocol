@@ -100,11 +100,11 @@ This section condenses the deployed system to just enough to ground the governan
 
 \textbf{Three-layer architecture.} Authorization is checked at three layers: \emph{cryptographic} (Ed25519 + RFC~8785, tamper-evident by construction), \emph{API} (trust-score and revocation consequences, fail-closed on unreachable revocation), and \emph{kernel} (Falco eBPF detection below the agent's process boundary \cite{ref13_falcobridge}). In the reference deployment a DENY is produced as a signed, anchorable verdict that any party recomputes, and recorded; whether to act on the verdict is the relying party's decision \cite{ref28_techspec}. Operator-local blocking (scope (a), Section~\ref{subsec:protocol-not-deployer}) is available to a relying party in its own gateway; at the network scope the protocol produces recomputable evidence that operators opt into, rather than a chokepoint imposed on them.
 
-\begin{figure}[tb]
+\textbf{Decentralised evidence, centralised registry — for now.} The evidence layer is verifier-independent: any party with an issuer's key validates any signed artifact without a central service. The reference registry, however, is run by one organisation, and how an optional network-wide convention on that infrastructure makes the use of boundary-authority recomputably accountable — without that accountability resting on the single operating organisation — is the subject of the rest of the paper.
+
+\begin{figure}[b]
 \centering
 \input{figures/fig-three-layer.tex}
 \caption{The three-layer architecture: each layer states what it checks and at which boundary, from cryptographic integrity through registry-level consequences to kernel-level detection.}
 \label{fig:three-layer}
 \end{figure}
-
-\textbf{Decentralised evidence, centralised registry — for now.} The evidence layer is verifier-independent: any party with an issuer's key validates any signed artifact without a central service. The reference registry, however, is run by one organisation, and how an optional network-wide convention on that infrastructure makes the use of boundary-authority recomputably accountable — without that accountability resting on the single operating organisation — is the subject of the rest of the paper.
