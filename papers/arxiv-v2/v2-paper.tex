@@ -8,6 +8,7 @@
 % ============================================================================
 
 \documentclass[11pt,a4paper]{article}
+\pdfoutput=1  % arXiv: force pdflatex (submission embeds a PDF graphic, moltrust-logo.pdf)
 
 % ---------- Encoding & Fonts ----------
 \usepackage[utf8]{inputenc}
@@ -106,7 +107,12 @@
   \normalsize MolTrust / CryptoKRI GmbH, Zurich\\
   \normalsize \href{mailto:lars@moltrust.ch}{lars@moltrust.ch} $\cdot$ \href{https://moltrust.ch}{moltrust.ch}}
 
-\date{June 2026}
+% Publication date + title-page integrity anchor line (Form 2). MUST stay identical
+% to the distribution build (v2-paper-dist.tex) so the two artifacts do not diverge
+% on the title page. Own tag only — no hash/TX/block (those live in integrity.html).
+\date{14 June 2026\\[0.9em]
+{\footnotesize This preprint (PDF v2.0) is anchored on Base Layer~2 Mainnet under Tag \texttt{MolTrust/arXiv/v2.0}.\\
+Integrity record: \href{https://moltrust.ch/publications/integrity.html}{moltrust.ch/publications/integrity.html}}}
 
 \begin{document}
 
