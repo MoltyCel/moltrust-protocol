@@ -1,0 +1,65 @@
+% =====================================================================
+% arXiv v2 — BACK: §7 Deployment Evidence + §8 Discussion + §9 Conclusion
+% TONE PASS 2026-06-12 (Lars): POSITIVE; CEP = Combined Evidence Protocol;
+% no "advisory" -> "records and signs verdicts any party recomputes".
+% Conformance stays "4/5 + 1 open item". Conclusion confident, inviting.
+% (a)/(b) substance + mechanics + citations + labels unchanged.
+% =====================================================================
+
+% ---------------------------------------------------------------------
+\section{Deployment Evidence}
+\label{sec:evidence}
+% Material: v1.9 §4 + §6 re-weighted as SUPPORTING evidence (These-a).
+% ---------------------------------------------------------------------
+
+The governance design of Sections~\ref{sec:problem}–\ref{sec:scope} is worth posing only if the system it builds on is real. This section reports the deployment as supporting evidence — that the verification layer runs, at scale, with independently checkable conformance — not as the paper's central claim.
+
+\subsection{Live deployment, recomputable verdicts}
+
+The reference implementation is live at \texttt{api.moltrust.ch} and has operated since March 2026. Eight credential verticals are operational (Core Identity, Commerce, Travel, Skill Verification, Prediction Markets, Brand Protection, Music, Sports Integrity), exposed through MCP tooling and a published SDK. Agent registrations, credential issuances, and confirmed violations are anchored on Base L2; an ERC-8004 ecosystem scanner indexes 44{,}355 agents for cross-ecosystem visibility independent of MolTrust registration \cite{ref37_erc8004}. The three layers of Section~\ref{sec:background} are live: verdicts are signed, anchorable, and recomputable by any party, and acting on a verdict is the relying party's decision. The deployment is itself a relying party of the protocol it defines, the natural first site of operator-local (scope (a)) enforcement.
+
+\subsection{Scale and conformance}
+
+As of the reporting window the registry holds a modest population — on the order of dozens of agents and endorsements (Section~\ref{subsec:sybil}) — against an external benchmark of 69{,}000 bots on a single marketplace \cite{ref1_agentmarket}: the deployed system is real and the adversarial-scale validation is explicitly pending. Protocol conformance is documented in a published, SHA-256-anchored \texttt{CONFORMANCE.md} with Layer~A (protocol) and Layer~B (registry) requirements, auto-generated from source with drift detection, and a nine-check SKILL AUDIT mapped to CWE identifiers (cross-referencing NIST NVD and the Ferrag et al.\ taxonomy \cite{ref18_ferrag}). Independent verifiers can reproduce any check against the anchored specification using only a SHA-256 implementation and an HTTP client.
+
+Against the Agent Interoperability Profile (AIP/IBCT) feature set \cite{ref27_kroehlssrn}, the implementation satisfies \textbf{four of the five} features, with the fifth — expressive chained policy — tracked as an \textbf{open item}. The four implemented features hold against an independent verifier; the open item is expressive, multi-condition, context-dependent policy (Datalog/Biscuit/Cedar-class \cite{ref34_biscuit}). The current AAE constraint model uses URI-pattern matching, a deliberate lower bound on a single axis (Section~\ref{subsec:limits}): sufficient for the straightforward allow/deny boundaries of today's relying parties, and extended toward a full policy language as roadmap. We report this as ``4/5 + 1 open item'' and track the open item explicitly.
+
+\subsection{Sybil resistance and behavioural consistency}
+\label{subsec:sybil}
+
+The system's defence against identity fabrication is the same machinery the CEP cluster-diversity condition reuses (Section~\ref{subsec:clusters}), which is why we report it here. Three mechanisms compound. \textbf{Dual-signature Interaction Proofs} require two distinct Ed25519 keys, turning Sybil forgery from cheap identity fabrication into expensive key compromise. \textbf{Cross-vertical diversity gating} applies a hard penalty when a non-seed agent draws endorsements from fewer than three distinct verticals, forcing a Sybil operator to maintain credible presence across unrelated domains. \textbf{Principal-DID-linked violation persistence} carries an operator's negative history across agent re-registration, defeating identity rotation. Cluster detection uses the reciprocal-Jaccard coefficient over endorser sets with a 0.8 production threshold — the identical edge predicate CEP's cluster count is built on (Section~\ref{subsec:clusters}), so the diversity the combined evidence requires is computed from the same structural signal the registry already trusts for Sybil defence. The economic layer (per-verify pricing) compounds rather than stands alone. These thresholds are operational heuristics calibrated at bootstrap scale; their behaviour under adversarial load is an open empirical question (Section~\ref{subsec:limits}).
+
+% ---------------------------------------------------------------------
+\section{Discussion}
+\label{sec:discussion}
+% Material: v1.9 §5 (cross-protocol interop, FOLDED here) + §7.2/§7.3/§7.4 +
+% §17 open items. Positioning vs DAO/agent-ID/AIP; future work = §6.3.
+% ---------------------------------------------------------------------
+
+\subsection{Positioning against adjacent work}
+
+CEP's object — recomputable evidence of how authority over a voluntarily-drawn boundary is exercised — sets it apart from adjacent systems that either presuppose a central enforcer or coordinate nothing across organisations. Centralised architectures such as SAGA \cite{ref16_syros} obtain tight, formally analysed enforcement by trusting a Provider; CEP targets the case where no such Provider exists, offering recomputable evidence rather than per-domain enforcement. On-chain agent registries such as ERC-8004 \cite{ref37_erc8004} establish that an identity exists; CEP adds recomputable evidence of how a boundary around it was applied. DAO governance frameworks \cite{ref39_daogov} decentralise \emph{treasury and parameter} decisions but typically concentrate voting power; CEP's concentration caps and five-condition conjunction (Section~\ref{subsec:params}) are stricter than the norms those analyses report, and produce evidence rather than a sanction. Against the AIP/IBCT profile \cite{ref27_kroehlssrn}, our position is the one of Section~\ref{sec:evidence}: four features met, expressive chained policy an open item.
+
+\textbf{Cross-protocol interoperability} reinforces the positioning. A single Ed25519 + RFC~8785 signing operation produces artifacts verifiable by conformant implementations of independent protocols — verified against two external reference verifiers, one for authority-constraint evaluation and one for provider attestation — with reproducible test vectors. Interoperability here is by shared cryptographic primitive rather than bilateral specification agreement, which is what lets the verdict of Section~\ref{sec:background} be recomputed by independent parties absent any prior integration with MolTrust — a precondition for both operator-local (scope (a)) adoption and voluntary convergence on the convention through open coordination.
+
+\subsection{Limitations}
+\label{subsec:limits}
+
+The limitations are explicit and bound the claims. \textbf{Scale:} the registry operates at bootstrap scale with a short production history; the Sybil heuristics (Jaccard 0.8, three-vertical minimum, penalty multiplier) are calibrated, not formally optimal, and untested under adversarial load — formal sensitivity analysis is planned at larger N. \textbf{Expressiveness:} URI-pattern matching is a deliberate lower bound; expressive chained policy is the AIP open item. \textbf{Kernel layer:} Falco eBPF detection is defence-in-depth, not an isolation guarantee — privileged containers or a compromised host can evade it. \textbf{Network-wide evidence:} the combined evidence is designed and its parameters anchored; both gates (Section~\ref{subsec:params}) are met before it carries network-wide weight, and the open problems of Section~\ref{subsec:open} — treasury governance, the zero-knowledge phase, weak subjectivity for late joiners — are addressed elsewhere. Each of these bounds what the paper claims, and each is stated rather than hidden.
+
+\subsection{Future work}
+
+The near- and mid-term roadmap follows the open problems. On the governance track: build the Gate-2 prerequisites (a DID-bound relying-party registry with cluster attribution, an explicit \emph{convention-status} signal, multi-chain anchoring), then exercise the testnet ramp; specify the operator-signed override-record format that makes scope-(a) enforcement turn-key; and build the zero-knowledge verification phase and a weak-subjectivity reference point for late joiners. On the infrastructure track: adversarial-scale Sybil validation and trust-weight sensitivity analysis at larger N; expressive-policy support to close the AIP open item; and an independent third-party security audit. The governance items are the paper's centre of gravity; the infrastructure items keep the supporting evidence honest as it scales.
+
+% ---------------------------------------------------------------------
+\section{Conclusion}
+\label{sec:conclusion}
+% Material: v1.9 §8 reframed — recomputable evidence + deployed substrate +
+% operator-local-available-today + confident RFC/testnet invitation.
+% ---------------------------------------------------------------------
+
+Trust between autonomous agents can hold without trust in a central party. The operative question in an open agent economy concerns accountability rather than enforcement: whoever runs a closed space already enforces its boundaries; the open question is how the exercise of authority over a boundary is held to account by parties that distrust its holder. We answered with the Combined Evidence Protocol: five conditions about the relying-party population, combined into one predicate any party recomputes from anchored data, with keyed commitments reconciling permanence against the right to erasure, staged verification toward a zero-knowledge end-state, and cluster diversity proven from graph structure rather than declared categories. The design dissolves the oracle problem that conditions-based evidence usually reintroduces, and its concentration caps are stricter than the on-chain-governance norm. CEP makes the use of boundary-authority recomputably auditable; it leaves the authority with whoever holds it, and the transaction decision with the relying party.
+
+We separated two scopes and stated each plainly. \textbf{Operator-local} enforcement — a relying party gating its own agent against its own mandate — is available on the deployed system today and makes no claim over anyone else's agents. The \textbf{network-wide} scope is the recomputable evidence above: designed, its parameters anchored, demonstrable on testnet, and load-bearing in a consortium of co-equal, mutually distrusting peers who verify the admission rules they jointly agreed. The W3C VC + DID infrastructure — live since March 2026, anchored on Base L2 — is the evidence that the system is real, with conformance reported as four AIP features met and one open.
+
+The design is settled and the mechanism is demonstrable; what remains is to put it in front of the parties it serves. We invite the scrutiny recomputable evidence deserves: independent recomputation of the predicate, examination of the parameters, and — most valuable — relying parties willing to join the testnet ramp and exercise the mechanism. The companion RFC opens that process. The infrastructure regulators and industry have converged on is implementable now; an operator-independent way to recompute how a boundary was applied is ready to be tested.

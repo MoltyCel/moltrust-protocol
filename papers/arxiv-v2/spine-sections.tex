@@ -1,0 +1,188 @@
+% =====================================================================
+% arXiv v2 — SPINE: §4 problem, §5 CEP, §6 scope
+% TONE PASS 2026-06-12 (Lars): claim-first, POSITIVE. CEP = "Combined Evidence
+% Protocol" (acronym kept). No "advisory": the layer "records and signs
+% verdicts any party recomputes". The 5-AND combines five conditions into
+% RECOMPUTABLE EVIDENCE about the boundary. Honest limits KEPT, restated
+% positively (esp. §6.2). Substance/citations/labels/parameters unchanged.
+% Source: TECH_SPEC v0.9 §17, anchored Base L2 block 46,986,137 (ref28).
+% =====================================================================
+
+% ---------------------------------------------------------------------
+\section{The Boundary-Accountability Problem}
+\label{sec:problem}
+% Material: TECH_SPEC §17.2.1 + ADR CEP-Governance + v1.9 §3.5 (promoted).
+% ---------------------------------------------------------------------
+
+Wherever a boundary is drawn, authority over it accrues to its drawer — the power to decide who is admitted and who is excluded — and that authority can be exercised opaquely. Section~\ref{sec:background} described the MolTrust layer as it runs today: it verifies an Agent Authorization Envelope (AAE), evaluates a proposed action against the envelope's MANDATE, CONSTRAINTS, and VALIDITY blocks, and emits a signed, anchorable verdict that any party recomputes; whether to act on it is the relying party's decision \cite{ref28_techspec}. An operator can already act on a verdict for its \emph{own} agent (Section~\ref{subsec:protocol-not-deployer}). The harder question is network-wide, and it is the question this paper sets out to answer:
+
+\begin{quote}
+\emph{How can the use of boundary-authority be held to account by parties that distrust its holder?}
+\end{quote}
+
+\noindent The aim is accountability that is itself trustworthy — evidence anyone can recompute — resting on recomputation rather than a new trusted party.
+
+This is what the Combined Evidence Protocol provides, and it provides it \emph{as evidence}: the protocol audits how authority is used, while the authority itself stays with whoever holds it (Section~\ref{sec:scope}). The rest of this section states why the natural ways to certify such evidence fail, and the oracle problem any conditions-based scheme must dissolve.
+
+\subsection{Why the obvious certifiers fail}
+
+The party that certifies the evidence — that says, network-wide, ``these conditions about the relying-party population hold'' — must be one no one has to trust, and it must remain so over the infrastructure's intended lifetime, measured in years. Three intuitive certifiers each fail under that horizon \cite{ref28_techspec}:
+
+\begin{itemize}
+  \item \textbf{A person.} Binding the judgement to a founder or a named operator lasts only as long as that person: people leave, organisations are acquired, keys are lost or compelled. Evidence only one person can vouch for is mere testimony.
+  \item \textbf{A single chain.} Anchoring the judgement to one ledger inherits that ledger's mortality and politics: it can halt, censor, reorganise, or fork. A verification protocol meant to be neutral keeps its most consequential signal free of any single chain's governance.
+  \item \textbf{A single instance.} Vesting the judgement in one running deployment recreates a single point of failure of exactly the kind that motivated decentralised identity in the first place: the instance can be shut down, seized, or compromised, and with it the signal.
+\end{itemize}
+
+The design replaces all three with \textbf{objective, publicly recomputable conditions}: the evidence holds because a set of measurable facts about the relying-party population holds — a fact anyone can check — not because any party certified it.
+
+\subsection{The oracle problem}
+\label{subsec:oracle}
+
+Conditions-based evidence moves the difficulty rather than removing it. If the evidence reads ``enough independent relying parties have adopted the boundary,'' then \emph{someone} must measure adoption — count the relying parties, judge their independence, decide the threshold is met. Whoever holds that measurement becomes a new trusted party: an oracle. An oracle that can misreport the world produces or withholds the evidence at will, which reintroduces precisely the single point of authority the conditions were meant to eliminate.
+
+This is the pivot on which the paper turns. We name it the \textbf{oracle problem for recomputable evidence}: \emph{a conditions-based signal is only as trustworthy as the party that measures whether the conditions are met}. Recomputable accountability is worth little if a single measurer can decide what the data says — that party would be the central authority under a new name, and a scheme that leaves the problem unaddressed merely relabels its operator a ``measurement service.'' Section~\ref{sec:cep} sets out the Combined Evidence Protocol (CEP), whose central move (Section~\ref{subsec:hvda}) makes the measurement a deterministic function anyone can recompute, so that no party holds the oracle.
+
+% ---------------------------------------------------------------------
+\section{The Combined Evidence Protocol (CEP)}
+\label{sec:cep}
+% Core contribution. Material: TECH_SPEC v0.9 §17.2 (PRIMARY, anchored
+% block 46,986,137 = ref28_techspec) + ADR CEP-Governance + CEP-3
+% Threshold Spec. Summarise + reference; do NOT re-derive the design.
+% ---------------------------------------------------------------------
+
+CEP is the model for the recomputable evidence introduced in Section~\ref{sec:problem}. Its full design is fixed in the MolTrust \emph{CEP Governance} architecture decision record and the \emph{CEP-3 Threshold Specification}, and is published at roadmap level — with parameters and rationale — in \S17.2 of the Protocol Technical Specification v0.9, which is anchored on Base L2 as an immutable, independently citable record of the design as of its acceptance.\footnote{TECH\_SPEC v0.9 \S17, anchored at Base L2 block 46{,}986{,}137 under payload \texttt{MolTrust/TechSpec/0.9} (sha256:\texttt{462af65a\ldots}); see \cite{ref28_techspec}. The specification names the protocol ``Combined Enforcement Protocol''; we forward-develop it here as the \emph{Combined Evidence Protocol}, reflecting that its function is recomputable evidence rather than enforcement. We summarise the design here so the paper is self-contained, and treat the anchored specification, not this paper, as the authoritative source.} The purpose of this section is to make the mechanism legible, not to re-derive it: each subsection states what the mechanism does and why it answers a specific failure from Section~\ref{sec:problem}.
+
+\subsection{Five conditions, combined (AND)}
+\label{subsec:ramp}
+
+CEP combines five conditions about the relying-party population into a single predicate; the evidence holds only when all five hold \emph{simultaneously}, and acting on it stays the relying party's choice \cite{ref28_techspec}:
+
+\begin{enumerate}
+  \item a minimum elapsed time since the thresholds were fixed and anchored (a timelock and public-veto window);
+  \item a minimum number $N$ of Sybil-qualified relying parties;
+  \item distribution of those relying parties over a minimum number $K$ of independent clusters;
+  \item no single actor holding more than a share $X$ of the voting weight;
+  \item no single cluster holding more than a share $Y$ of the total.
+\end{enumerate}
+
+The conjunction is the point — and the source of the name. Any single threshold — ``$N$ relying parties'' alone — is manipulable: an adversary mints identities until the count is met. \emph{Combining} all five means an adversary must simultaneously clear a Sybil filter, populate multiple independent clusters, and stay under both a per-actor and a per-cluster cap, while a timelock exposes the attempt to public veto. The conditions form a conjunction of gates that must all open, and the cost of opening them jointly is what makes the combined predicate strong evidence rather than a single gameable number. The conjunction of all five — their logical AND — \emph{is} the CEP signal: the recomputable evidence holds only when all five conditions hold at once, and a single missing condition yields no signal.
+
+\begin{figure}[tb]
+\centering
+\input{figures/fig-cep-conditions.tex}
+\caption{The five conditions combined. Evidence holds only when all five gates open at once; any one missing yields no signal. The conjunction, not any single threshold, is the load-bearing element.}
+\label{fig:cep-conditions}
+\end{figure}
+
+\subsection{Honest-verifier data availability: dissolving the oracle}
+\label{subsec:hvda}
+
+The five conditions are facts about the relying-party population, and Section~\ref{subsec:oracle} warned that whoever measures those facts becomes an oracle. CEP removes the oracle rather than trusting it. The condition data is published to decentralised, permanent storage and anchored as a \texttt{(merkle\_root, data\_uri)} tuple across multiple chains; the evidence is then a \textbf{deterministic function that any party can recompute} from the published data \cite{ref28_techspec}. There is no privileged measuring party: a relying party, a skeptic, or a regulator can independently fetch the committed data, recompute the five-condition predicate, and arrive at the same answer.
+
+\begin{figure}[tb]
+\centering
+\input{figures/fig-recompute-flow.tex}
+\caption{Verification $>$ production. Any verifier fetches the committed $(\textsf{merkle\_root},\,\textsf{data\_uri})$, recomputes the five-condition predicate, and reaches the same result; there is no privileged measurer.}
+\label{fig:recompute-flow}
+\end{figure}
+
+We call this stance \emph{verification $>$ production}: the design lets anyone verify that the conditions were met rather than asking them to trust it, making the determination cheap to verify and impossible to monopolise. The lineage is the same security argument that underwrites optimistic rollups, where correctness rests not on trusting a producer but on the ability of any verifier to recompute and challenge a published claim \cite{ref38_arbitrum}.
+Multi-chain anchoring of the commitment tuple means the determination also survives the failure or censorship of any one chain, addressing the single-chain certifier of Section~\ref{sec:problem} at the data layer as well.
+
+\begin{figure}[tb]
+\input{snippets/snippet-recompute.tex}
+\caption{The recompute predicate. A verifier reads the anchored commitment, downloads and checks the committed data, rebuilds the qualified set and clusters, and evaluates the five conditions; their conjunction is the evidence. Here $\textsf{weight}(\cdot)$ is the governance trust-weight fixed by the CEP-3 threshold specification (Section~\ref{subsec:params}) and $\textsf{sybil\_clear}$ is the registry's Sybil filter (Section~\ref{subsec:sybil}); every input is read from the committed, anchored data, so the result is recomputable from public data rather than a registry judgement.}
+\label{lst:recompute}
+\end{figure}
+
+\subsection{Keyed commitment and cryptographic erasure}
+\label{subsec:erasure}
+
+Publishing condition data permanently collides with data-protection law: relying parties are identifiable entities, and the right to erasure (e.g.\ Art.~17 GDPR) is difficult to reconcile with an immutable anchor. CEP reconciles the two by anchoring only \textbf{keyed commitments} to relying-party identifiers, while the cleartext lives in the permissioned data layer. Erasure is performed by destroying the key (\textbf{cryptographic erasure}), after which the anchored commitment is non-attributable — the integrity proof remains, but it can no longer be tied to a person \cite{ref28_techspec}. Permanent verifiability and the right to be forgotten are thus held at once, rather than traded off.
+
+\subsection{Staged verification: permissioned ramp-up to zero-knowledge}
+\label{subsec:staged}
+
+The recomputability of Section~\ref{subsec:hvda} is introduced in two stages. A \textbf{permissioned ramp-up phase} comes first: verifiers are bound by data-processing agreements and recompute the predicate over the committed data under contract. A \textbf{target phase} then replaces that contractual trust with \textbf{zero-knowledge verification}, which proves the recomputation was performed correctly \emph{without disclosing} the underlying relying-party data \cite{ref28_techspec}. The staging is honest about status: the mechanism is exercised first under permissioned assumptions, and the privacy-preserving end-state is a later, separately built phase (Section~\ref{subsec:open}). The zero-knowledge component strengthens the \emph{verification} of the conditions; it is evidence machinery, not authority over agents.
+
+\subsection{Cluster diversity proven from structure}
+\label{subsec:clusters}
+
+Condition~3 — distribution over $K$ independent clusters — is the design's defence against an adversary who satisfies a headcount with sockpuppets. Independence is therefore computed from \textbf{structure}, not from \emph{declared} categories (a relying party asserting ``I am a different kind of organisation''), which an adversary controls for free. Clusters are derived from the relying-party endorsement graph by reciprocal-Jaccard analysis — the same construction the registry already runs over agent endorser sets for Sybil detection at the trust-scoring layer (Section~\ref{subsec:sybil}), here applied to the relying-party population. Two relying parties whose endorsement neighbourhoods overlap above a reciprocal threshold collapse into one cluster regardless of how they describe themselves, so diversity is earned in the endorsement graph rather than asserted in labels. Diversity is thus a property the public can recompute from the committed graph, consistent with Section~\ref{subsec:hvda}; grounding independence in graph structure rather than declared attributes follows the Sybil-resistance lineage of Section~\ref{subsec:lineages} \cite{ref40_sybilguard,ref41_brightid}.
+
+\subsection{Parameters and gates}
+\label{subsec:params}
+
+The thresholds differ by network. The testnet values exist to \emph{demonstrate} the mechanism end to end; the mainnet values are the production \emph{target}. The two sets serve distinct roles \cite{ref28_techspec}.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}llcc@{}}
+\toprule
+ & \textbf{Parameter} & \textbf{Testnet (demonstration)} & \textbf{Mainnet (target)} \\
+\midrule
+$N$ & Sybil-qualified relying parties & 11 & 101 \\
+$K$ & Independent clusters & 3 & 4 \\
+$Y$ & Max share per cluster & $\ge 34\%$ & $33\%$ \\
+$X$ & Max voting weight per actor & $10\%$ & $10\%$ \\
+$T$ & Timelock / public-veto window & 31 days & 31 days \\
+\bottomrule
+\end{tabular}
+\caption{CEP thresholds. Testnet values demonstrate the mechanism; mainnet values are the production target. Source: \S17.2.3 of the anchored Technical Specification \cite{ref28_techspec}.}
+\label{tab:cep-params}
+\end{table}
+
+The cluster count differs by design. Informally, by analogy with the byzantine-tolerance relation $N \ge 3f+1$, the mainnet $K = 4$ leaves headroom for one captured or faulty cluster ($f = 1$) whereas the testnet $K = 3$ corresponds to $f = 0$. We use this as a heuristic for sizing, not a hard fault-tolerance guarantee: structural independence in the endorsement graph is the design's proxy for fault-domain independence, and it is only as strong as that proxy. The invariant $Y \ge 1/K$ is preserved in both rows (testnet $K = 3 \Rightarrow Y \ge 34\% > 33.3\%$; mainnet $K = 4 \Rightarrow Y = 33\% \ge 25\%$), so both configurations are structurally satisfiable. These thresholds are also markedly stricter than the concentration limits typical of on-chain DAO governance, where a single actor or a small coalition can frequently meet a quorum \cite{ref39_daogov}.
+
+Two independent gates govern when the combined evidence carries weight, and both are met before it does \cite{ref28_techspec}:
+
+\begin{itemize}
+  \item \textbf{Gate-1 — thresholds fixed and anchored.} The parameters of Table~\ref{tab:cep-params} are written down and chain-agnostically anchored before the ramp-up begins. \emph{Status: the values are fixed (CEP-3 Threshold Specification); chain-agnostic anchoring is pending the multi-chain prerequisite.}
+  \item \textbf{Gate-2 — prerequisites built.} A relying-party registry with cryptographic (DID-bound) identity and cluster attribution; an explicit \emph{convention-status} signal in the authorization model; and multi-chain anchoring. \emph{Status: open.}
+\end{itemize}
+
+Until both gates are met, the layer records and signs verdicts that any party recomputes; the combined evidence carrying network-wide weight is a deliberate, separate step — not a side effect of publishing this paper or the specification it summarises.
+
+% ---------------------------------------------------------------------
+\section{Scope and Honest Limits}
+\label{sec:scope}
+% Material: TECH_SPEC §17.2.2 (scope position) + ADR CEP-Governance + v1.9 §7.
+% Negative-lists restated POSITIVELY; honest limits kept.
+% ---------------------------------------------------------------------
+
+A design that produces consequential evidence about how a network treats agents invites a fair question about responsibility and overreach. This section states the protocol's scope, the limits of what we claim, and the problems that remain open — before the deployment evidence of Section~\ref{sec:evidence}, so that the evidence is read against an honest boundary.
+
+\subsection{Operator-local enforcement, a network-wide accountability convention, and a protocol layer that is not a deployer}
+\label{subsec:protocol-not-deployer}
+
+A DENY verdict (Section~\ref{sec:background}) becomes a \emph{block} only when some party refuses the action it describes. \emph{Who} that party is, and under \emph{whose authority} it acts, separates two scopes this paper is careful to keep apart.
+
+\textbf{(a) Operator-local enforcement.} A relying party may run a fail-closed chokepoint in its \emph{own} gateway: it submits its own agent's proposed action to the evaluator and refuses the action on a signed DENY against its own AAE mandate, under its own authority and with its own override. This scope requires \textbf{no convention} — the operator is already the authorising party for its own agent, exactly as any deployer may bound its own software. In the reference implementation it is buildable today: the registry-side verdict service is deployed (signed, default-DENY verdicts scoped to a mandate and an agent identity), and what remains is the thin caller-side wiring in the operator's own gateway. The operator that gates its own agent also carries the corresponding duty of human oversight.
+
+\textbf{(b) A network-wide accountability convention.} The harder scope is the recomputable evidence of Section~\ref{sec:cep}: an \emph{optional} convention that participating operators voluntarily follow, by which anyone who relies on a boundary can independently verify that the owner applied its own published admission rules. Operators who follow it gain shared, recomputable evidence; others transact as they choose. CEP makes the \emph{use} of boundary-authority auditable while leaving the authority itself with whoever holds it — accountability, which complements control rather than claiming it.
+
+The verdict is identical in both scopes; they differ only in \textbf{who acts on it and under whose authority}. Scope (a) needs no convention; scope (b) is the voluntary network coordination layered above it. What the paper makes recomputable is the \emph{evidence} of how boundary-authority was exercised — a fact anyone can check — and it does so without taking authority over anyone's agent.
+
+This is why MolTrust is a \textbf{verification and evidence \emph{protocol} layer, not the deployer} of a high-risk AI system. The analogy is TLS and the public-key infrastructure: a certificate authority issues certificates and lets any party verify them, while each session and the systems that rely on them remain the relying parties' own to operate \cite{ref28_techspec}. Under both scopes the duty of \emph{human oversight} over a high-risk deployment — including under Art.~14 of the EU AI Act \cite{ref23_euaiact} — rests with the \textbf{relying party} that uses the protocol to gate its agents. The protocol provides oversight-\textbf{enabling} machinery: signed and independently recomputable verdicts, a default-DENY evaluation rule, an append-only audit trail, and a public-veto window during the ramp. It equips a relying party to discharge its duty, which remains the relying party's own to discharge.
+
+\subsection{Status, and what ``demonstrable'' means}
+\label{subsec:designed-not-activated}
+
+We are precise about status, and we state it as what the system does. In the reference deployment the layer records and signs verdicts that any party recomputes; operator-local blocking (scope (a) of Section~\ref{subsec:protocol-not-deployer}) is available to a relying party in its own gateway. The combined network-wide evidence is designed and its parameters anchored; the gates of Section~\ref{subsec:params} carry it to network-wide weight. The mechanism is \textbf{demonstrable on testnet}: the testnet parameters of Table~\ref{tab:cep-params} let the five-condition predicate, the recomputable evidence, and the cluster-diversity check run end to end over committed data, which establishes that the mechanism works. What runs is the five-condition \emph{computation}; the Gate-2 production prerequisites of Section~\ref{subsec:params} — a DID-bound relying-party registry with cluster attribution, and multi-chain anchoring — remain open.
+
+Three claims fix the standard precisely. The mechanism produces \textbf{recomputable evidence}, and the transaction decision rests with the relying party. The combined evidence is \textbf{designed and gated}, and the mechanism is demonstrable on testnet. And the property we claim is \textbf{verifiability}: the predicate is publicly recomputable and the mechanism demonstrable — a verifiability claim, which is what the design delivers. Where the deployment evidence in Section~\ref{sec:evidence} reports conformance, it holds to the same standard: four of the five AIP/IBCT features hold against an independent verifier, with expressive chained policy tracked as an open item.
+
+\subsection{Open problems}
+\label{subsec:open}
+
+Stating precisely what is unfinished is part of the contribution:
+
+\begin{itemize}
+  \item \textbf{Treasury governance.} CEP provides recomputable evidence about an \emph{optional} convention; decentralising the funding and management of the infrastructure is a separate problem, and the treasury remains a governance anchor addressed elsewhere.
+  \item \textbf{The zero-knowledge phase.} The privacy-preserving end-state of Section~\ref{subsec:staged} — proving recomputation without disclosing relying-party data — is designed; the demonstrable mechanism today runs under the permissioned, data-processing-agreement assumptions of the ramp-up phase.
+  \item \textbf{Weak subjectivity for late joiners.} A party joining long after the evidence first carries weight obtains a trustworthy recent reference point to verify the committed history, rather than recomputing from genesis; bounding and distributing that reference point is an open design question.
+\end{itemize}
+
+The contribution is a recomputable-evidence design with a demonstrable mechanism and a clearly bounded set of open problems.

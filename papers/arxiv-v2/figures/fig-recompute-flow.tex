@@ -1,0 +1,36 @@
+% fig-recompute-flow — §5.2, verification > production.
+% Standalone-buildable AND \input-able. Uniform verifier boxes, muted palette,
+% the result = accent. Any verifier fetches + recomputes -> same result.
+\documentclass[border=4pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\input{colors.tex}
+\begin{document}
+\begin{tikzpicture}[
+  dbox/.style={draw=figline, line width=0.5pt, rounded corners=2pt, align=center,
+               text=figline, font=\small\sffamily, fill=figfill,
+               text width=34mm, minimum height=16mm, inner sep=5pt},
+  dacc/.style={dbox, draw=figaccent, fill=figaccentfill, text=figaccent, text width=30mm},
+  vrf/.style={draw=figline, line width=0.5pt, rounded corners=2pt, align=center,
+              text=figline, font=\small\sffamily, fill=figfill,
+              text width=22mm, minimum height=10mm, inner sep=3pt},
+  flow/.style={-{Latex[length=2.2mm]}, draw=figline, line width=0.6pt},
+  clab/.style={font=\footnotesize\sffamily, text=figmuted},
+  node distance=9mm and 26mm
+]
+\node[dbox] (anchor) {committed data\\[1pt]{\footnotesize $(\textsf{merkle\_root},\ \textsf{data\_uri})$}\\[1pt]multi-chain anchor};
+\node[vrf, right=of anchor] (v2) {Verifier B};
+\node[vrf, above=of v2] (v1) {Verifier A};
+\node[vrf, below=of v2] (v3) {Verifier $\dots$};
+\node[dacc, right=of v2] (res) {same result\\[1pt]predicate holds / not};
+\draw[flow] (anchor.east) -- node[clab, midway, fill=white, inner sep=1.5pt] {fetch} (v2.west);
+\draw[flow] (anchor.north east) -- (v1.west);
+\draw[flow] (anchor.south east) -- (v3.west);
+\draw[flow] (v2.east) -- node[clab, midway, fill=white, inner sep=1.5pt] {recompute} (res.west);
+\draw[flow] (v1.east) -- (res.west);
+\draw[flow] (v3.east) -- (res.west);
+\node[clab, font=\footnotesize\sffamily\itshape, below=7mm of res,
+      text width=46mm, align=center]
+     {anyone recomputes the five-condition predicate; no privileged measurer};
+\end{tikzpicture}
+\end{document}

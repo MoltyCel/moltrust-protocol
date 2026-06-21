@@ -1,0 +1,1042 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{ref1_agentmarket}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=e35fb0b751f45a96bd9c240951c6c211}{%
+           family={{Agent.market}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{e35fb0b751f45a96bd9c240951c6c211}
+      \strng{fullhash}{e35fb0b751f45a96bd9c240951c6c211}
+      \strng{bibnamehash}{e35fb0b751f45a96bd9c240951c6c211}
+      \strng{authorbibnamehash}{e35fb0b751f45a96bd9c240951c6c211}
+      \strng{authornamehash}{e35fb0b751f45a96bd9c240951c6c211}
+      \strng{authorfullhash}{e35fb0b751f45a96bd9c240951c6c211}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{4}
+      \field{note}{As reported by the platform at launch across seven commercial categories}
+      \field{title}{Launch Statistics, April 2026: 69,000 Autonomous Bots, 165 Million Transactions, \$50 Million {USDC} Cumulative Volume}
+      \field{year}{2026}
+    \endentry
+    \entry{ref2_neville}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=829525e6925defa63b17f764821d82a4}{%
+           family={Neville},
+           familyi={N\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{829525e6925defa63b17f764821d82a4}
+      \strng{fullhash}{829525e6925defa63b17f764821d82a4}
+      \strng{bibnamehash}{829525e6925defa63b17f764821d82a4}
+      \strng{authorbibnamehash}{829525e6925defa63b17f764821d82a4}
+      \strng{authornamehash}{829525e6925defa63b17f764821d82a4}
+      \strng{authorfullhash}{829525e6925defa63b17f764821d82a4}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{a16z crypto}
+      \field{month}{1}
+      \field{title}{We'll Go from {KYC} to {KYA}}
+      \field{year}{2026}
+    \endentry
+    \entry{ref3_entrolabs}{report}{}
+      \name{author}{1}{}{%
+        {{hash=4461ae6979d6a057247ed9be3b0181db}{%
+           family={{Entro Labs}},
+           familyi={E\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {Entro Labs}%
+      }
+      \strng{namehash}{4461ae6979d6a057247ed9be3b0181db}
+      \strng{fullhash}{4461ae6979d6a057247ed9be3b0181db}
+      \strng{bibnamehash}{4461ae6979d6a057247ed9be3b0181db}
+      \strng{authorbibnamehash}{4461ae6979d6a057247ed9be3b0181db}
+      \strng{authornamehash}{4461ae6979d6a057247ed9be3b0181db}
+      \strng{authorfullhash}{4461ae6979d6a057247ed9be3b0181db}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{7}
+      \field{note}{Enterprise-environment telemetry, January--June 2025}
+      \field{title}{{NHI} and Secrets Risk Report --- {H1} 2025}
+      \field{type}{techreport}
+      \field{year}{2025}
+    \endentry
+    \entry{ref4_prince}{online}{}
+      \name{author}{1}{}{%
+        {{hash=20c867ae4620909a817bcb53ba01be11}{%
+           family={Prince},
+           familyi={P\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{20c867ae4620909a817bcb53ba01be11}
+      \strng{fullhash}{20c867ae4620909a817bcb53ba01be11}
+      \strng{bibnamehash}{20c867ae4620909a817bcb53ba01be11}
+      \strng{authorbibnamehash}{20c867ae4620909a817bcb53ba01be11}
+      \strng{authornamehash}{20c867ae4620909a817bcb53ba01be11}
+      \strng{authorfullhash}{20c867ae4620909a817bcb53ba01be11}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Cloudflare Blog}
+      \field{month}{7}
+      \field{title}{Content Independence Day}
+      \field{year}{2025}
+    \endentry
+    \entry{ref5_cloudflare}{report}{}
+      \name{author}{1}{}{%
+        {{hash=1d212a7f3bda1d4cb8714d06bc601ab6}{%
+           family={{Cloudflare, Inc.}},
+           familyi={C\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {Cloudflare}%
+      }
+      \strng{namehash}{1d212a7f3bda1d4cb8714d06bc601ab6}
+      \strng{fullhash}{1d212a7f3bda1d4cb8714d06bc601ab6}
+      \strng{bibnamehash}{1d212a7f3bda1d4cb8714d06bc601ab6}
+      \strng{authorbibnamehash}{1d212a7f3bda1d4cb8714d06bc601ab6}
+      \strng{authornamehash}{1d212a7f3bda1d4cb8714d06bc601ab6}
+      \strng{authorfullhash}{1d212a7f3bda1d4cb8714d06bc601ab6}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{12}
+      \field{title}{The 2025 Cloudflare Radar Year in Review}
+      \field{type}{techreport}
+      \field{year}{2025}
+    \endentry
+    \entry{ref6_w3cdid}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=446a1ae6601a5c59360c7d591c3992da}{%
+           family={{W3C}},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{fullhash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{bibnamehash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{authorbibnamehash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{authornamehash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{authorfullhash}{446a1ae6601a5c59360c7d591c3992da}
+      \field{extraname}{1}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{W3C Recommendation}
+      \field{title}{Decentralized Identifiers ({DIDs}) v1.0}
+      \verb{urlraw}
+      \verb https://www.w3.org/TR/did-core/
+      \endverb
+      \verb{url}
+      \verb https://www.w3.org/TR/did-core/
+      \endverb
+    \endentry
+    \entry{ref7_w3cvc}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=446a1ae6601a5c59360c7d591c3992da}{%
+           family={{W3C}},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{fullhash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{bibnamehash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{authorbibnamehash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{authornamehash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{authorfullhash}{446a1ae6601a5c59360c7d591c3992da}
+      \field{extraname}{2}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Verifiable Credentials Data Model v2.0}
+      \verb{urlraw}
+      \verb https://www.w3.org/TR/vc-data-model-2.0/
+      \endverb
+      \verb{url}
+      \verb https://www.w3.org/TR/vc-data-model-2.0/
+      \endverb
+    \endentry
+    \entry{ref8_imda}{report}{}
+      \name{author}{1}{}{%
+        {{hash=dbdf8ea120ba1e2fc5caacefbfc046e8}{%
+           family={{Infocomm Media Development Authority, Singapore}},
+           familyi={I\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {IMDA Singapore}%
+      }
+      \strng{namehash}{dbdf8ea120ba1e2fc5caacefbfc046e8}
+      \strng{fullhash}{dbdf8ea120ba1e2fc5caacefbfc046e8}
+      \strng{bibnamehash}{dbdf8ea120ba1e2fc5caacefbfc046e8}
+      \strng{authorbibnamehash}{dbdf8ea120ba1e2fc5caacefbfc046e8}
+      \strng{authornamehash}{dbdf8ea120ba1e2fc5caacefbfc046e8}
+      \strng{authorfullhash}{dbdf8ea120ba1e2fc5caacefbfc046e8}
+      \field{extraname}{1}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{1}
+      \field{note}{Published at World Economic Forum 2026, Davos}
+      \field{title}{Model {AI} Governance Framework for Agentic {AI}}
+      \field{type}{techreport}
+      \field{version}{1.0}
+      \field{year}{2026}
+    \endentry
+    \entry{ref9_nistcaisi}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=bb4470d228a0903a8531f48a680ae19a}{%
+           family={{National Institute of Standards and Technology, Center for AI Standards and Innovation}},
+           familyi={N\bibinitperiod}}}%
+      }
+      \strng{namehash}{bb4470d228a0903a8531f48a680ae19a}
+      \strng{fullhash}{bb4470d228a0903a8531f48a680ae19a}
+      \strng{bibnamehash}{bb4470d228a0903a8531f48a680ae19a}
+      \strng{authorbibnamehash}{bb4470d228a0903a8531f48a680ae19a}
+      \strng{authornamehash}{bb4470d228a0903a8531f48a680ae19a}
+      \strng{authorfullhash}{bb4470d228a0903a8531f48a680ae19a}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{2}
+      \field{title}{{AI} Agent Standards Initiative}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://www.nist.gov/caisi/ai-agent-standards-initiative
+      \endverb
+      \verb{url}
+      \verb https://www.nist.gov/caisi/ai-agent-standards-initiative
+      \endverb
+    \endentry
+    \entry{ref10_nccoe}{report}{}
+      \name{author}{1}{}{%
+        {{hash=8a5bcd07f504c087237ff3447ea4dacb}{%
+           family={{NIST National Cybersecurity Center of Excellence}},
+           familyi={N\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {NIST NCCoE}%
+      }
+      \strng{namehash}{8a5bcd07f504c087237ff3447ea4dacb}
+      \strng{fullhash}{8a5bcd07f504c087237ff3447ea4dacb}
+      \strng{bibnamehash}{8a5bcd07f504c087237ff3447ea4dacb}
+      \strng{authorbibnamehash}{8a5bcd07f504c087237ff3447ea4dacb}
+      \strng{authornamehash}{8a5bcd07f504c087237ff3447ea4dacb}
+      \strng{authorfullhash}{8a5bcd07f504c087237ff3447ea4dacb}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{2}
+      \field{title}{Accelerating the Adoption of Software and {AI} Agent Identity and Authorization}
+      \field{type}{Concept Paper}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://www.nccoe.nist.gov/projects/software-and-ai-agent-identity-and-authorization
+      \endverb
+      \verb{url}
+      \verb https://www.nccoe.nist.gov/projects/software-and-ai-agent-identity-and-authorization
+      \endverb
+    \endentry
+    \entry{ref11_anthropic}{report}{}
+      \name{author}{1}{}{%
+        {{hash=f431db65cea024a5f19eab835afefee2}{%
+           family={{Anthropic}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {Anthropic}%
+      }
+      \strng{namehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{fullhash}{f431db65cea024a5f19eab835afefee2}
+      \strng{bibnamehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authorbibnamehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authornamehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authorfullhash}{f431db65cea024a5f19eab835afefee2}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{4}
+      \field{title}{Trustworthy Agents in Practice}
+      \field{type}{techreport}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://www.anthropic.com/research/trustworthy-agents
+      \endverb
+      \verb{url}
+      \verb https://www.anthropic.com/research/trustworthy-agents
+      \endverb
+    \endentry
+    \entry{ref12_google}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=8b36e9207c24c76e6719268e49201d94}{%
+           family={{Google}},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{8b36e9207c24c76e6719268e49201d94}
+      \strng{fullhash}{8b36e9207c24c76e6719268e49201d94}
+      \strng{bibnamehash}{8b36e9207c24c76e6719268e49201d94}
+      \strng{authorbibnamehash}{8b36e9207c24c76e6719268e49201d94}
+      \strng{authornamehash}{8b36e9207c24c76e6719268e49201d94}
+      \strng{authorfullhash}{8b36e9207c24c76e6719268e49201d94}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Secure {AI} Framework ({SAIF}) 2.0 with Agent Risk Map}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://saif.google/
+      \endverb
+      \verb{url}
+      \verb https://saif.google/
+      \endverb
+    \endentry
+    \entry{ref13_falcobridge}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=e3c523e7561a2b1dcfed6396336bdf7a}{%
+           family={{HaraldeRoessler}},
+           familyi={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{e3c523e7561a2b1dcfed6396336bdf7a}
+      \strng{fullhash}{e3c523e7561a2b1dcfed6396336bdf7a}
+      \strng{bibnamehash}{e3c523e7561a2b1dcfed6396336bdf7a}
+      \strng{authorbibnamehash}{e3c523e7561a2b1dcfed6396336bdf7a}
+      \strng{authornamehash}{e3c523e7561a2b1dcfed6396336bdf7a}
+      \strng{authorfullhash}{e3c523e7561a2b1dcfed6396336bdf7a}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{moltrust-falco-bridge: Reference Implementation of Layer 3 Kernel Enforcement}
+      \verb{urlraw}
+      \verb https://github.com/HaraldeRoessler/moltrust-falco-bridge
+      \endverb
+      \verb{url}
+      \verb https://github.com/HaraldeRoessler/moltrust-falco-bridge
+      \endverb
+    \endentry
+    \entry{ref14_schroederdewitt}{article}{}
+      \name{author}{1}{}{%
+        {{hash=c802c91721d5200c6e478c98c8626d67}{%
+           family={Schroeder\bibnamedelimb de\bibnamedelima Witt},
+           familyi={S\bibinitperiod\bibinitdelim d\bibinitperiod\bibinitdelim W\bibinitperiod},
+           given={C.},
+           giveni={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{c802c91721d5200c6e478c98c8626d67}
+      \strng{fullhash}{c802c91721d5200c6e478c98c8626d67}
+      \strng{bibnamehash}{c802c91721d5200c6e478c98c8626d67}
+      \strng{authorbibnamehash}{c802c91721d5200c6e478c98c8626d67}
+      \strng{authornamehash}{c802c91721d5200c6e478c98c8626d67}
+      \strng{authorfullhash}{c802c91721d5200c6e478c98c8626d67}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2505.02077}
+      \field{note}{University of Oxford, Department of Engineering Science}
+      \field{title}{Open Challenges in Multi-Agent Security: Towards Secure Systems of Interacting {AI} Agents}
+      \field{year}{2025}
+    \endentry
+    \entry{ref15_hurong}{article}{}
+      \name{author}{2}{}{%
+        {{hash=d6220c75419ea8eff9ff219f819e0020}{%
+           family={Hu},
+           familyi={H\bibinitperiod},
+           given={B.},
+           giveni={B\bibinitperiod}}}%
+        {{hash=fa79ed1c179243589c99a25b91c7e32b}{%
+           family={Rong},
+           familyi={R\bibinitperiod},
+           given={H.},
+           giveni={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{3304c0daa597c2ab7fbd366c95f3c893}
+      \strng{fullhash}{3304c0daa597c2ab7fbd366c95f3c893}
+      \strng{bibnamehash}{3304c0daa597c2ab7fbd366c95f3c893}
+      \strng{authorbibnamehash}{3304c0daa597c2ab7fbd366c95f3c893}
+      \strng{authornamehash}{3304c0daa597c2ab7fbd366c95f3c893}
+      \strng{authorfullhash}{3304c0daa597c2ab7fbd366c95f3c893}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2511.03434}
+      \field{note}{Submitted to AAAI 2026 TrustAgent Workshop. University of Oxford / NYU Shanghai}
+      \field{title}{Inter-Agent Trust Models: A Comparative Study of Brief, Claim, Proof, Stake, Reputation and Constraint in Agentic Web Protocol Design --- {A2A}, {AP2}, {ERC-8004}, and Beyond}
+      \field{year}{2025}
+    \endentry
+    \entry{ref16_syros}{article}{}
+      \name{author}{5}{}{%
+        {{hash=675183d3e8a91d8284ca52ea5bc8af88}{%
+           family={Syros},
+           familyi={S\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod}}}%
+        {{hash=b3ae34a75e829a355cb1e24262ade3a8}{%
+           family={Suri},
+           familyi={S\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+        {{hash=0cd7bb62a2d2e164d7d1bb909e59da5b}{%
+           family={Ginesin},
+           familyi={G\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod}}}%
+        {{hash=e350ada69b54bfebff045ce28db91f2d}{%
+           family={Nita-Rotaru},
+           familyi={N\bibinithyphendelim R\bibinitperiod},
+           given={C.},
+           giveni={C\bibinitperiod}}}%
+        {{hash=e54f0da2e8aa141c36401cfd0c95a8af}{%
+           family={Oprea},
+           familyi={O\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{cf4327d4f8f6b7ae3ba8bd74d462c343}
+      \strng{fullhash}{f4a5463ac54bfd1548f97a377296f057}
+      \strng{bibnamehash}{f4a5463ac54bfd1548f97a377296f057}
+      \strng{authorbibnamehash}{f4a5463ac54bfd1548f97a377296f057}
+      \strng{authornamehash}{cf4327d4f8f6b7ae3ba8bd74d462c343}
+      \strng{authorfullhash}{f4a5463ac54bfd1548f97a377296f057}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2504.21034}
+      \field{note}{Accepted at NDSS 2026. Northeastern University, Khoury College of Computer Sciences}
+      \field{title}{{SAGA}: A Security Architecture for Governing {AI} Agentic Systems}
+      \field{year}{2025}
+    \endentry
+    \entry{ref17_acharya}{article}{}
+      \name{author}{1}{}{%
+        {{hash=222b090ebe4b196d0c23889b7bb9cc4a}{%
+           family={Acharya},
+           familyi={A\bibinitperiod},
+           given={V.},
+           giveni={V\bibinitperiod}}}%
+      }
+      \strng{namehash}{222b090ebe4b196d0c23889b7bb9cc4a}
+      \strng{fullhash}{222b090ebe4b196d0c23889b7bb9cc4a}
+      \strng{bibnamehash}{222b090ebe4b196d0c23889b7bb9cc4a}
+      \strng{authorbibnamehash}{222b090ebe4b196d0c23889b7bb9cc4a}
+      \strng{authornamehash}{222b090ebe4b196d0c23889b7bb9cc4a}
+      \strng{authorfullhash}{222b090ebe4b196d0c23889b7bb9cc4a}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2511.15712}
+      \field{title}{Secure Autonomous Agent Payments: Verifying Authenticity and Intent in a Trustless Environment}
+      \field{year}{2025}
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2511.15712
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2511.15712
+      \endverb
+    \endentry
+    \entry{ref18_ferrag}{article}{}
+      \name{author}{6}{}{%
+        {{hash=a7704934970fdedcbb5de571db35c3ae}{%
+           family={Ferrag},
+           familyi={F\bibinitperiod},
+           given={M.\bibnamedelimi A.},
+           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=74eded779ccf7dfcbfbf38144a46e973}{%
+           family={Tihanyi},
+           familyi={T\bibinitperiod},
+           given={N.},
+           giveni={N\bibinitperiod}}}%
+        {{hash=72eb7845dd3c691e31834ad5bd3c81fa}{%
+           family={Hamouda},
+           familyi={H\bibinitperiod},
+           given={D.},
+           giveni={D\bibinitperiod}}}%
+        {{hash=41c491230766cfff3c7dd89b28ca339a}{%
+           family={Maglaras},
+           familyi={M\bibinitperiod},
+           given={L.},
+           giveni={L\bibinitperiod}}}%
+        {{hash=f71fa1cce77b44492dcb09d5004b3ebe}{%
+           family={Lakas},
+           familyi={L\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+        {{hash=f84fe98f185344082c6296d943514431}{%
+           family={Debbah},
+           familyi={D\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{57b8dc4d23d50be8b76cc25a7b3b38d7}
+      \strng{fullhash}{c1d3023f30d0a4eec5d4555b2948cee5}
+      \strng{bibnamehash}{c1d3023f30d0a4eec5d4555b2948cee5}
+      \strng{authorbibnamehash}{c1d3023f30d0a4eec5d4555b2948cee5}
+      \strng{authornamehash}{57b8dc4d23d50be8b76cc25a7b3b38d7}
+      \strng{authorfullhash}{c1d3023f30d0a4eec5d4555b2948cee5}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{ICT Express}
+      \field{note}{In press. arXiv:2506.23260}
+      \field{title}{From Prompt Injections to Protocol Exploits: Threats in {LLM}-Powered {AI} Agents Workflows}
+      \field{year}{2026}
+      \verb{doi}
+      \verb 10.1016/j.icte.2025.12.001
+      \endverb
+    \endentry
+    \entry{ref19_owasp}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=24b95a7fdad5a850196cd87546dcc70b}{%
+           family={{OWASP}},
+           familyi={O\bibinitperiod}}}%
+      }
+      \strng{namehash}{24b95a7fdad5a850196cd87546dcc70b}
+      \strng{fullhash}{24b95a7fdad5a850196cd87546dcc70b}
+      \strng{bibnamehash}{24b95a7fdad5a850196cd87546dcc70b}
+      \strng{authorbibnamehash}{24b95a7fdad5a850196cd87546dcc70b}
+      \strng{authornamehash}{24b95a7fdad5a850196cd87546dcc70b}
+      \strng{authorfullhash}{24b95a7fdad5a850196cd87546dcc70b}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{LLM} Top 10 and Associated Runtime Integrity Layers Discussion (Issue \#802)}
+      \field{year}{2026}
+    \endentry
+    \entry{ref20_mao}{article}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{hash=a9bef990b295213c3572572d046906f9}{%
+           family={Mao},
+           familyi={M\bibinitperiod},
+           given={Y.},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \strng{namehash}{e59543a4e8f24a7c591a907f33d67849}
+      \strng{fullhash}{e59543a4e8f24a7c591a907f33d67849}
+      \strng{bibnamehash}{e59543a4e8f24a7c591a907f33d67849}
+      \strng{authorbibnamehash}{e59543a4e8f24a7c591a907f33d67849}
+      \strng{authornamehash}{e59543a4e8f24a7c591a907f33d67849}
+      \strng{authorfullhash}{e59543a4e8f24a7c591a907f33d67849}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2604.15367}
+      \field{title}{Systematization of Knowledge on {AI} Agent Security}
+      \field{year}{2026}
+    \endentry
+    \entry{ref21_imdafull}{report}{}
+      \name{author}{1}{}{%
+        {{hash=dbdf8ea120ba1e2fc5caacefbfc046e8}{%
+           family={{Infocomm Media Development Authority, Singapore}},
+           familyi={I\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {IMDA Singapore}%
+      }
+      \strng{namehash}{dbdf8ea120ba1e2fc5caacefbfc046e8}
+      \strng{fullhash}{dbdf8ea120ba1e2fc5caacefbfc046e8}
+      \strng{bibnamehash}{dbdf8ea120ba1e2fc5caacefbfc046e8}
+      \strng{authorbibnamehash}{dbdf8ea120ba1e2fc5caacefbfc046e8}
+      \strng{authornamehash}{dbdf8ea120ba1e2fc5caacefbfc046e8}
+      \strng{authorfullhash}{dbdf8ea120ba1e2fc5caacefbfc046e8}
+      \field{extraname}{2}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Model {AI} Governance Framework for Agentic {AI} (Full {PDF})}
+      \field{type}{techreport}
+      \verb{urlraw}
+      \verb https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf
+      \endverb
+      \verb{url}
+      \verb https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf
+      \endverb
+    \endentry
+    \entry{ref22_cosais}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=f3d690f02c1513c3c173ba0e0caadacb}{%
+           family={{NIST COSAiS project}},
+           familyi={N\bibinitperiod}}}%
+      }
+      \strng{namehash}{f3d690f02c1513c3c173ba0e0caadacb}
+      \strng{fullhash}{f3d690f02c1513c3c173ba0e0caadacb}
+      \strng{bibnamehash}{f3d690f02c1513c3c173ba0e0caadacb}
+      \strng{authorbibnamehash}{f3d690f02c1513c3c173ba0e0caadacb}
+      \strng{authornamehash}{f3d690f02c1513c3c173ba0e0caadacb}
+      \strng{authorfullhash}{f3d690f02c1513c3c173ba0e0caadacb}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Announced August 2025; draft deliverables expected 2026}
+      \field{title}{Control Overlays for Securing {AI} Systems --- {SP} 800-53 Overlays for {AI} Deployment Categories}
+      \field{year}{2025}
+    \endentry
+    \entry{ref23_euaiact}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=158562a5e9dc942912330c711ca123ca}{%
+           family={{European Union}},
+           familyi={E\bibinitperiod}}}%
+      }
+      \strng{namehash}{158562a5e9dc942912330c711ca123ca}
+      \strng{fullhash}{158562a5e9dc942912330c711ca123ca}
+      \strng{bibnamehash}{158562a5e9dc942912330c711ca123ca}
+      \strng{authorbibnamehash}{158562a5e9dc942912330c711ca123ca}
+      \strng{authornamehash}{158562a5e9dc942912330c711ca123ca}
+      \strng{authorfullhash}{158562a5e9dc942912330c711ca123ca}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Enforcement begins August 2026}
+      \field{title}{Regulation ({EU}) 2024/1689 on Artificial Intelligence ({AI} Act)}
+      \field{year}{2024}
+    \endentry
+    \entry{ref24_cosai}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=bf443291349a54c8a315e82af173be77}{%
+           family={{Coalition for Secure AI (CoSAI)}},
+           familyi={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{bf443291349a54c8a315e82af173be77}
+      \strng{fullhash}{bf443291349a54c8a315e82af173be77}
+      \strng{bibnamehash}{bf443291349a54c8a315e82af173be77}
+      \strng{authorbibnamehash}{bf443291349a54c8a315e82af173be77}
+      \strng{authornamehash}{bf443291349a54c8a315e82af173be77}
+      \strng{authorfullhash}{bf443291349a54c8a315e82af173be77}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Founding Members Include Anthropic, Cisco, Google, {IBM}, Intel, {Nvidia}, {PayPal}}
+      \verb{urlraw}
+      \verb https://www.coalitionforsecureai.org/
+      \endverb
+      \verb{url}
+      \verb https://www.coalitionforsecureai.org/
+      \endverb
+    \endentry
+    \entry{ref25_entra}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=140864078aeca1c7c35b4beb33c53c34}{%
+           family={{Microsoft}},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{fullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{bibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorbibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authornamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorfullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Introduced at Microsoft Ignite 2025; preview available from November 2025}
+      \field{title}{Microsoft Entra Agent {ID}}
+      \field{year}{2025}
+      \verb{urlraw}
+      \verb https://learn.microsoft.com/en-us/entra/agent-id/
+      \endverb
+      \verb{url}
+      \verb https://learn.microsoft.com/en-us/entra/agent-id/
+      \endverb
+    \endentry
+    \entry{ref26_motwani}{inproceedings}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{hash=904b8a2c5501de2fc9b1e3bd389c0e78}{%
+           family={Motwani},
+           familyi={M\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{d6acdf52c3706b1fdcf0f1a7a8e976cb}
+      \strng{fullhash}{d6acdf52c3706b1fdcf0f1a7a8e976cb}
+      \strng{bibnamehash}{d6acdf52c3706b1fdcf0f1a7a8e976cb}
+      \strng{authorbibnamehash}{d6acdf52c3706b1fdcf0f1a7a8e976cb}
+      \strng{authornamehash}{d6acdf52c3706b1fdcf0f1a7a8e976cb}
+      \strng{authorfullhash}{d6acdf52c3706b1fdcf0f1a7a8e976cb}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{NeurIPS 2024}
+      \field{title}{Secret Collusion among {AI} Agents: Multi-Agent Deception via Steganography}
+      \field{year}{2024}
+    \endentry
+    \entry{ref27_kroehlssrn}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=0f2b79addf2338e069a15ebbd071e5ac}{%
+           family={Kroehl},
+           familyi={K\bibinitperiod},
+           given={L.},
+           giveni={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{0f2b79addf2338e069a15ebbd071e5ac}
+      \strng{fullhash}{0f2b79addf2338e069a15ebbd071e5ac}
+      \strng{bibnamehash}{0f2b79addf2338e069a15ebbd071e5ac}
+      \strng{authorbibnamehash}{0f2b79addf2338e069a15ebbd071e5ac}
+      \strng{authornamehash}{0f2b79addf2338e069a15ebbd071e5ac}
+      \strng{authorfullhash}{0f2b79addf2338e069a15ebbd071e5ac}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Preprint. SSRN Abstract ID 6568061}
+      \field{title}{{MolTrust}: {AIP} Conformance Analysis}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6568061
+      \endverb
+      \verb{url}
+      \verb https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6568061
+      \endverb
+    \endentry
+    \entry{ref28_techspec}{report}{}
+      \name{author}{1}{}{%
+        {{hash=c0356096dd4b34463344549777b09789}{%
+           family={{MolTrust / CryptoKRI GmbH}},
+           familyi={M\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {MolTrust / CryptoKRI GmbH}%
+      }
+      \strng{namehash}{c0356096dd4b34463344549777b09789}
+      \strng{fullhash}{c0356096dd4b34463344549777b09789}
+      \strng{bibnamehash}{c0356096dd4b34463344549777b09789}
+      \strng{authorbibnamehash}{c0356096dd4b34463344549777b09789}
+      \strng{authornamehash}{c0356096dd4b34463344549777b09789}
+      \strng{authorfullhash}{c0356096dd4b34463344549777b09789}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{4}
+      \field{note}{Anchored on Base L2 at Block 44745864}
+      \field{title}{{MolTrust} Protocol Technical Specification v0.8}
+      \field{type}{techreport}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://moltrust.ch/techspec
+      \endverb
+      \verb{url}
+      \verb https://moltrust.ch/techspec
+      \endverb
+    \endentry
+    \entry{ref29_abac}{report}{}
+      \name{author}{1}{}{%
+        {{hash=a44b6b00e5eebd7494e1fd00658685e2}{%
+           family={{NIST}},
+           familyi={N\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {NIST}%
+      }
+      \strng{namehash}{a44b6b00e5eebd7494e1fd00658685e2}
+      \strng{fullhash}{a44b6b00e5eebd7494e1fd00658685e2}
+      \strng{bibnamehash}{a44b6b00e5eebd7494e1fd00658685e2}
+      \strng{authorbibnamehash}{a44b6b00e5eebd7494e1fd00658685e2}
+      \strng{authornamehash}{a44b6b00e5eebd7494e1fd00658685e2}
+      \strng{authorfullhash}{a44b6b00e5eebd7494e1fd00658685e2}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{SP} 800-162: Guide to Attribute Based Access Control ({ABAC}) Definition and Considerations}
+      \field{type}{techreport}
+      \verb{urlraw}
+      \verb https://csrc.nist.gov/pubs/sp/800/162/final
+      \endverb
+      \verb{url}
+      \verb https://csrc.nist.gov/pubs/sp/800/162/final
+      \endverb
+    \endentry
+    \entry{ref30_rar}{misc}{}
+      \name{author}{3}{}{%
+        {{hash=ec7958bfd29d85e176d6038302ce62f4}{%
+           family={Lodderstedt},
+           familyi={L\bibinitperiod},
+           given={T.},
+           giveni={T\bibinitperiod}}}%
+        {{hash=d383d7ad9a8756dd1d859f5ecb08e239}{%
+           family={Richer},
+           familyi={R\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod}}}%
+        {{hash=7186d1868d3f045c9620cda709fbac9f}{%
+           family={Campbell},
+           familyi={C\bibinitperiod},
+           given={B.},
+           giveni={B\bibinitperiod}}}%
+      }
+      \strng{namehash}{a2e3b33ec448cf183e798b0d3e5664d0}
+      \strng{fullhash}{a2e3b33ec448cf183e798b0d3e5664d0}
+      \strng{bibnamehash}{a2e3b33ec448cf183e798b0d3e5664d0}
+      \strng{authorbibnamehash}{a2e3b33ec448cf183e798b0d3e5664d0}
+      \strng{authornamehash}{a2e3b33ec448cf183e798b0d3e5664d0}
+      \strng{authorfullhash}{a2e3b33ec448cf183e798b0d3e5664d0}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{RFC} 9396: {OAuth} 2.0 Rich Authorization Requests}
+      \verb{urlraw}
+      \verb https://www.rfc-editor.org/rfc/rfc9396
+      \endverb
+      \verb{url}
+      \verb https://www.rfc-editor.org/rfc/rfc9396
+      \endverb
+    \endentry
+    \entry{ref31_jcs}{misc}{}
+      \name{author}{3}{}{%
+        {{hash=3f6a73142f932892ab64b269400bc7da}{%
+           family={Rundgren},
+           familyi={R\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+        {{hash=f70f3b6380842e93f4cd95f8d445d2cd}{%
+           family={Jordan},
+           familyi={J\bibinitperiod},
+           given={B.},
+           giveni={B\bibinitperiod}}}%
+        {{hash=b69fbd7a2dc433b527c3f9e89a9c6157}{%
+           family={Erdtman},
+           familyi={E\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{61b19f0a434c0ffb1a1993f0a2b0b072}
+      \strng{fullhash}{61b19f0a434c0ffb1a1993f0a2b0b072}
+      \strng{bibnamehash}{61b19f0a434c0ffb1a1993f0a2b0b072}
+      \strng{authorbibnamehash}{61b19f0a434c0ffb1a1993f0a2b0b072}
+      \strng{authornamehash}{61b19f0a434c0ffb1a1993f0a2b0b072}
+      \strng{authorfullhash}{61b19f0a434c0ffb1a1993f0a2b0b072}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{RFC} 8785: {JSON} Canonicalization Scheme ({JCS})}
+      \verb{urlraw}
+      \verb https://www.rfc-editor.org/rfc/rfc8785
+      \endverb
+      \verb{url}
+      \verb https://www.rfc-editor.org/rfc/rfc8785
+      \endverb
+    \endentry
+    \entry{ref32_ed25519}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=3d903e5321431c99206b7d95bdc61b91}{%
+           family={{W3C Credentials Community Group}},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{3d903e5321431c99206b7d95bdc61b91}
+      \strng{fullhash}{3d903e5321431c99206b7d95bdc61b91}
+      \strng{bibnamehash}{3d903e5321431c99206b7d95bdc61b91}
+      \strng{authorbibnamehash}{3d903e5321431c99206b7d95bdc61b91}
+      \strng{authornamehash}{3d903e5321431c99206b7d95bdc61b91}
+      \strng{authorfullhash}{3d903e5321431c99206b7d95bdc61b91}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{Ed25519Signature2020}}
+      \verb{urlraw}
+      \verb https://w3c-ccg.github.io/di-eddsa-2020/
+      \endverb
+      \verb{url}
+      \verb https://w3c-ccg.github.io/di-eddsa-2020/
+      \endverb
+    \endentry
+    \entry{ref33_schnabl}{article}{}
+      \name{author}{4}{}{%
+        {{hash=ab6ca07b656e590ce89de499dae5c45c}{%
+           family={Schnabl},
+           familyi={S\bibinitperiod},
+           given={C.},
+           giveni={C\bibinitperiod}}}%
+        {{hash=df24f1c819af9a19eb9937194049efdc}{%
+           family={Hugenroth},
+           familyi={H\bibinitperiod},
+           given={D.},
+           giveni={D\bibinitperiod}}}%
+        {{hash=d1dcdec1e83e99c2806d37a0fae6aaf0}{%
+           family={Marino},
+           familyi={M\bibinitperiod},
+           given={B.},
+           giveni={B\bibinitperiod}}}%
+        {{hash=4bf1003058a443dff3ba0f7876ffcea8}{%
+           family={Beresford},
+           familyi={B\bibinitperiod},
+           given={A.\bibnamedelimi R.},
+           giveni={A\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \strng{namehash}{0673609c5e2c54384ec70013a8b6a049}
+      \strng{fullhash}{e3280365b55fa2cded62fe0289e92d4c}
+      \strng{bibnamehash}{e3280365b55fa2cded62fe0289e92d4c}
+      \strng{authorbibnamehash}{e3280365b55fa2cded62fe0289e92d4c}
+      \strng{authornamehash}{0673609c5e2c54384ec70013a8b6a049}
+      \strng{authorfullhash}{e3280365b55fa2cded62fe0289e92d4c}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2506.23706}
+      \field{title}{Attestable Audits: Verifiable {AI} Safety Benchmarks using Trusted Execution Environments}
+      \field{year}{2025}
+    \endentry
+    \entry{ref34_biscuit}{misc}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{hash=f871ec0610f431f6338e6d89d98e4641}{%
+           family={Clement},
+           familyi={C\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{7d13dacc5c095426a54200520bf2912f}
+      \strng{fullhash}{7d13dacc5c095426a54200520bf2912f}
+      \strng{bibnamehash}{7d13dacc5c095426a54200520bf2912f}
+      \strng{authorbibnamehash}{7d13dacc5c095426a54200520bf2912f}
+      \strng{authornamehash}{7d13dacc5c095426a54200520bf2912f}
+      \strng{authorfullhash}{7d13dacc5c095426a54200520bf2912f}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Biscuit: Decentralized Bearer Tokens with Offline Attenuation}
+      \field{year}{2021}
+      \verb{urlraw}
+      \verb https://www.biscuitsec.org/
+      \endverb
+      \verb{url}
+      \verb https://www.biscuitsec.org/
+      \endverb
+    \endentry
+    \entry{ref35_openclaw}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=4a23d6cdd8311401b917fe8c8450abc0}{%
+           family={{openclaw/openclaw}},
+           familyi={o\bibinitperiod}}}%
+      }
+      \strng{namehash}{4a23d6cdd8311401b917fe8c8450abc0}
+      \strng{fullhash}{4a23d6cdd8311401b917fe8c8450abc0}
+      \strng{bibnamehash}{4a23d6cdd8311401b917fe8c8450abc0}
+      \strng{authorbibnamehash}{4a23d6cdd8311401b917fe8c8450abc0}
+      \strng{authornamehash}{4a23d6cdd8311401b917fe8c8450abc0}
+      \strng{authorfullhash}{4a23d6cdd8311401b917fe8c8450abc0}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{RFC} \#49971: Native Agent Identity --- Proposals for Trust Vocabulary Integration}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://github.com/openclaw/openclaw/issues/49971
+      \endverb
+      \verb{url}
+      \verb https://github.com/openclaw/openclaw/issues/49971
+      \endverb
+    \endentry
+    \entry{ref36_rodriguezgarzon}{article}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{hash=7a0ba96463bec2e107ac2a18a86856ad}{%
+           family={Rodriguez\bibnamedelima Garzon},
+           familyi={R\bibinitperiod\bibinitdelim G\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{d11a38dbf9c63afd37e4ccb5f62e12b9}
+      \strng{fullhash}{d11a38dbf9c63afd37e4ccb5f62e12b9}
+      \strng{bibnamehash}{d11a38dbf9c63afd37e4ccb5f62e12b9}
+      \strng{authorbibnamehash}{d11a38dbf9c63afd37e4ccb5f62e12b9}
+      \strng{authornamehash}{d11a38dbf9c63afd37e4ccb5f62e12b9}
+      \strng{authorfullhash}{d11a38dbf9c63afd37e4ccb5f62e12b9}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2511.02841}
+      \field{note}{v1: 1 October 2025; v2: 15 December 2025. Technische Universität Berlin}
+      \field{title}{{AI} Agents with Decentralized Identifiers and Verifiable Credentials}
+      \field{year}{2025}
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2511.02841
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2511.02841
+      \endverb
+    \endentry
+    \entry{ref37_erc8004}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=c4a239aaaa4249eb3c7d3e08c416f61f}{%
+           family={{Ethereum Improvement Proposal 8004}},
+           familyi={E\bibinitperiod}}}%
+      }
+      \strng{namehash}{c4a239aaaa4249eb3c7d3e08c416f61f}
+      \strng{fullhash}{c4a239aaaa4249eb3c7d3e08c416f61f}
+      \strng{bibnamehash}{c4a239aaaa4249eb3c7d3e08c416f61f}
+      \strng{authorbibnamehash}{c4a239aaaa4249eb3c7d3e08c416f61f}
+      \strng{authornamehash}{c4a239aaaa4249eb3c7d3e08c416f61f}
+      \strng{authorfullhash}{c4a239aaaa4249eb3c7d3e08c416f61f}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{ERC-8004}: Trustless Agents}
+      \verb{urlraw}
+      \verb https://eips.ethereum.org/EIPS/eip-8004
+      \endverb
+      \verb{url}
+      \verb https://eips.ethereum.org/EIPS/eip-8004
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

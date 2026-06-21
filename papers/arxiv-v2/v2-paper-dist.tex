@@ -1,0 +1,128 @@
+% ============================================================================
+% DISTRIBUTION BUILD — the moltrust.ch distribution PDF (PDF v2.0).
+% This is the file that gets hashed + anchored on Base L2 (Tag MolTrust/arXiv/v2.0).
+% NOT the arXiv submit source (that is v2-paper.tex, biblatex+biber, no anchor line).
+%
+% Differences vs v2-paper.tex (canonical submit):
+%   - natbib+bibtex instead of biblatex/biber (build server has no biber);
+%   - title-page anchor line (Form 2: tag + integrity URL only, no hash/TX/block);
+%   - concrete publication date.
+% Header reads "arXiv preprint v2" (NOT "local build"). Inputs the SAME section files.
+% Build deterministically via build-dist.sh (SOURCE_DATE_EPOCH). FREEZE after build.
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+
+% ---------- Encoding & Fonts ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+% ---------- Layout ----------
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\setstretch{1.05}
+\usepackage{parskip}
+
+% ---------- Math ----------
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+% ---------- Tables ----------
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{longtable}
+
+% ---------- Code listings ----------
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codebg}{RGB}{248,248,248}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{codebg},
+  breaklines=true,
+  showstringspaces=false,
+  frame=single,
+  framesep=4pt,
+  rulecolor=\color{gray!40},
+  numbers=none,
+  columns=flexible
+}
+
+% ---------- Figures & graphics ----------
+\usepackage{graphicx}
+\usepackage{float}
+% TikZ + standalone: figures live in figures/*.tex as standalone-buildable files,
+% \input here. Parent loads the union of all libraries the figures use.
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric,fit,calc,backgrounds}
+\usepackage{standalone}
+\input{figures/colors.tex} % shared muted figure palette (single source of colour)
+
+% ---------- Cross-references & links ----------
+\usepackage{xurl}
+\usepackage[colorlinks=true,
+            linkcolor=blue!50!black,
+            citecolor=blue!50!black,
+            urlcolor=blue!50!black,
+            pdfauthor={Lars Kersten Kroehl},
+            pdftitle={Trust Without Trusting: A Recomputable Trust Protocol for Autonomous Agents},
+            pdfsubject={MolTrust Protocol arXiv preprint v2}]{hyperref}
+\usepackage[capitalize,noabbrev]{cleveref}
+
+% ---------- Bibliography (DIST BUILD: natbib + bibtex; canonical = biblatex/biber) ----------
+\usepackage[numbers,sort&compress]{natbib}
+
+% ---------- Header/Footer ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\lhead{\small MolTrust Protocol --- Kroehl, 2026}
+\rhead{\small arXiv preprint v2}
+\cfoot{\thepage}
+
+% ---------- Theorems ----------
+\newtheorem{claim}{Claim}
+
+% ---------- Document ----------
+\title{\textbf{Trust Without Trusting}\\[0.3em]
+\large A Recomputable Trust Protocol for Autonomous Agents\\[0.2em]
+\normalsize\normalfont Empirical Evidence from a W3C VC + DID Trust Infrastructure}
+
+\author{Lars Kersten Kroehl\\
+  \normalsize MolTrust / CryptoKRI GmbH, Zurich\\
+  \normalsize \href{mailto:lars@moltrust.ch}{lars@moltrust.ch} $\cdot$ \href{https://moltrust.ch}{moltrust.ch}}
+
+% Publication date + title-page integrity anchor line (Form 2). Own tag only — no
+% hash/TX/block (those live externally in integrity.html: circle-free, byte-stable).
+\date{14 June 2026\\[0.9em]
+{\footnotesize This preprint (PDF v2.0) is anchored on Base Layer~2 Mainnet under Tag \texttt{MolTrust/arXiv/v2.0}.\\
+Integrity record: \href{https://moltrust.ch/publications/integrity.html}{moltrust.ch/publications/integrity.html}}}
+
+\begin{document}
+
+\sloppy
+\emergencystretch=3em
+
+\maketitle
+
+% MolTrust logo, top-left corner of the first page (figures/moltrust-logo.pdf, from the SVG source).
+\begin{tikzpicture}[remember picture, overlay]
+  \node[anchor=north west, inner sep=0pt]
+    at ([xshift=1.0cm, yshift=-0.85cm]current page.north west)
+    {\includegraphics[height=1.1cm]{figures/moltrust-logo}};
+\end{tikzpicture}
+
+\input{front-sections.tex}   % Abstract + §1 Introduction + §2 Related Work + §3 Background
+\input{spine-sections.tex}   % §4 Problem + §5 CEP + §6 Scope & Limits
+\input{back-sections.tex}    % §7 Deployment Evidence + §8 Discussion + §9 Conclusion
+
+\bibliographystyle{ieeetr}
+\bibliography{scaffold-from-v1/references}
+
+\end{document}

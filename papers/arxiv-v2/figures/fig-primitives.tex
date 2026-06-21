@@ -1,0 +1,30 @@
+% fig-primitives — §3, the four primitives (DID -> VC -> IPR -> Trust Score).
+% Standalone-buildable AND \input-able. Uniform boxes, muted palette (figures/colors.tex),
+% Trust Score = accent (the aggregating element).
+\documentclass[border=4pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\input{colors.tex}
+\begin{document}
+\begin{tikzpicture}[
+  node distance=12mm,
+  pbox/.style={draw=figline, line width=0.5pt, rounded corners=2pt, align=center,
+               text=figline, font=\small\sffamily, fill=figfill,
+               text width=24mm, minimum height=15mm, inner sep=3pt},
+  pacc/.style={pbox, draw=figaccent, fill=figaccentfill, text=figaccent},
+  flow/.style={-{Latex[length=2.2mm]}, draw=figline, line width=0.6pt},
+  clab/.style={font=\footnotesize\sffamily, text=figmuted}
+]
+\node[pbox] (did) {\textbf{DID}\\[2pt]identity};
+\node[pbox, right=of did] (vc)  {\textbf{Verifiable Credential}\\[2pt]authorization};
+\node[pbox, right=of vc]  (ipr) {\textbf{Interaction Proof Records}\\[2pt]behaviour};
+\node[pacc, right=of ipr] (ts)  {\textbf{Trust Score}\\[2pt]aggregate};
+\draw[flow] (did) -- (vc);
+\draw[flow] (vc)  -- (ipr);
+\draw[flow] (ipr) -- (ts);
+\node[clab, below=3mm of did] {who it is};
+\node[clab, below=3mm of vc]  {what it may do};
+\node[clab, below=3mm of ipr] {what it did};
+\node[clab, below=3mm of ts]  {how it scored};
+\end{tikzpicture}
+\end{document}

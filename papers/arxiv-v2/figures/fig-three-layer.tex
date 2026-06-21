@@ -1,0 +1,23 @@
+% fig-three-layer — §3, the three-layer architecture as a real top-down stacked
+% layer model inside an enclosing frame (Layer 1 top -> Layer 3 bottom).
+% Standalone-buildable AND \input-able. Muted palette (figures/colors.tex).
+\documentclass[border=4pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning,fit}
+\input{colors.tex}
+\begin{document}
+\begin{tikzpicture}[
+  lyr/.style={draw=figline, line width=0.4pt, align=left, text=figline, font=\small\sffamily,
+              fill=figfill, text width=88mm, minimum height=16mm, inner sep=6pt, anchor=north}
+]
+% three layers stacked top-to-bottom, sharing borders (a true stack)
+\node[lyr] (l1) at (0,0)
+  {\textbf{Layer 1 \ Cryptographic}\\[2pt]\footnotesize Ed25519 over RFC~8785 canonical JSON: AAE boundaries tamper-evident, verifiable without infrastructure.};
+\node[lyr, below=0pt of l1.south, anchor=north] (l2)
+  {\textbf{Layer 2 \ API}\\[2pt]\footnotesize Registry-level trust-score and revocation consequences; fail-closed on an unreachable revocation endpoint.};
+\node[lyr, below=0pt of l2.south, anchor=north] (l3)
+  {\textbf{Layer 3 \ Kernel}\\[2pt]\footnotesize Falco eBPF detection below the agent's process boundary, recording violations the agent runtime cannot suppress.};
+% enclosing architecture frame (accent)
+\node[draw=figaccent, line width=0.9pt, rounded corners=2pt, fit=(l1)(l2)(l3), inner sep=2.5pt] (frame) {};
+\end{tikzpicture}
+\end{document}
