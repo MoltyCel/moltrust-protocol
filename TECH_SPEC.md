@@ -1,14 +1,15 @@
 # The MolTrust Protocol: Technical Specification
-## Version 0.9 — Draft for Review
+## Version 0.10 — Draft for Review
 
 **MolTrust / CryptoKRI GmbH, Zurich**
-**May 2026**
+**July 2026**
 **Status: Informational Draft**
 
 *v0.7 additions: Cross-Protocol Interoperability (qntm/APS), Infrastructure-Layer Enforcement (Falco), Governance Layer, Outcome Verification.*
 
 *v0.8.1 additions: A2A v0.3 Conformance (Sec. 8.8)*
 *v0.9 additions: Enforcement Layer & Governance Transition (Sec. 17) — AAE enforcement layer (advisory) + CEP governance-transition model (designed, not activated)*
+*v0.10 additions: Violation Penalty term in the reference reputation model (Sec. 4.2, new Sec. 4.7) — adjudicated-graded penalties plus automatic AAE constraint-breach penalties; bounded Sybil penalty in [0, 6] with Jaccard threshold 0.7 (Sec. 4.2); violation classification P/O/A with an operational-exempt guarantee (Sec. 2.7); public `GET /aae/evaluations/{did}` for independent class=P recomputation (Sec. 5.1). This section documents the deployed reference implementation (moltrust-api PR #217, #218, #221), not a target formula.*
 
 This document is a companion to *The MolTrust Protocol: A Verification Standard for Autonomous Software Agents* (Whitepaper v0.8). It provides the technical definitions, data models, verification flows, and conformance requirements referenced in that document.
 
@@ -483,6 +484,28 @@ A Violation Record is a signed artifact attesting that a confirmed protocol viol
 ```{=typst}
 ]
 ```
+
+**Violation classification (effect on the reference score).** For the reference reputation model (Sec. 4.7), recorded violations split by adjudication source and are classified by their effect on the score.
+
+*Adjudicated violations* (the five types above, confirmed by external adjudication):
+
+| Type | Score effect |
+|---|---|
+| `authorization-abuse` | Graded penalty — score-affecting, rehabilitable (Sec. 4.7) |
+| `behavioral-fraud` | Graded penalty — score-affecting, rehabilitable (Sec. 4.7) |
+| `identity-spoofing` | Revoke-tier — score 0 via revocation, never via this term |
+| `sybil` | Revoke-tier — score 0 via revocation, never via this term |
+| `clone-impersonation` | Revoke-tier — score 0 via revocation, never via this term |
+
+*Automatic constraint breaches* (AAE-evaluator guardrail `DENY`s, Sec. 2.8) are classified P / O / A:
+
+| Class | Constraint types | Score effect |
+|---|---|---|
+| **P** — penalized | `max_transaction_value`, `validity`, `single_use`, `allowed_domains`, `rate_limit` | Contributes to the penalty (Sec. 4.7), counted once per distinct unresolved type |
+| **O** — operational-exempt | `revocation_check`, and **any** breach whose reason is a MolTrust-side server fail-closed (evaluation error, not-yet-enforceable, unknown-but-required constraint) | **Never** a penalty — a registry-side deferral is not agent misbehaviour |
+| **A** — attack-signal | `nonce` (replay token) | Never a score penalty; routed to separate admin review |
+
+An unmapped constraint type defaults to **O** — the unclassified is never penalized. Reversed violation records (`"reversed": true`) never contribute to any of the above.
 
 **Recording process:**
 
@@ -1306,7 +1329,8 @@ score = clamp(
   + 0.3 * propagated_score
   + 0.1 * cross_vertical_bonus
   + interaction_bonus
-  - sybil_penalty,
+  - sybil_penalty
+  - violation_penalty,
   0, 100
 )
 ```
@@ -1354,7 +1378,7 @@ interaction_bonus = min(
 sybil_penalty = 20 * max(0, jaccard(endorsers_A, endorsers_B) - 0.7)
 ```
 
-Where `endorsers_A` and `endorsers_B` are the endorser DID sets of the scored agent and its most similar peer. Jaccard threshold 0.7 is a heuristic; implementations SHOULD tune this value based on observed network topology. This is not a robust sybil detection system; it is a lightweight signal.
+Where `endorsers_A` and `endorsers_B` are the endorser DID sets of the scored agent and its most similar peer. Jaccard threshold 0.7 is a heuristic; implementations SHOULD tune this value based on observed network topology. This is not a robust sybil detection system; it is a lightweight signal. Because `jaccard` is in [0, 1], `sybil_penalty` is bounded to [0, 6]. The `violation_penalty` term is defined in Section 4.7; it is applied after any bootstrap/seed contribution, so the floor protects a thin-but-honest agent, never a confirmed violator.
 
 ### 4.3 Minimum Endorser Threshold
 
@@ -1397,6 +1421,40 @@ An anomaly is flagged when consistency drops more than 0.3 within any rolling 30
 
 Cache TTL: 3600 seconds. Cache MUST be invalidated on new endorsement, endorsement expiry, revocation event, or violation recording.
 
+### 4.7 Violation Penalty and Rehabilitation
+
+The `violation_penalty` in Section 4.2 is the sum of two independently-computed, non-negative contributions:
+
+```
+violation_penalty = adjudicated_graded + constraint_breach
+```
+
+**Adjudicated graded** — summed over the agent's active (confirmed, non-reversed, externally adjudicated) violation records whose type is graded (Sec. 2.7):
+
+```
+adjudicated_graded = sum( severity(type) * rehab(type) )
+
+severity: authorization-abuse = 15, behavioral-fraud = 25
+rehab(type)  = max(0, 1 - distinct_new_endorsers / 5)
+```
+
+`distinct_new_endorsers` counts distinct endorser DIDs (excluding the record's principal) that endorsed the agent after the violation's `confirmedAt`. A graded violation fully rehabilitates after 5 such endorsements: trust is rebuilt by fresh independent vouching, not by waiting out a timer.
+
+**Constraint breach** — summed over the agent's *distinct unresolved* class=P constraint types (Sec. 2.7), read per-constraint from the evaluator's `evaluations[]` array rather than the aggregate one-`DENY`-whole-`DENY` verdict:
+
+```
+constraint_breach = min( CAP_CB, sum( severity_P(c) * (1 - decay_c(c)) ) )
+
+CAP_CB    = 30
+severity_P: max_transaction_value = 20, validity = 20,
+            single_use = 15, allowed_domains = 15, rate_limit = 10
+decay_c(c) = min(1, allow_since_last_deny(c) / 5)
+```
+
+A constraint type is a breach only if the most recent evaluation element of that type is a `DENY`; `decay_c` counts the `ALLOW` elements of that type recorded after that last `DENY`. A type resolves and drops out once `decay_c = 1` — after 5 subsequent compliant evaluations. Deduplication is by type: sixteen `single_use` `DENY`s count once, not sixteen. Class=O and class=A breaches never contribute.
+
+**Recomputability (class=P).** Every input to `constraint_breach` is public: an independent witness recomputes it from `GET /aae/evaluations/{did}` (Sec. 5.1), `GET /violation/{id}`, and the agent's endorsements — no registry-private state is required. All reference numbers (severities, `CAP_CB`, the rehabilitation and decay targets of 5) are calibration constants; changing them is a configuration change, not a protocol change.
+
 ---
 
 ## 5. Reference Registry (Layer B)
@@ -1418,6 +1476,7 @@ The reference registry MUST expose the following endpoints:
 | `/interaction/proofs/{did}` | GET | List proofs for agent |
 | `/violation/record` | POST | Submit violation record (operator only) |
 | `/violation/{id}` | GET | Retrieve violation record |
+| `/aae/evaluations/{did}` | GET | Public read of an agent's AAE-evaluator verdicts: per-constraint `{type, verdict, reason, class}` plus `aae_ref` / `created_at` / aggregate verdict. Omits `nonce` and `action_context`. Enables independent recomputation of the class=P constraint-breach penalty (Sec. 4.7). |
 | `/revocation/{credential-id}` | GET | Check credential revocation status |
 | `/revocation/status-list/{credential-type}` | GET | Bitstring status list for credential type |
 | `/swarm/stats` | GET | Network-level statistics |
@@ -1443,6 +1502,7 @@ The reference registry MUST expose the following endpoints:
     "cross_vertical_bonus": 10.0,
     "interaction_bonus": 3.5,
     "sybil_penalty": 0.0,
+    "violation_penalty": 0.0,
     "bootstrap_contribution": 0.0,
     "computation_method": "moltrust-v0.7"
   },
@@ -2255,7 +2315,7 @@ A conformant implementation is NOT required to:
 
 ### 16.5 Version Compatibility
 
-Version 0.9 is a draft. Breaking changes to Layer A data formats will carry a minimum 12-month deprecation period in future versions. Layer B API changes follow semantic versioning. Layer C changes are non-breaking by definition.
+Version 0.10 is a draft. Breaking changes to Layer A data formats will carry a minimum 12-month deprecation period in future versions. Layer B API changes follow semantic versioning. Layer C changes are non-breaking by definition.
 
 ---
 

@@ -1,4 +1,4 @@
-// TechSpec v0.9 layout hardening (pandoc --include-in-header). Optics only.
+// TechSpec v0.10 layout hardening (pandoc --include-in-header). Optics only.
 // Headings keep-with-next; table/figure bodies kept whole.
 #show heading: set block(sticky: true)
 #show figure: set block(breakable: false)
