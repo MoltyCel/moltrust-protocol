@@ -2393,9 +2393,11 @@ The mechanism is public; the instances are not. A holder that knows how canaries
 The two modes match the two ways a delegating agent hands material out.
 
 - **`bound`** — the credential's subject is the counterparty's DID, and the counterparty holds it as its own credential. Presentations by the issuer or by the counterparty are expected. A presentation by any other party is a leak.
-- **`decoy`** — the credential's subject is not the counterparty. The counterparty receives the credential among other material and has no reason to present it. Every presentation except the issuer's own is a leak.
+- **`decoy`** — the credential's subject is also the counterparty's DID, but the counterparty receives the credential among other material and has no reason to present it. Every presentation except the issuer's own is a leak, including one by the counterparty.
 
-In both modes the registry knows which counterparty received the canary, and a presenter that sends no API key counts as an unexpected presenter.
+The modes differ only in who counts as an expected presenter, not in the credential. In both modes the registry knows which counterparty received the canary, and a presenter that sends no API key counts as an unexpected presenter.
+
+A canary can be issued only to a counterparty that is a registered, non-revoked agent of the reference registry. A request naming any other DID is refused before anything is issued or stored.
 
 ### 18.3 Flow
 
