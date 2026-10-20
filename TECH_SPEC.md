@@ -1,14 +1,15 @@
 # The MolTrust Protocol: Technical Specification
-## Version 0.9 — Draft for Review
+## Version 0.10 — Draft for Review
 
 **MolTrust / CryptoKRI GmbH, Zurich**
-**May 2026**
+**October 2026**
 **Status: Informational Draft**
 
 *v0.7 additions: Cross-Protocol Interoperability (qntm/APS), Infrastructure-Layer Enforcement (Falco), Governance Layer, Outcome Verification.*
 
 *v0.8.1 additions: A2A v0.3 Conformance (Sec. 8.8)*
 *v0.9 additions: Enforcement Layer & Governance Transition (Sec. 17) — AAE enforcement layer (advisory) + CEP governance-transition model (designed, not activated)*
+*v0.10 additions: Leak Canary (Sec. 18) — per-counterparty canary credentials, modes `bound` and `decoy`, signed leak events with holder-proof attribution (live)*
 
 This document is a companion to *The MolTrust Protocol: A Verification Standard for Autonomous Software Agents* (Whitepaper v0.8). It provides the technical definitions, data models, verification flows, and conformance requirements referenced in that document.
 
@@ -85,6 +86,15 @@ This distinction resolves the central design tension in any open-standard-plus-c
    - 17.1 Enforcement Layer (implemented, advisory)
    - 17.2 Governance Transition (CEP, designed)
    - 17.3 Summary of status
+18. Leak Canary
+   - 18.1 A canary is an ordinary credential
+   - 18.2 Modes
+   - 18.3 Flow
+   - 18.4 Attribution
+   - 18.5 Leak event
+   - 18.6 Privacy
+   - 18.7 Limits
+   - 18.8 Summary of status
 
 ---
 
@@ -2255,7 +2265,7 @@ A conformant implementation is NOT required to:
 
 ### 16.5 Version Compatibility
 
-Version 0.9 is a draft. Breaking changes to Layer A data formats will carry a minimum 12-month deprecation period in future versions. Layer B API changes follow semantic versioning. Layer C changes are non-breaking by definition.
+Version 0.10 is a draft. Breaking changes to Layer A data formats will carry a minimum 12-month deprecation period in future versions. Layer B API changes follow semantic versioning. Layer C changes are non-breaking by definition.
 
 ---
 
@@ -2363,6 +2373,88 @@ Until both gates are met, the evaluator remains in **advisory** mode (Part A): v
 | Mechanism on testnet | Demonstrable |
 
 This chapter adds no normative conformance requirement to Section 16; it documents an implemented advisory layer and a designed governance transition. Conformance for active enforcement will be specified when the activation gates (§17.2.4) are met.
+
+---
+
+## 18. Leak Canary
+
+An agent that delegates work hands credentials to counterparties. When one of those credentials turns up where it was never meant to go, the delegating agent needs to learn two things: that it happened, and through which counterparty. A leak canary answers both. The delegating agent (the *issuer*) obtains one canary credential per counterparty; the reference registry records which counterparty received which canary and writes a signed leak event when the canary is presented by a party that should not hold it.
+
+Relationship to earlier chapters: a canary is a credential of the reference registry, issued and verified like any other (Sections 2 and 3). The leak event carries a recomputable decision in the evidence format of the enforcement layer (Section 17.1), and a hold takes effect through the issuer's own mandate.
+
+### 18.1 A canary is an ordinary credential
+
+A canary is issued by the same issuance path as every other credential of the reference registry, with the same claims, keys, validity, storage, publication and anchoring (Section 6). No field, type, identifier pattern, validity period or status entry marks a canary. The mapping from a credential to its issuer and counterparty is held server-side by the registry and is readable only by the issuer.
+
+The mechanism is public; the instances are not. A holder that knows how canaries work still cannot tell whether a given credential is one, and so has no reason to avoid presenting it. The reference implementation carries a public test that holds the structural equality of a canary and a regular credential from the same issuer.
+
+### 18.2 Modes
+
+The two modes match the two ways a delegating agent hands material out.
+
+- **`bound`** — the credential's subject is the counterparty's DID, and the counterparty holds it as its own credential. Presentations by the issuer or by the counterparty are expected. A presentation by any other party is a leak.
+- **`decoy`** — the credential's subject is not the counterparty. The counterparty receives the credential among other material and has no reason to present it. Every presentation except the issuer's own is a leak.
+
+In both modes the registry knows which counterparty received the canary, and a presenter that sends no API key counts as an unexpected presenter.
+
+### 18.3 Flow
+
+1. **Issue.** The issuer calls `POST /canary/issue` with the counterparty's DID, a mode and the reaction on leak (`hold` or `none`). The response carries the credential and a `canary_id`. A canary costs the same as any other credential.
+2. **Hand over.** The issuer passes the credential to the counterparty through its usual channel. The registry is not involved in this step.
+3. **Presentation.** A party presents the credential at `POST /credentials/verify`. The verifier's answer does not depend on whether the credential is a canary; the registry checks every presented credential against its canary records.
+4. **Leak event.** If the credential is a canary and the presenter is not an expected holder (§18.2), the registry writes a signed leak event (§18.5). The presenter is identified only by the DID behind the API key it sent, if any.
+5. **Hold.** For a canary issued with `on_leak: hold`, the counterparty's DID goes on the issuer's hold list.
+6. **Enforce hook.** Before an enforcement check, the issuer passes its mandate through `POST /canary/enforce-hook`. The hook places, in front of every `allow` grant, a copy with disposition `hold` that applies only to held counterparties. The unchanged evaluator then returns `PENDING` for those counterparties, which the issuer can ratify or let stand. The patched mandate is an ordinary mandate, and its verdicts recompute like any other.
+7. **Review.** The issuer reads its canaries, events and holds (`GET /canary/list`, `GET /canary/events`, `GET /canary/holds`) and lifts a hold with `POST /canary/holds/release`. The same functions are available as MCP tools on the reference registry's MCP endpoint.
+
+### 18.4 Attribution
+
+A presentation proves that the credential has left the counterparty's hands. It ties the leak to the counterparty only when the counterparty's key signed the presentation. A presentation can carry an RFC 9421 HTTP Message Signature by the holder's DID over the request, in the proof-of-possession profile of the reference registry (covered components `@method`, `@path`, `x-moltrust-did`, `content-digest`; key in force from the registry; nonce valid once within 300 seconds). The signature covers the request body, and the body contains the credential.
+
+The verifier checks such a signature on every presentation that carries one and reports the result in every answer, for every credential, in a `presentation` block (`api_key_did`, and `holder_proof` with `scheme`, `did`, `valid`, `reason`, `subject_match`). A holder signature that does not verify leaves the credential's own validity unchanged.
+
+Each leak event records one of two attribution classes:
+
+| `attribution` | Condition | What the event shows |
+|---|---|---|
+| `counterparty` | Valid holder proof by the counterparty's DID | The counterparty's key signed this presentation of this credential |
+| `open` | No holder proof, a proof that does not verify, or a proof by another DID | The leak; the path it took remains open |
+
+The class depends on the counterparty's key, not on the credential's subject, and applies the same way in both modes.
+
+### 18.5 Leak event
+
+The leak event is a JSON object with the members `event_version` (1), `event_id`, `canary_id`, `issuer_did`, `counterparty_did`, `mode`, `trigger` (`verifier_presentation`), `observed_at`, `presenter_did`, `credential_valid`, `canary_ref`, `presentation`, `attribution`, `aer` and `signature`.
+
+- **`canary_ref`** is `sha256:` followed by the hex SHA-256 of the RFC 8785 (JCS) form of the credential the issuer received, so the issuer can match an event to a credential without asking the registry.
+- **`presentation`** is the block from the verifier's answer. For a valid holder proof it adds a `record` with the public key, the signature, the signature base and the request body, so a third party can check the holder's signature and the bound path and body without contacting the registry.
+- **`signature`** is an Ed25519 signature by the registry key over the bytes `moltrust:leak-canary-event:v1`, one `0x00` byte, and the JCS form of the event without the `signature` member. The public key is the registry JWK published in the issuer DID document; `GET /canary/trust-list` carries the same key.
+- **`aer`** carries a complete, recomputable decision: one evidence item signed by `did:web:api.moltrust.ch#leak-canary` stating that the canary was presented, a one-grant mandate that allows the action `{"verb": "leak_canary_hold"}` only on that evidence, the evidence bundle and the decision record. The decision is `PERMIT`.
+
+A third party checks an event offline with the `moltrust-enforce` package and the trust list: the event signature, the recomputed decision, the match between the signed evidence and the event's `canary_ref`, `counterparty_did` and `attribution`, and, for attribution `counterparty`, the holder proof. With the AER material, anyone can recompute that the hold follows from signed evidence.
+
+### 18.6 Privacy
+
+The registry stores DIDs, digests and timestamps for canaries and events. It stores no IP address, no user agent, no name, no e-mail address and no free text. The presenter appears only as the DID behind its API key, or as `null`. Every canary endpoint resolves the issuer from the API key and returns only that issuer's records; a request for another issuer's canary or event receives the same `404` as a request for one that does not exist. This version has no automatic expiry for canaries, events or holds; a hold ends when the issuer releases it. The general rules of Section 14 apply.
+
+### 18.7 Limits
+
+- **Attribution.** Credentials of the reference registry are published, so a party that obtains a published copy can present it. An event of class `open` may stem from such a copy and says nothing about the counterparty; only class `counterparty` names it.
+- **Coverage.** A canary detects presentations at the reference verifier. A party that checks a leaked credential's signature on its own, or only stores the credential, leaves no trace.
+- **Unknown presenters in `bound` mode.** A presenter without an API key counts as a leak. If the counterparty has its own relying parties verify the credential, those presentations raise events; `bound` canaries suit counterparties that are expected to present to the issuer alone.
+- **No per-counterparty `forbid`.** The evaluator applies `forbid` to the action binding before any constraint is read, so a per-counterparty forbid would forbid the action for every counterparty. An issuer that wants this removes the counterparty from its `allow` grants instead.
+
+### 18.8 Summary of status
+
+| Element | Status |
+|---|---|
+| Canary issuance, modes `bound` and `decoy` | Live |
+| Detection at the reference verifier, signed leak event with AER material | Live |
+| Holder-proof attribution (`counterparty` / `open`) | Live |
+| Hold list and enforce hook (`PENDING` for held counterparties) | Live |
+| Per-counterparty `forbid` | Not offered (§18.7) |
+
+This chapter adds no normative conformance requirement to Section 16; it documents a live service of the reference registry.
 
 ---
 
