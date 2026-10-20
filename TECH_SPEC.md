@@ -2416,7 +2416,7 @@ The verifier checks such a signature on every presentation that carries one and 
 Each leak event records one of two attribution classes:
 
 | `attribution` | Condition | What the event shows |
-|---|---|---|
+|:----|:----------|:----------|
 | `counterparty` | Valid holder proof by the counterparty's DID | The counterparty's key signed this presentation of this credential |
 | `open` | No holder proof, a proof that does not verify, or a proof by another DID | The leak; the path it took remains open |
 
@@ -2447,7 +2447,7 @@ The registry stores DIDs, digests and timestamps for canaries and events. It sto
 ### 18.8 Summary of status
 
 | Element | Status |
-|---|---|
+|:-----------|:-----|
 | Canary issuance, modes `bound` and `decoy` | Live |
 | Detection at the reference verifier, signed leak event with AER material | Live |
 | Holder-proof attribution (`counterparty` / `open`) | Live |
